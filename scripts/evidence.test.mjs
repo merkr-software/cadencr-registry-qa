@@ -27,7 +27,7 @@ console.log('Evidence helper tests passed');
 
 const retained = { releases: [
   { id: 413497066, tag: 'qa-source-theme-v0.0.1', assets: [{ id: 642968615, name: 'theme.tar.gz', size: 1100 }] },
-  { id: 413501761, tag: 'theme-qa-inert-theme-v0.0.1', assets: [{ id: 642988641, name: 'theme.tar.gz', size: 1100 }] },
+  { id: 413501761, tag: 'theme-qa-inert-theme-v0.0.1', assets: [{ id: 642988641, name: 'theme.tar.gz', size: 1100 }, { id: 777777777, name: 'publication-plan.json', size: 1200 }] },
 ] };
 assertRetainedReleases(retained);
 assertPreservedReleases(retained, { releases: [...retained.releases, { id: 1, assets: [] }] });
@@ -35,4 +35,8 @@ for (const change of [x=>x.releases.pop(), x=>x.releases[1].assets[0].id++, x=>x
   const bad = structuredClone(retained); change(bad);
   assert.throws(() => assertRetainedReleases(bad));
   assert.throws(() => assertPreservedReleases(retained, bad));
+}
+
+for (const change of [x=>x.releases[1].assets.pop(), x=>x.releases[1].assets.push({id:8,name:'unexpected',size:1}), x=>x.releases[1].assets[1].size=4194305]) {
+ const bad=structuredClone(retained);change(bad);assert.throws(()=>assertRetainedReleases(bad));
 }

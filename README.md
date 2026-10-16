@@ -2,7 +2,7 @@
 
 - Canonical repository: `merkr-software/cadencr-registry-qa` only. No production pins or repositories.
 - `workflow_dispatch` only, exact default-branch commit and reviewed request SHA-256.
-- Uses only distributed CLI `0.13.1-dev.38947325650.1`, verified by the committed SHA-256; no build/fallback.
+- Uses only distributed CLI `0.13.1-dev.38974097824.1`, verified by the committed SHA-256; no build/fallback.
 - Only QA job has repository-scoped `contents: write`; no host OAuth credential.
 - Secret `QA_SIGNING_KEY_PEM` must be the distinct QA-only Ed25519 PKCS8 key matching `requests/public.pem`.
 

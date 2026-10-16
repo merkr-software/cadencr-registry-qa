@@ -37,8 +37,16 @@ export function assertRetainedReleases(inventory) {
     { id: 413497066, tag: 'qa-source-theme-v0.0.1', assets: [{ id: 642968615, name: 'theme.tar.gz', size: 1100 }] },
     { id: 413501761, tag: 'theme-qa-inert-theme-v0.0.1', assets: [{ id: 642988641, name: 'theme.tar.gz', size: 1100 }] },
   ]) {
-    assert.deepEqual(inventory.releases.find(release => release.id === expected.id), expected,
-      'retained source or managed release identity changed');
+    const actual = inventory.releases.find(release => release.id === expected.id);
+    assert.equal(actual?.tag, expected.tag, 'retained release identity changed');
+    for (const asset of expected.assets) {
+      assert.deepEqual(actual.assets.find(item => item.id === asset.id), asset, 'retained archive identity changed');
+    }
+    const names = actual.assets.map(asset => asset.name).sort();
+    assert.deepEqual(names, expected.id === 413501761
+      ? ['publication-plan.json', 'theme.tar.gz'] : ['theme.tar.gz'], 'unexpected managed/source assets');
+    const plan = actual.assets.find(asset => asset.name === 'publication-plan.json');
+    if (plan) assert.ok(Number.isSafeInteger(plan.id) && plan.id > 0 && plan.size > 0 && plan.size <= 4194304);
   }
 }
 
