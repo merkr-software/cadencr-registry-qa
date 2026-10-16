@@ -32,3 +32,15 @@ QA ONLY: not an official plugin release. Declarative Graphite theme fixture from
 - Initial publication stays bound to existing managed draft commit `69b919e5f9e0162a55e10873e495829c05bcae13`; top-level catalog binding uses the new exact reviewed workflow commit.
 - Guard requires default branch `main`, exact dispatch commit/digest and runner `first` or `fresh`. Runtime checks pinned binary digest/version before materializing the existing signing secret.
 - Existing source/managed releases, tags and assets must not be recreated or overwritten. This harness update alone does not qualify the lifecycle.
+
+## Initial qualification evidence
+
+CLI `0.13.1-dev.38974097824.1` completed real publication in run `38975839952`.
+The first anonymous inventory LIST lagged the publication. After read-only
+reconciliation, attempt 2 passed publish/replay and fresh-runner reconstruction
+with identical remote IDs and signed bytes. Known draft/archive IDs were retained;
+the required `publication-plan.json` was added, not substituted for the archive.
+
+Post-publication inventory now waits at most 60 seconds for the required public
+release IDs to appear. It retries reads only and never manufactures entries.
+This is not yet an interruption/resume or renewal qualification.

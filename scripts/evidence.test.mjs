@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { assertX8664Elf, assertEmptyDeltaRenewal, assertRetainedReleases, assertPreservedReleases, boundedFetch } from './evidence.mjs';
+import { assertX8664Elf, assertEmptyDeltaRenewal, assertRetainedReleases, assertPreservedReleases, publicReleaseList, boundedFetch } from './evidence.mjs';
 const elf = Buffer.alloc(64);
 Buffer.from([0x7f,0x45,0x4c,0x46,2,1,1]).copy(elf);
 elf.writeUInt16LE(62,18);
@@ -40,3 +40,22 @@ for (const change of [x=>x.releases.pop(), x=>x.releases[1].assets[0].id++, x=>x
 for (const change of [x=>x.releases[1].assets.pop(), x=>x.releases[1].assets.push({id:8,name:'unexpected',size:1}), x=>x.releases[1].assets[1].size=4194305]) {
  const bad=structuredClone(retained);change(bad);assert.throws(()=>assertRetainedReleases(bad));
 }
+
+let reads = 0;
+const published = [{id:7,draft:false}];
+assert.equal(await publicReleaseList(async () => ++reads === 1 ? [] : published, [7], {attempts:2,pauseMs:0}), published);
+assert.equal(reads, 2);
+await assert.rejects(publicReleaseList(async () => [{id:7,draft:true}], [7], {attempts:2,pauseMs:0}));
+await assert.rejects(publicReleaseList(async () => [], [7], {attempts:1,pauseMs:0}));
+await assert.rejects(publicReleaseList(async () => Array(100).fill({id:7,draft:false}), [7], {attempts:1,pauseMs:0}));
+
+// A single deadline includes slow requests, not only pauses between attempts.
+let deadlineReads = 0;
+await assert.rejects(publicReleaseList(async (_path, signal) => {
+  deadlineReads++;
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => resolve([]), 200);
+    signal.addEventListener('abort', () => { clearTimeout(timer); reject(signal.reason); }, {once:true});
+  });
+}, [7], {attempts:31,pauseMs:0,timeoutMs:5}), {name:'TimeoutError'});
+assert.equal(deadlineReads, 1);

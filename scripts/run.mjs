@@ -1,5 +1,5 @@
 import './guard.mjs';
-import { assertX8664Elf, assertEmptyDeltaRenewal, assertRetainedReleases, assertPreservedReleases, boundedFetch } from './evidence.mjs';
+import { assertX8664Elf, assertEmptyDeltaRenewal, assertRetainedReleases, assertPreservedReleases, publicReleaseList, boundedFetch } from './evidence.mjs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, unlinkSync, readFileSync, appendFileSync, existsSync, lstatSync } from 'node:fs';
@@ -58,7 +58,7 @@ try {
     writeFileSync(index, bytes);
     verifyIndex(index);
     if (env.PHASE === 'renewal') assertEmptyDeltaRenewal(JSON.parse(readFileSync('requests/previous.json')), JSON.parse(bytes));
-    const inventory = await remoteInventory();
+    const inventory = await remoteInventory([413497066, 413501761, catalog.release_id]);
     assertRetainedReleases(inventory);
     assertPreservedReleases(before, inventory);
     if (baseline) assert.deepEqual(inventory, baseline, 'replay changed remote IDs');
@@ -72,12 +72,11 @@ try {
   unlinkSync(key); // Only the task-owned secret, never state or a database.
 }
 
-async function remoteInventory() {
+async function remoteInventory(requiredIds = []) {
   const base = 'https://api.github.com/repos/merkr-software/cadencr-registry-qa';
-  const headers = { Accept: 'application/vnd.github+json' }; // Anonymous; no host OAuth.
-  const get = async path => JSON.parse(await boundedFetch(base + path, headers));
-  const releases = await get('/releases?per_page=100');
-  assert.ok(releases.length < 100, 'inventory must not silently truncate');
+  const headers = { Accept: 'application/vnd.github+json', 'Cache-Control': 'no-cache' }; // Anonymous; no host OAuth.
+  const get = async (path, signal) => JSON.parse(await boundedFetch(base + path, headers, fetch, signal));
+  const releases = await publicReleaseList(get, requiredIds);
   for (const release of releases) {
     release.assets = await get(`/releases/${release.id}/assets?per_page=100`);
     assert.ok(release.assets.length < 100, 'assets inventory must not silently truncate');

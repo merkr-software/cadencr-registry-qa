@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { setTimeout as sleep } from 'node:timers/promises';
 
 export function assertX8664Elf(bytes) {
   assert.ok(bytes.length >= 64, 'ELF header is truncated');
@@ -17,8 +18,8 @@ export function assertEmptyDeltaRenewal(previous, current) {
   assert.ok(Number.isFinite(before) && Number.isFinite(after) && after > before, 'renewal date must advance');
 }
 
-export async function boundedFetch(url, headers = {}, fetcher = fetch) {
-  const response = await fetcher(url, { headers, signal: AbortSignal.timeout(60000) });
+export async function boundedFetch(url, headers = {}, fetcher = fetch, signal = AbortSignal.timeout(60000)) {
+  const response = await fetcher(url, { headers, signal });
   assert.equal(response.status, 200);
   assert.ok(Number(response.headers.get('content-length') ?? 0) <= 4194304);
   const chunks = [];
@@ -55,4 +56,22 @@ export function assertPreservedReleases(before, after) {
     assert.deepEqual(after.releases.find(item => item.id === release.id), release,
       'publication changed a previously public release or asset');
   }
+}
+
+// GitHub's anonymous release LIST can lag a successful public byte check.
+// Retry reads only; never synthesize or rewrite inventory contents.
+export async function publicReleaseList(get, requiredIds, { attempts = 31, pauseMs = 2000, timeoutMs = 60000 } = {}) {
+  assert.ok(Number.isInteger(attempts) && attempts > 0 && attempts <= 31);
+  assert.ok(Number.isFinite(pauseMs) && pauseMs >= 0 && pauseMs <= 2000);
+  assert.ok(Number.isInteger(timeoutMs) && timeoutMs > 0 && timeoutMs <= 60000);
+  const signal = AbortSignal.timeout(timeoutMs);
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    signal.throwIfAborted();
+    const releases = await get('/releases?per_page=100', signal);
+    signal.throwIfAborted();
+    assert.ok(Array.isArray(releases) && releases.length < 100, 'inventory must not silently truncate');
+    if (requiredIds.every(id => releases.some(release => release.id === id && release.draft === false))) return releases;
+    if (attempt + 1 < attempts) await sleep(pauseMs, undefined, { signal });
+  }
+  throw new Error('Public release inventory did not converge within its read deadline');
 }
