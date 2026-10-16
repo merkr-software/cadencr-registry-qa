@@ -9,7 +9,8 @@
   "public_key": "public.pem",
   "publications": [
     {
-      "submission": "submission.json"
+      "submission": "submission.json",
+      "registry_commit": "69b919e5f9e0162a55e10873e495829c05bcae13"
     }
   ]
 }

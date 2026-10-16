@@ -34,6 +34,7 @@ jobs:
           persist-credentials: false
       - name: Validate exact trusted dispatch before accessing secrets
         env:
+          QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: first
           PHASE: ${{ inputs.phase }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
@@ -43,6 +44,7 @@ jobs:
         run: sh scripts/fetch-released-cli.sh cli-pin.env "$RUNNER_TEMP/qa-cli"
       - name: Run publication and same-state replay
         env:
+          QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: first
           PHASE: ${{ inputs.phase }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
@@ -55,8 +57,12 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: qa-${{ inputs.phase }}-first-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/qa-public/
-          include-hidden-files: true
+          path: |
+            ${{ runner.temp }}/qa-public/*-index.json
+            ${{ runner.temp }}/qa-public/*-mirror.json
+            ${{ runner.temp }}/qa-public/publish.json
+            ${{ runner.temp }}/qa-public/same-state-replay.json
+          include-hidden-files: false
           retention-days: 14
           if-no-files-found: warn
 
@@ -74,6 +80,7 @@ jobs:
           persist-credentials: false
       - name: Validate exact trusted dispatch before accessing secrets
         env:
+          QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: fresh
           PHASE: ${{ inputs.phase }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
@@ -83,6 +90,7 @@ jobs:
         run: sh scripts/fetch-released-cli.sh cli-pin.env "$RUNNER_TEMP/qa-cli"
       - name: Run publication and same-state replay
         env:
+          QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: fresh
           PHASE: ${{ inputs.phase }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
@@ -95,7 +103,11 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: qa-${{ inputs.phase }}-fresh-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/qa-public/
-          include-hidden-files: true
+          path: |
+            ${{ runner.temp }}/qa-public/*-index.json
+            ${{ runner.temp }}/qa-public/*-mirror.json
+            ${{ runner.temp }}/qa-public/publish.json
+            ${{ runner.temp }}/qa-public/same-state-replay.json
+          include-hidden-files: false
           retention-days: 14
           if-no-files-found: warn

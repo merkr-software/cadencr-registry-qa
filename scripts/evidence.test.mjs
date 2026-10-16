@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { assertX8664Elf, assertEmptyDeltaRenewal, boundedFetch } from './evidence.mjs';
+import { assertX8664Elf, assertEmptyDeltaRenewal, assertRetainedReleases, assertPreservedReleases, boundedFetch } from './evidence.mjs';
 const elf = Buffer.alloc(64);
 Buffer.from([0x7f,0x45,0x4c,0x46,2,1,1]).copy(elf);
 elf.writeUInt16LE(62,18);
@@ -24,3 +24,15 @@ await assert.rejects(boundedFetch('https://example.invalid', {}, fake([],4194305
 await assert.rejects(boundedFetch('https://example.invalid', {}, fake([Buffer.alloc(4194305)])));
 await assert.rejects(boundedFetch('https://example.invalid', {}, fake([],0,500)));
 console.log('Evidence helper tests passed');
+
+const retained = { releases: [
+  { id: 413497066, tag: 'qa-source-theme-v0.0.1', assets: [{ id: 642968615, name: 'theme.tar.gz', size: 1100 }] },
+  { id: 413501761, tag: 'theme-qa-inert-theme-v0.0.1', assets: [{ id: 642988641, name: 'theme.tar.gz', size: 1100 }] },
+] };
+assertRetainedReleases(retained);
+assertPreservedReleases(retained, { releases: [...retained.releases, { id: 1, assets: [] }] });
+for (const change of [x=>x.releases.pop(), x=>x.releases[1].assets[0].id++, x=>x.releases[0].tag='wrong']) {
+  const bad = structuredClone(retained); change(bad);
+  assert.throws(() => assertRetainedReleases(bad));
+  assert.throws(() => assertPreservedReleases(retained, bad));
+}

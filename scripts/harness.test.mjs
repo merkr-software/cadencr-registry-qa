@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const root = new URL('../', import.meta.url);
+const read = path => readFileSync(new URL(path, root), 'utf8');
+const workflow = read('.github/workflows/qa.yml');
+const runtime = read('scripts/run.mjs');
+const pin = read('cli-pin.env');
+assert.equal(pin, 'CADENCR_RELEASE_VERSION=0.13.1-dev.38947325650.1\nCADENCR_RELEASE_SHA256=0cf516ce62da03e52d56502d6da977908282058138e62164ab65eea4982c79f3\nCADENCR_RELEASE_TAG=cli/v0.13.1-dev.38947325650.1\n');
+assert.equal((workflow.match(/runs-on: ubuntu-24.04/g) ?? []).length, 2);
+assert.match(workflow, /fresh:\n    needs: first/);
+assert.doesNotMatch(workflow, /actions\/(?:download-artifact|cache)@/);
+assert.doesNotMatch(workflow, /include-hidden-files: true|qa-state|qa-private/);
+assert.equal((workflow.match(/QA_DEFAULT_BRANCH:/g) ?? []).length, 4);
+assert.equal((workflow.match(/QA_SIGNING_KEY_PEM: \$\{\{ secrets.QA_SIGNING_KEY_PEM \}\}/g) ?? []).length, 2);
+assert.equal((workflow.match(/persist-credentials: false/g) ?? []).length, 2);
+assert.match(runtime, /assert.ok\(!existsSync\(state\)/);
+assert.ok(runtime.indexOf('version.stdout') < runtime.indexOf('writeFileSync(key,'));
+assert.ok(runtime.indexOf("createHash('sha256').update(binaryBytes)") < runtime.indexOf('writeFileSync(key,'));
+assert.match(runtime, /for \(const attempt of \['publish', 'same-state-replay'\]\)/);
+assert.match(runtime, /assert.deepEqual\(inventory, baseline/);
+assert.match(runtime, /verifyIndex\(index\)/);
+console.log('Harness configuration regression tests passed');

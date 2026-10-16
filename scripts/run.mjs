@@ -1,15 +1,27 @@
 import './guard.mjs';
-import { assertX8664Elf, assertEmptyDeltaRenewal, boundedFetch } from './evidence.mjs';
+import { assertX8664Elf, assertEmptyDeltaRenewal, assertRetainedReleases, assertPreservedReleases, boundedFetch } from './evidence.mjs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, unlinkSync, readFileSync, appendFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, unlinkSync, readFileSync, appendFileSync, existsSync, lstatSync } from 'node:fs';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
 const env = process.env;
 const root = join(env.RUNNER_TEMP, 'qa-public');
 const state = join(env.RUNNER_TEMP, 'qa-state');
 const key = join(env.RUNNER_TEMP, 'qa-private.pem');
-assertX8664Elf(readFileSync(join(env.RUNNER_TEMP, 'qa-cli/cadencr')).subarray(0, 64));
+assert.ok(!existsSync(state), 'each hosted runner must start without pipeline state');
+assert.ok(!existsSync(key), 'secret path must not preexist');
+const pin = readFileSync('cli-pin.env', 'utf8');
+assert.equal(pin, 'CADENCR_RELEASE_VERSION=0.13.1-dev.38947325650.1\nCADENCR_RELEASE_SHA256=0cf516ce62da03e52d56502d6da977908282058138e62164ab65eea4982c79f3\nCADENCR_RELEASE_TAG=cli/v0.13.1-dev.38947325650.1\n');
+const binary = join(env.RUNNER_TEMP, 'qa-cli/cadencr');
+const binaryStat = lstatSync(binary);
+assert.ok(binaryStat.isFile() && !binaryStat.isSymbolicLink());
+const binaryBytes = readFileSync(binary);
+assert.equal(createHash('sha256').update(binaryBytes).digest('hex'), '0cf516ce62da03e52d56502d6da977908282058138e62164ab65eea4982c79f3');
+const version = spawnSync(binary, ['--version'], { encoding: 'utf8', timeout: 30000, maxBuffer: 1024 });
+assert.equal(version.status, 0);
+assert.equal(version.stdout, 'cadencr 0.13.1-dev.38947325650.1\n');
+assertX8664Elf(binaryBytes.subarray(0, 64));
 mkdirSync(root, { mode: 0o700 });
 if (env.PHASE === 'renewal') verifyIndex('requests/previous.json');
 assert.ok(env.QA_SIGNING_KEY_PEM && Buffer.byteLength(env.QA_SIGNING_KEY_PEM) <= 16384);
@@ -20,7 +32,8 @@ try {
     '--directory', state, '--repository', 'merkr-software/cadencr-registry-qa',
     '--registry-commit', env.REVIEWED_COMMIT, '--private-key', key,
     '--confirm-request-sha256', env.REQUEST_SHA256];
-  let baseline = env.QA_RUNNER === 'fresh' ? await remoteInventory() : undefined;
+  const before = await remoteInventory();
+  let baseline = env.QA_RUNNER === 'fresh' ? before : undefined;
   for (const attempt of ['publish', 'same-state-replay']) {
     const result = spawnSync(join(env.RUNNER_TEMP, 'qa-cli/cadencr'), args, { stdio: 'inherit', env, timeout: 900000, killSignal: 'SIGKILL' });
     if (result.error) throw result.error;
@@ -46,6 +59,8 @@ try {
     verifyIndex(index);
     if (env.PHASE === 'renewal') assertEmptyDeltaRenewal(JSON.parse(readFileSync('requests/previous.json')), JSON.parse(bytes));
     const inventory = await remoteInventory();
+    assertRetainedReleases(inventory);
+    assertPreservedReleases(before, inventory);
     if (baseline) assert.deepEqual(inventory, baseline, 'replay changed remote IDs');
     baseline = inventory;
     const receipt = { attempt, request_sha256: env.REQUEST_SHA256, registry_commit: env.REVIEWED_COMMIT,

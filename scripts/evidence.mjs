@@ -30,3 +30,21 @@ export async function boundedFetch(url, headers = {}, fetcher = fetch) {
   }
   return Buffer.concat(chunks);
 }
+
+// Public immutable identities retained from the two earlier failed QA runs.
+export function assertRetainedReleases(inventory) {
+  for (const expected of [
+    { id: 413497066, tag: 'qa-source-theme-v0.0.1', assets: [{ id: 642968615, name: 'theme.tar.gz', size: 1100 }] },
+    { id: 413501761, tag: 'theme-qa-inert-theme-v0.0.1', assets: [{ id: 642988641, name: 'theme.tar.gz', size: 1100 }] },
+  ]) {
+    assert.deepEqual(inventory.releases.find(release => release.id === expected.id), expected,
+      'retained source or managed release identity changed');
+  }
+}
+
+export function assertPreservedReleases(before, after) {
+  for (const release of before.releases) {
+    assert.deepEqual(after.releases.find(item => item.id === release.id), release,
+      'publication changed a previously public release or asset');
+  }
+}

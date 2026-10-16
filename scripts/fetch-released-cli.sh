@@ -13,20 +13,23 @@ output=$2
 [ -f "$pin_file" ] && [ ! -L "$pin_file" ] || { echo "invalid released CLI pin file" >&2; exit 2; }
 version=''
 sha256=''
+tag=''
 version_lines=0
 sha256_lines=0
+tag_lines=0
 while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
     ''|'#'*) ;;
     CADENCR_RELEASE_VERSION=*) version_lines=$((version_lines + 1)); version=${line#*=} ;;
     CADENCR_RELEASE_SHA256=*) sha256_lines=$((sha256_lines + 1)); sha256=${line#*=} ;;
+    CADENCR_RELEASE_TAG=*) tag_lines=$((tag_lines + 1)); tag=${line#*=} ;;
     *) echo "released CLI pin file has an unexpected field or malformed line" >&2; exit 2 ;;
   esac
 done < "$pin_file"
-[ "$version_lines" -eq 1 ] && [ "$sha256_lines" -eq 1 ] || {
+[ "$version_lines" -eq 1 ] && [ "$sha256_lines" -eq 1 ] && [ "$tag_lines" -le 1 ] || {
   echo "released CLI pin file has an unexpected field or malformed line" >&2; exit 2;
 }
-if [ "$version" = PENDING ] && [ "$sha256" = PENDING ]; then
+if [ "$version" = PENDING ] && [ "$sha256" = PENDING ] && [ "$tag_lines" -eq 0 ]; then
   echo "Released Cadencr CLI pin is PENDING." >&2
   pending=1
   exit 3
@@ -40,6 +43,18 @@ if ! printf '%s' "$sha256" | grep -Eq '^[0-9a-f]{64}$'; then
   exit 2
 fi
 
+# Namespaced releases are deliberately limited to CI-derived development tags.
+# The legacy two-field format retains its original version validation and URL.
+if [ "$tag_lines" -eq 1 ]; then
+  if ! printf '%s' "$version" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-dev\.[1-9][0-9]*\.[1-9][0-9]*$' ||
+    [ "$tag" != "cli/v$version" ]; then
+    echo "released CLI tag must match cli/vVERSION for a canonical development version" >&2
+    exit 2
+  fi
+else
+  tag="v$version"
+fi
+
 # mkdir is exclusive: existing files, directories and symlinks are refused.
 [ ! -e "$output" ] && [ ! -L "$output" ] || { echo "released CLI output already exists" >&2; exit 1; }
 umask 077
@@ -47,7 +62,7 @@ mkdir "$output"
 work=$(cd "$output" && pwd -P)
 binary="$work/cadencr"
 asset="cadencr-v${version}-x86_64-unknown-linux-gnu"
-url="https://github.com/merkr-software/CadencR/releases/download/v${version}/${asset}"
+url="https://github.com/merkr-software/CadencR/releases/download/${tag}/${asset}"
 redirects=0
 while :; do
   curl_status=0
