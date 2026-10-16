@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "repository": "merkr-software/cadencr-registry-qa",
+  "key_id": "qa-2026",
+  "discovery_branch": "marketplace-v2",
+  "generated_at": "2026-10-16T23:01:51Z",
+  "expires_at": "2026-10-23T23:01:51Z",
+  "previous_index": "previous-fault.json",
+  "public_key": "public.pem",
+  "publications": [
+    {
+      "submission": "submission-fault.json"
+    }
+  ]
+}

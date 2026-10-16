@@ -6,7 +6,7 @@ on:
         description: Reviewed request to run
         required: true
         type: choice
-        options: [initial, renewal]
+        options: [initial, renewal, fault]
       request_sha256:
         description: Exact SHA-256 of reviewed requests/<phase>.json
         required: true
@@ -22,6 +22,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   first:
+    outputs:
+      inventory_sha256: ${{ steps.execution.outputs.inventory_sha256 }}
     if: github.repository == 'merkr-software/cadencr-registry-qa' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -43,6 +45,7 @@ jobs:
       - name: Fetch exact distributed CLI (no source fallback)
         run: sh scripts/fetch-released-cli.sh cli-pin.env "$RUNNER_TEMP/qa-cli"
       - name: Run publication and same-state replay
+        id: execution
         env:
           QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: first
@@ -62,6 +65,7 @@ jobs:
             ${{ runner.temp }}/qa-public/*-mirror.json
             ${{ runner.temp }}/qa-public/publish.json
             ${{ runner.temp }}/qa-public/same-state-replay.json
+            ${{ runner.temp }}/qa-public/interruption.json
           include-hidden-files: false
           retention-days: 14
           if-no-files-found: warn
@@ -82,6 +86,7 @@ jobs:
         env:
           QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: fresh
+          QA_EXPECTED_INVENTORY_SHA256: ${{ needs.first.outputs.inventory_sha256 }}
           PHASE: ${{ inputs.phase }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
           REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
@@ -92,6 +97,7 @@ jobs:
         env:
           QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: fresh
+          QA_EXPECTED_INVENTORY_SHA256: ${{ needs.first.outputs.inventory_sha256 }}
           PHASE: ${{ inputs.phase }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
           REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
@@ -108,6 +114,7 @@ jobs:
             ${{ runner.temp }}/qa-public/*-mirror.json
             ${{ runner.temp }}/qa-public/publish.json
             ${{ runner.temp }}/qa-public/same-state-replay.json
+            ${{ runner.temp }}/qa-public/interruption.json
           include-hidden-files: false
           retention-days: 14
           if-no-files-found: warn

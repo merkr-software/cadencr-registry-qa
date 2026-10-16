@@ -44,3 +44,25 @@ the required `publication-plan.json` was added, not substituted for the archive.
 Post-publication inventory now waits at most 60 seconds for the required public
 release IDs to appear. It retries reads only and never manufactures entries.
 This is not yet an interruption/resume or renewal qualification.
+
+## Controlled network interruption
+
+- `fault` is a reviewed incremental publication of inert QA theme `0.0.2` from
+  its separate immutable public source. Baseline is the authenticated renewal.
+- The actual pinned ELF first stages a public fixture through a loopback CONNECT
+  proxy to prove traversal. An independent direct API observer then waits until
+  the exact new managed release and both expected assets are public.
+- The proxy records its first fault time/reason and closes all tunnels. Automatic
+  earlier faults are rejected. No TLS interception, custom CA, process killing,
+  lock removal or pipeline-state cleanup is used to claim recovery.
+- The CLI must exit normally with a nonzero status and release its owned lock.
+  The exact same request/state is resumed without the fault, then replayed. Release
+  and asset IDs must survive; a fresh hosted runner reconstructs everything again.
+- This proves interruption after real remote publication, NOT loss of a specific
+  HTTP mutation response. A lost race or deadline is inconclusive, never a pass.
+- First job exports only a public inventory digest as a test assertion. The fresh
+  job waits for real API observations matching that digest; it does not restore
+  CLI state. API identity reads use the ephemeral QA job token. Catalog bytes are
+  still downloaded anonymously and authenticated by the actual CLI.
+- Post-publication inventory must observe the immutable head containing the exact
+  blob SHA from the CLI discovery receipt, under a shared 60-second read deadline.

@@ -1,4 +1,6 @@
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { isDeepStrictEqual } from 'node:util';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 export function assertX8664Elf(bytes) {
@@ -60,11 +62,11 @@ export function assertPreservedReleases(before, after) {
 
 // GitHub's anonymous release LIST can lag a successful public byte check.
 // Retry reads only; never synthesize or rewrite inventory contents.
-export async function publicReleaseList(get, requiredIds, { attempts = 31, pauseMs = 2000, timeoutMs = 60000 } = {}) {
+export async function publicReleaseList(get, requiredIds, { attempts = 31, pauseMs = 2000, timeoutMs = 60000, signal: sharedSignal } = {}) {
   assert.ok(Number.isInteger(attempts) && attempts > 0 && attempts <= 31);
   assert.ok(Number.isFinite(pauseMs) && pauseMs >= 0 && pauseMs <= 2000);
   assert.ok(Number.isInteger(timeoutMs) && timeoutMs > 0 && timeoutMs <= 60000);
-  const signal = AbortSignal.timeout(timeoutMs);
+  const signal = sharedSignal ?? AbortSignal.timeout(timeoutMs);
   for (let attempt = 0; attempt < attempts; attempt++) {
     signal.throwIfAborted();
     const releases = await get('/releases?per_page=100', signal);
@@ -74,4 +76,48 @@ export async function publicReleaseList(get, requiredIds, { attempts = 31, pause
     if (attempt + 1 < attempts) await sleep(pauseMs, undefined, { signal });
   }
   throw new Error('Public release inventory did not converge within its read deadline');
+}
+
+// Caller authenticates both signed envelopes with the pinned distributed CLI.
+export function assertIncrementalTheme(previous, current) {
+  const before = previous.signed.packages;
+  const after = current.signed.packages;
+  assert.equal(after.length, before.length + 1, 'expected exactly one new package version');
+  for (const entry of before) assert.ok(after.some(candidate => isDeepStrictEqual(candidate, entry)), 'historical package changed');
+  const added = after.filter(entry => !before.some(candidate => isDeepStrictEqual(candidate, entry)));
+  assert.equal(added.length, 1);
+  assert.equal(added[0].kind, 'theme');
+  const theme = added[0].package.theme;
+  assert.equal(theme.id, 'qa-inert-theme');
+  assert.equal(theme.version, '0.0.2');
+  assert.equal(theme.distribution.archive, 'https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-inert-theme-v0.0.2/theme.tar.gz');
+  assert.equal(theme.distribution.sha256, 'feb4ba028cbb4abf9014284322d7920ad647e7c26318db586c8a50d9326ceb17');
+}
+
+// Hash only normalized public observations, never local CLI state.
+export function inventoryDigest(inventory) {
+  const normalized = { head: inventory.head, releases: inventory.releases.map(release => ({
+    id: release.id, tag: release.tag, assets: release.assets.map(asset => ({
+      id: asset.id, name: asset.name, size: asset.size,
+    })).sort((a, b) => a.id - b.id),
+  })).sort((a, b) => a.id - b.id) };
+  return createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+}
+
+export async function waitForInventory(read, expected, { timeoutMs = 60000, pauseMs = 2000 } = {}) {
+  assert.match(expected, /^[a-f0-9]{64}$(?![\s\S])/);
+  return waitForObservation(read, inventory => inventoryDigest(inventory) === expected, { timeoutMs, pauseMs });
+}
+
+export async function waitForObservation(read, accepts, { timeoutMs = 60000, pauseMs = 2000 } = {}) {
+  assert.ok(Number.isInteger(timeoutMs) && timeoutMs > 0 && timeoutMs <= 60000);
+  assert.ok(Number.isFinite(pauseMs) && pauseMs >= 0 && pauseMs <= 2000);
+  const signal = AbortSignal.timeout(timeoutMs);
+  while (true) {
+    signal.throwIfAborted();
+    const inventory = await read(signal);
+    signal.throwIfAborted();
+    if (accepts(inventory)) return inventory;
+    await sleep(pauseMs, undefined, { signal });
+  }
 }

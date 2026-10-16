@@ -36,3 +36,16 @@ for (const publications of [
   writeFileSync(file, JSON.stringify({ ...request, publications }));
   assert.notEqual(run({ REQUEST_SHA256: createHash('sha256').update(readFileSync(file)).digest('hex') }), 0);
 }
+
+const fault = {...request, previous_index:'previous-fault.json', publications:[{submission:'submission-fault.json'}]};
+const faultFile=join(root,'requests/fault.json');writeFileSync(faultFile,JSON.stringify(fault));
+assert.equal(run({PHASE:'fault',REQUEST_SHA256:createHash('sha256').update(readFileSync(faultFile)).digest('hex')}),0);
+fault.publications[0].registry_commit='b'.repeat(40);writeFileSync(faultFile,JSON.stringify(fault));
+assert.notEqual(run({PHASE:'fault',REQUEST_SHA256:createHash('sha256').update(readFileSync(faultFile)).digest('hex')}),0);
+
+// Fresh runners accept only the first runner's exact public inventory digest.
+writeFileSync(file, bytes);
+assert.equal(run({QA_RUNNER:'fresh',QA_EXPECTED_INVENTORY_SHA256:'a'.repeat(64)}),0);
+for (const digest of ['', 'a'.repeat(63), 'A'.repeat(64), 'a'.repeat(64)+'\n']) {
+  assert.notEqual(run({QA_RUNNER:'fresh',QA_EXPECTED_INVENTORY_SHA256:digest}),0);
+}

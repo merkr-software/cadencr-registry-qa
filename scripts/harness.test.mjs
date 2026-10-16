@@ -21,3 +21,20 @@ assert.match(runtime, /for \(const attempt of \['publish', 'same-state-replay'\]
 assert.match(runtime, /assert.deepEqual\(inventory, baseline/);
 assert.match(runtime, /verifyIndex\(index\)/);
 console.log('Harness configuration regression tests passed');
+assert.match(workflow, /inventory_sha256: \$\{\{ steps.execution.outputs.inventory_sha256 \}\}/);
+assert.match(workflow, /name: Run publication and same-state replay\n        id: execution/);
+assert.equal((workflow.match(/QA_EXPECTED_INVENTORY_SHA256: \$\{\{ needs.first.outputs.inventory_sha256 \}\}/g) ?? []).length, 2);
+assert.match(runtime, /waitForInventory\(signal => remoteInventory\(\[\], signal\), env.QA_EXPECTED_INVENTORY_SHA256\)/);
+assert.match(runtime, /publicReleaseList\(get, requiredIds, \{ signal \}\)/);
+assert.match(runtime, /requestSignal = signal/);
+assert.ok(runtime.indexOf('appendFileSync(env.GITHUB_OUTPUT') > runtime.indexOf('appendFileSync(env.GITHUB_STEP_SUMMARY'));
+assert.equal((runtime.match(/env.QA_EXPECTED_INVENTORY_SHA256/g) ?? []).length, 1);
+assert.match(runtime, /if \(env.QA_RUNNER === 'first'\) \{\n    appendFileSync\(env.GITHUB_OUTPUT/);
+assert.match(runtime, /postPublicationInventory\(\[413497066, 413501761, catalog.release_id\], discovery.blob_sha\)/);
+assert.match(runtime, /contents\/managed-index.json\?ref=\$\{inventory.head\}/);
+assert.match(runtime, /observation => observation.blob === expectedBlob/);
+assert.match(runtime, /Authorization: `Bearer \$\{env.CADENCR_REGISTRY_GITHUB_TOKEN\}`/);
+assert.match(runtime, /filter\(release => release.draft === false\)/);
+assert.match(runtime, /const bytes = await boundedFetch\(catalog.catalog_url\)/);
+
+assert.match(runtime, /async function remoteInventory\(requiredIds = \[\], signal = AbortSignal.timeout\(60000\)\)/);
