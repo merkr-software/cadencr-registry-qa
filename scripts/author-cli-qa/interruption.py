@@ -18,6 +18,7 @@ def interrupt(cli, args, home, token, network, c, sha, env_builder, require):
         observed = None
         try:
             while time.monotonic() < deadline and process.poll() is None:
+                require(not gate.transport_failed.is_set())
                 require(out.tell() <= 1024*1024 and err.tell() <= 1024*1024)
                 if gate.api_seen.is_set() and gate.upload_held.is_set():
                     observed = network.draft(c, token, deadline=deadline)
@@ -31,12 +32,13 @@ def interrupt(cli, args, home, token, network, c, sha, env_builder, require):
                         assets = network.get("/repos/" + c["repository"] + "/releases/" +
                                              str(observed["id"]) + "/assets?per_page=100", token, deadline=deadline)
                         require(assets == [] and process.poll() is None
-                                and time.monotonic() < deadline)
+                                and time.monotonic() < deadline
+                                and not gate.transport_failed.is_set())
                         break
                 time.sleep(0.2)
             require(observed is not None and gate.api_seen.is_set()
                     and gate.upload_held.is_set() and process.poll() is None
-                    and time.monotonic() < deadline)
+                    and time.monotonic() < deadline and not gate.transport_failed.is_set())
         finally:
             # Only this exact child PID is signalled, never process-name matching.
             if process.poll() is None:

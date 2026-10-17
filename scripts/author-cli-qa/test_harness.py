@@ -64,6 +64,8 @@ class Guards(unittest.TestCase):
         trace = []
         class FakeGate:
             def __init__(self):
+                FakeGate.last = self
+                self.transport_failed = threading.Event()
                 self.api_seen = threading.Event()
                 self.upload_held = threading.Event()
                 self.api_seen.set()
@@ -80,6 +82,7 @@ class Guards(unittest.TestCase):
                 return self.returncode
             def terminate(self):
                 trace.append("terminate-owned")
+                FakeGate.last.transport_failed.set()  # Expected disconnect after owned shutdown.
                 self.returncode = -15
             def wait(self, timeout):
                 trace.append("wait-owned")
@@ -106,6 +109,17 @@ class Guards(unittest.TestCase):
                 "private-token", Network(), c, "d"*64, qa.cli_env, qa.require)
         self.assertEqual(release_id, 123)
         self.assertEqual(trace, ["draft", "draft", "empty-assets", "terminate-owned", "wait-owned"])
+        class FailedGate(FakeGate):
+            def __init__(self):
+                super().__init__()
+                self.transport_failed.set()
+        trace.clear()
+        with patch.object(interruption, "bounded_command", return_value=["/cli"]), patch.object(
+            interruption, "Gate", FailedGate
+        ), patch.object(interruption.subprocess, "Popen", return_value=Process()), self.assertRaises(qa.Rejected):
+            interruption.interrupt(Path("/cli"), [], Path("/scratch"),
+                "private-token", Network(), c, "d"*64, qa.cli_env, qa.require)
+        self.assertEqual(trace, ["draft", "terminate-owned", "wait-owned"])
 
     def test_interruption_requires_publish_and_namespaced_tag(self):
         with self.assertRaises(qa.Rejected):
