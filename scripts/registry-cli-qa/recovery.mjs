@@ -16,9 +16,9 @@ import {
   failureDiagnostic,
 } from "./evidence.mjs";
 
-export const ORIGINAL_REQUEST = "2cd78368ffe6f1831aabbbca023e6e5c20f54f792b85f2f4b3505058fbfdbbf0";
-export const OPERATION_COMMIT = "15a797ebfe0f108873471de63052fac3283ba768";
-export const CATALOG_SHA = "c7363e0af236bb38b16dc6a1f88fca7922ad56a6d6856852d88aed72c47f8ebf";
+export const ORIGINAL_REQUEST = "f1cf2b60e13f5c867f0b72de4b60ee48bfa3400f4d6aa7b2faf94d705b349c8d";
+export const OPERATION_COMMIT = "e8fbdc424dfc14717db2ea4ca325e35d169a00c4";
+export const CATALOG_SHA = "a6a71f22e262ac1bc0f9c0843d2ed1590a616a101b4a3de47fbea55a000bf95c";
 const HELPER_SHA = "57ff31556ee87708a8fcb197e635513e4ee3fc0013d91c1131fd0648836471ba";
 
 export function bindIntent(plan, request, previous, candidate) {
@@ -37,7 +37,7 @@ export function bindIntent(plan, request, previous, candidate) {
     assert.equal(candidate.signed.expires_at, request.expires_at);
     continuity(previous, candidate, { phase: "renewal" });
     archiveCoverage(candidate, plan.archives);
-    assert.equal(plan.archives.length, 6);
+    assert.equal(plan.archives.length, 10);
   }
 }
 
