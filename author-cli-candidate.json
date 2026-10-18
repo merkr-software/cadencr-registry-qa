@@ -1,11 +1,11 @@
 {
-  "kind": "provider",
+  "kind": "tab",
   "cli_version": "0.13.1-dev.39108033875.1",
   "cli_sha256": "d11bfade6297fa30e1e10e82605f5a221da8e07edeeee372e2c2f6185c6ff725",
   "repository": "merkr-software/cadencr-registry-qa",
   "repository_id": 1420296872,
   "public": true,
   "expected_account": "rle-mino",
-  "tag": "qa-author-cli/wave3-39108033875-provider-assets",
+  "tag": "qa-author-cli/wave3-39108033875-tab-dist",
   "source_commit": "e3a7054af53dcf05628872e8bad41b1bd4218fe1"
 }
