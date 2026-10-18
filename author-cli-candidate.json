@@ -1,10 +1,11 @@
 {
-  "cli_sha256": "be1369550f9717dd2404893b30e7aae4be61a0baaac3f3aa40937500d094926f",
-  "cli_version": "0.13.1-dev.39060688472.1",
-  "expected_account": "rle-mino",
-  "public": true,
+  "kind": "provider",
+  "cli_version": "0.13.1-dev.39108033875.1",
+  "cli_sha256": "d11bfade6297fa30e1e10e82605f5a221da8e07edeeee372e2c2f6185c6ff725",
   "repository": "merkr-software/cadencr-registry-qa",
   "repository_id": 1420296872,
-  "source_commit": "30b66c72546114849d1940b737dc13f88ac365f8",
-  "tag": "qa-author-cli/ce63c6e4-39060688472"
+  "public": true,
+  "expected_account": "rle-mino",
+  "tag": "qa-author-cli/wave3-39108033875-provider",
+  "source_commit": "0d6ba2948ed1636e1907533ea4e849041539aebd"
 }
