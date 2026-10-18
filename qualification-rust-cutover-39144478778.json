@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "scope": "isolated-public-QA-only; distribution orchestration; inert payloads never executed",
+  "status": "completed-with-observed-renewal-error",
+  "production_promotion_ready": false,
+  "production_pins_changed": false,
+  "desktop_activated": false,
+  "cli": {
+    "version": "0.13.1-dev.39144478778.1",
+    "tag": "cli/v0.13.1-dev.39144478778.1",
+    "source_commit": "50aae277d9cae56ec2e261d2f5df904f0ec5c3ee",
+    "sha256": "be5a15c9d065670466511fa9e23ce6e5205c73fade4a5ed9320b262296fbb122",
+    "platform": "x86_64-unknown-linux-gnu",
+    "release_url": "https://github.com/merkr-software/CadencR/releases/tag/cli/v0.13.1-dev.39144478778.1",
+    "assets": 4
+  },
+  "offline": {
+    "run": 39145349862,
+    "checks": 65,
+    "proof_sha256": "758fd6c05982e3c692fe3392b65d230c4af8ca8ccbb7ce242391be81c842f9b8"
+  },
+  "authors": {
+    "provider": {
+      "candidate_sha256": "1d4f88daeb251b65c5fd792d95e0930cb2a872242d5b98b97d929f57380658cb",
+      "source_commit": "e47b9f3bcad3c55eb896dfa52850809ab8e2e26f",
+      "tag": "qa-author-cli/rust-cutover-provider-39144478778",
+      "request_sha256": "151fac06b175be38c1ad3926f1b1b86c46c963167edf763c5d0c9d6b9be3b9c7",
+      "public_run": 39145464562,
+      "fresh_run": 39145648513,
+      "public_proof_sha256": "086625ed8fd079f88780dbc96744658b5e68056264fcf4ac4736f3f129f56d6e",
+      "fresh_proof_sha256": "6caf987a9bcf9e69200b1c65719eebdbacde6e642ab0571c9ead19c23c9fe748",
+      "release_id": 416566460,
+      "interrupted_draft": "observed_empty_draft_terminated_owned_cli_resumed_same_id",
+      "changed_bytes": "rejected_inventory_unchanged",
+      "changed_request": "rejected_inventory_unchanged",
+      "failed_attempts": []
+    },
+    "theme": {
+      "candidate_sha256": "fae5bbbacfbe85dfccb418f7c6eef337a9816a95164968f4c64983f1b51f3c63",
+      "source_commit": "e47b9f3bcad3c55eb896dfa52850809ab8e2e26f",
+      "tag": "qa-author-cli/rust-cutover-theme-39144478778",
+      "request_sha256": "027a6531aa4dcd1c78d83662f67519dc752428890d4ced668a27bcd5ba4237c5",
+      "public_run": 39145769283,
+      "fresh_run": 39145841221,
+      "public_proof_sha256": "74ea76dab297053e804061b94587c92cf156504b1ab6fbe38a0b561471f78a48",
+      "fresh_proof_sha256": "9d7ddd37e2530eedd2883c3b48c1eb505ce89dc10a1423896a188fb9abc5048a",
+      "release_id": 416568400,
+      "interrupted_draft": "observed_empty_draft_terminated_owned_cli_resumed_same_id",
+      "changed_bytes": "rejected_inventory_unchanged",
+      "changed_request": "rejected_inventory_unchanged",
+      "failed_attempts": []
+    },
+    "tab": {
+      "candidate_sha256": "d52fc87eef3c33ad0141752f079d66c7bf92380edc3cadc1d6e12a19013c09e3",
+      "source_commit": "e47b9f3bcad3c55eb896dfa52850809ab8e2e26f",
+      "tag": "qa-author-cli/rust-cutover-tab-39144478778",
+      "request_sha256": "4c22adb9a8ab80e36abe416a116d02d9ef4edec4808a8f4019c814d8baf355e2",
+      "public_run": 39146640708,
+      "fresh_run": 39146710883,
+      "public_proof_sha256": "ec1d1565e6bd5edc019496d9cd12436122955661063866b220173b573c938cdf",
+      "fresh_proof_sha256": "cd3f33171fafa627bb6ce4cd59dc5fbe575bb32c713800bcb2fc72d9becbfc97",
+      "release_id": 416574249,
+      "interrupted_draft": "observed_empty_draft_terminated_owned_cli_resumed_same_id",
+      "changed_bytes": "rejected_inventory_unchanged",
+      "changed_request": "rejected_inventory_unchanged",
+      "failed_attempts": [
+        {
+          "run": 39145893752,
+          "commit": "0e8271c598b3fa1e361b9830c736b7ca6eb5062c",
+          "request_sha256": "4c22adb9a8ab80e36abe416a116d02d9ef4edec4808a8f4019c814d8baf355e2",
+          "cause": "unknown; generic diagnostic before observability patch"
+        }
+      ]
+    }
+  },
+  "incremental": {
+    "phase": "incremental",
+    "commit": "37920ba7a26835ec85de6f717d0d7ccd6a20291f",
+    "run": 39146858795,
+    "request_sha256": "76c1b630f19ce147477dcd62bde3b33a481dcb36fc5dc1dd32c1bc932e340669",
+    "plan_sha256": "af8e7180d420a65b5b25c863fa032a714600834c3b0ed264f31142edccfb9b29",
+    "verified": true,
+    "catalog_sha256": "010e978b1a3bd3aed7cabc4d4cb9833b94de0054aa180fdbf7a179d21dd1113d",
+    "entries": 8,
+    "archives": 10,
+    "proof_sha256": {
+      "first/publish": "1fb061d897817c9048fa9393cf231ed354a398fc72ac0753f8109b33ccd80137",
+      "first/same-state-replay": "39f92cb37537ee9d488772433dd43ed097cc26b2979a60a5127d74854ef36959",
+      "fresh/publish": "4caeb194e4d7400cf5dabc4b0c7176b06e1c4c9079cbc7debcbbe4a3db20757a",
+      "fresh/same-state-replay": "6f45c18cb860b88cf728a0b738b80a6b67316c6995e92489886c2488d06be7d9"
+    }
+  },
+  "renewal": {
+    "initial": {
+      "phase": "renewal",
+      "commit": "e8fbdc424dfc14717db2ea4ca325e35d169a00c4",
+      "run": 39147214594,
+      "request_sha256": "f1cf2b60e13f5c867f0b72de4b60ee48bfa3400f4d6aa7b2faf94d705b349c8d",
+      "plan_sha256": "105b8945916c35a195f50e4f64ed497590de0888187c32b6e6249933006237b3",
+      "conclusion": "failure",
+      "publication_observed": true,
+      "cli_code": "REGISTRY_PIPELINE_FAILED",
+      "exit_status": 1,
+      "message_sha256": "775efb2e87756c1553615fe5f0528b0d8601594d94f835df34a49be28eaa01b8",
+      "matching_source_message": "archive download: SHA-256 mismatch",
+      "specific_response_and_cause": "not established"
+    },
+    "original_intent_recovery": {
+      "commit": "30b1453867801325ed0340434501b9ea1923cce3",
+      "run": 39147499709,
+      "plan_sha256": "a65c0dbe97e1dbac38cdc547b811dde9ebc308f96bf8accd61fa4b163b50cde3",
+      "verified": true,
+      "catalog_sha256": "a6a71f22e262ac1bc0f9c0843d2ed1590a616a101b4a3de47fbea55a000bf95c",
+      "inventory_sha256": "34e02dfa33f58598915752aa69eb9ff40df6ede70a6585994c77e9a06cfe528a",
+      "proof_sha256": {
+        "fresh-recovery": "33259020f1e11766145cdafff3914ec1c7d75d6e71fc9ce7b2bb5d2a1c8dd791",
+        "same-state-replay": "5a6bf2ada48179fa2c23ca8dc11161fa23bcc5c9e4a2760978a81e94b6ad8dff"
+      }
+    }
+  },
+  "next_gate": "Diagnose and address post-publication renewal failure; demonstrate first-pass renewal before production pin promotion."
+}
