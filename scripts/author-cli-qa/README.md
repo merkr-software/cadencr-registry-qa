@@ -58,3 +58,50 @@ not arbitrary lost-response recovery.
 ```sh
 node --test scripts/qualify-author-cli.test.mjs scripts/author-cli-qa-workflow.test.mjs
 ```
+
+## Three-kind qualification candidates
+
+Each dispatch reads one exact reviewed `author-cli-candidate.json`. `kind` is
+required and is exactly `provider`, `theme`, or `tab`; theme-only candidates
+without it are deliberately rejected. Use a distinct `qa-author-cli/<suffix>`
+tag per kind, all bound to the committed fixture source SHA. Preserve old tags
+and releases. Deploy the complete `scripts/author-cli-qa/` tree and
+`scripts/qualify-author-cli.py` before creating those source tags. Then commit
+candidate and binary pin, and dispatch with that final reviewed commit and the
+SHA-256 of the exact candidate bytes.
+
+```json
+{
+  "kind": "provider",
+  "cli_version": "0.13.1-dev.39108033875.1",
+  "cli_sha256": "d11bfade6297fa30e1e10e82605f5a221da8e07edeeee372e2c2f6185c6ff725",
+  "repository": "merkr-software/cadencr-registry-qa",
+  "repository_id": 1420296872,
+  "public": true,
+  "expected_account": "REVIEWED-AUTHOR",
+  "tag": "qa-author-cli/wave3-provider-unique",
+  "source_commit": "REPLACE_WITH_40_CHARACTER_QA_FIXTURE_COMMIT"
+}
+```
+
+- `fixtures/provider/bin/provider` is inert text, never executed. Packaging marks
+  only its private scratch copy executable. Two archives exercise
+  `additional_archives`: `linux-x86_64` and `darwin-aarch64`.
+- `fixtures/tab/` contains static HTML with no script, permissions, or network.
+  It is inspected and packaged, never loaded into a renderer. Its package requires
+  app version `999.0.0` to make the QA-only identity unmistakable; no released-app
+  runtime support is claimed. Proof explicitly records `runtime: not_executed`.
+- `theme.json` remains the original declarative theme fixture.
+- Package metadata uses the full schema-2 `{kind, package}` envelope with
+  `qa-author-provider`, `qa-author-theme`, and `qa-author-tab` identities. The
+  released CLI validates it through `registry build-index --schema-version 2`;
+  no Python business validator substitutes for Rust validation. Disposable index
+  validation uses current UTC plus one day only in CLI arguments; timestamps do
+  not enter the published metadata or content-bound author request.
+- The portable **author release request** remains schema version `1`, as required
+  by that independent Rust API. Metadata and archive URLs bind the namespaced
+  source tag with `%2F` encoding and archive digests.
+- Every archive and metadata asset is changed independently for a rejected
+  publication probe; immutable public inventory must remain exactly unchanged.
+- Mocked orchestration tests are not released-ELF qualification evidence. A Linux
+  runner must execute offline and public jobs using the reviewed released binary.

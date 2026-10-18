@@ -1,3 +1,19 @@
+# Three-kind distributed CLI QA — 2026-10-18
+
+- QA ONLY: inert provider/theme/tab publication and mixed catalog lifecycle.
+- Candidate binary: `0.13.1-dev.39108033875.1`, SHA-256 `d11bfade6297fa30e1e10e82605f5a221da8e07edeeee372e2c2f6185c6ff725`.
+- Source: `merkr-software/CadencR` commit `88ead507983371e5c3df468c6d9bf7c6c12e5fbb`; no local build fallback.
+- Existing releases, immutable tags, dedicated QA secrets and signed history are retained.
+- Offline workflow uses an explicit reviewed commit/pin hash, no credentials or network.
+- Author candidates require one explicit kind and immutable fixture source tag per reviewed dispatch.
+- Registry runs extend the existing authenticated catalog; they never reset discovery.
+- Qualification is pending; deployment alone does not qualify this binary or grant production authority.
+- See `scripts/author-cli-qa/README.md` and `scripts/registry-cli-qa/README.md` for current contracts.
+
+## Historical qualification runbook
+
+The retained text below describes the older binary and theme-only runs, not the current candidate.
+
 # Isolated public registry QA
 
 - Canonical repository: `merkr-software/cadencr-registry-qa` only. No production pins or repositories.

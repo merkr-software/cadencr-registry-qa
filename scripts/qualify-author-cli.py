@@ -20,7 +20,8 @@ import urllib.request
 REPOSITORY = "merkr-software/cadencr-registry-qa"
 REPOSITORY_ID = 1420296872
 LIMIT = 16 * 1024 * 1024
-sys.path.insert(0, str(Path(__file__).parent / "author-cli-qa"))
+SCRIPTS_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPTS_ROOT / "author-cli-qa"))
 from process_limits import bounded_command
 
 
@@ -50,7 +51,8 @@ def load_candidate(data, confirmation):
     c = json.loads(data, object_pairs_hook=unique_object)
     require(type(c) is dict and set(c) == {
         "cli_version", "cli_sha256", "repository", "repository_id",
-        "public", "expected_account", "tag", "source_commit"})
+        "public", "expected_account", "tag", "source_commit", "kind"})
+    require(c["kind"] in ("provider", "theme", "tab"))
     require(c["repository"] == REPOSITORY and type(c["repository_id"]) is int
             and c["repository_id"] == REPOSITORY_ID and c["public"] is True)
     for field, pattern in {
@@ -172,13 +174,15 @@ class GitHub:
         tag = urllib.parse.quote(c["tag"], safe="")
         commit = self.get("/repos/" + REPOSITORY + "/commits/" + tag)
         require(commit["sha"] == c["source_commit"])
-        source = self.get("/repos/" + REPOSITORY +
-            "/contents/scripts/author-cli-qa/theme.json?ref=" + c["source_commit"])
-        require(source["type"] == "file" and source["encoding"] == "base64"
-                and type(source["content"]) is str and source["size"] <= 256*1024)
-        actual = base64.b64decode(source["content"].replace("\n", ""), validate=True)
-        expected = (Path(__file__).parent / "author-cli-qa/theme.json").read_bytes()
-        require(actual == expected and len(actual) == source["size"])
+        from packages import fixture_paths
+        for path in fixture_paths(c["kind"]):
+            relative = path.relative_to(SCRIPTS_ROOT).as_posix()
+            source = self.get("/repos/" + REPOSITORY + "/contents/scripts/" +
+                              relative + "?ref=" + c["source_commit"])
+            require(source["type"] == "file" and source["encoding"] == "base64"
+                    and type(source["content"]) is str and source["size"] <= 256*1024)
+            actual = base64.b64decode(source["content"].replace("\n", ""), validate=True)
+            require(actual == path.read_bytes() and len(actual) == source["size"])
         if token:
             require(self.get("/user", token)["login"] == c["expected_account"])
 
@@ -255,22 +259,16 @@ def asset(path):
 def local(cli, c, root):
     home = root / "home"
     home.mkdir()
-    theme = root / "theme"
-    theme.mkdir()
-    shutil.copyfile(Path(__file__).parent / "author-cli-qa/theme.json", theme / "theme.json")
     require(invoke(cli, ["--version"], home).decode().strip() == "cadencr " + c["cli_version"])
-    invoke(cli, ["--json", "plugin", "validate", str(theme), "--kind", "theme"], home)
-    stage = root / "stage"
-    stage.mkdir()
-    invoke(cli, ["registry", "pack-theme", "--directory", str(theme),
-                 "--output", str(stage / "theme.tar.gz")], home)
-    (stage / "metadata.json").write_text('{"kind":"theme","qualification":"inert"}\n')
-    assets = [asset(stage / n) for n in ("theme.tar.gz", "metadata.json")]
+    from packages import prepare
+    stage, archives = prepare(cli, c, root, home, invoke, asset)
+    assets = [*archives, asset(stage / "metadata.json")]
     request = {"schema_version": 1, "repository": REPOSITORY,
                "expected_repository_id": REPOSITORY_ID, "expected_account": c["expected_account"],
                "tag": c["tag"], "source_commit": c["source_commit"],
                "release_notes": "Inert original-author CLI qualification.", "prerelease": True,
-               "archive": assets[0], "metadata": assets[1]}
+               "archive": archives[0], "metadata": assets[-1],
+               "additional_archives": archives[1:]}
     path = stage / "request.json"
     path.write_text(json.dumps(request, sort_keys=True, separators=(",", ":")) + "\n")
     sha = digest(path.read_bytes())
@@ -284,6 +282,12 @@ def local(cli, c, root):
     return home, stage, path, sha, {a["name"]: a for a in assets}
 
 
+def source_inventory(c):
+    from packages import fixture_paths
+    return {p.relative_to(SCRIPTS_ROOT).as_posix(): digest(p.read_bytes())
+            for p in fixture_paths(c["kind"])}
+
+
 def qualify(cli, c, publish, network=None, interrupt_draft=False):
     require(not interrupt_draft or publish)
     check_cli(cli, c)
@@ -294,8 +298,8 @@ def qualify(cli, c, publish, network=None, interrupt_draft=False):
         home, stage, request, sha, assets = local(cli, c, root)
         proof = {"schema_version": 1, "cli_sha256": c["cli_sha256"],
                  "cli_version": c["cli_version"], "request_sha256": sha,
-                 "theme_source_sha256": digest((Path(__file__).parent /
-                    "author-cli-qa/theme.json").read_bytes()),
+                 "kind": c["kind"], "runtime": "not_executed",
+                 "source_fixtures": source_inventory(c),
                  "local_inspect": "passed", "bad_confirmation": "rejected",
                  "interrupted_draft": "not_exercised", "publication": "not_requested"}
         if not publish:
@@ -309,7 +313,7 @@ def qualify(cli, c, publish, network=None, interrupt_draft=False):
         interrupted_id = None
         if interrupt_draft:
             require(before is None)
-            sys.path.insert(0, str(Path(__file__).parent / "author-cli-qa"))
+            sys.path.insert(0, str(SCRIPTS_ROOT / "author-cli-qa"))
             from interruption import interrupt
             interrupted_id = interrupt(cli, ["plugin", "publish-release", "--request",
                 str(request), "--directory", str(stage), "--confirm-request-sha256", sha],
@@ -339,19 +343,9 @@ def qualify(cli, c, publish, network=None, interrupt_draft=False):
             require(current is not None and (before is None or current == before))
             require(interrupted_id is None or current["release_id"] == interrupted_id)
             before = current
-        # A changed source and changed request must both fail without any remote mutation.
-        archive = stage / "theme.tar.gz"
-        archive.write_bytes(archive.read_bytes() + b"!")
-        invoke(cli, ["--json", "plugin", "publish-release", "--request", str(request),
-            "--directory", str(stage), "--confirm-request-sha256", sha], home, token, success=False,
-            expected_error="author release local validation failed")
-        require(network.inventory(c, assets) == before)
-        archive.write_bytes(archive.read_bytes()[:-1])
-        request.write_bytes(request.read_bytes() + b" ")
-        invoke(cli, ["--json", "plugin", "publish-release", "--request", str(request),
-            "--directory", str(stage), "--confirm-request-sha256", sha], home, token, success=False,
-            expected_error="request SHA-256 confirmation does not match")
-        require(network.inventory(c, assets) == before)
+        from negative_probes import reject_changes
+        reject_changes(cli, home, stage, request, sha, token, network, c, assets,
+                       before, invoke, require)
         if interrupted_id is not None:
             proof["interrupted_draft"] = "observed_empty_draft_terminated_owned_cli_resumed_same_id"
         proof.update(publication="verified", repository=REPOSITORY,

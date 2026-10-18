@@ -6,7 +6,11 @@ on:
         description: Reviewed request to run
         required: true
         type: choice
-        options: [initial, renewal, fault]
+        options: [incremental, renewal]
+      plan_sha256:
+        description: Exact SHA-256 of reviewed plan
+        required: true
+        type: string
       request_sha256:
         description: Exact SHA-256 of reviewed requests/<phase>.json
         required: true
@@ -24,7 +28,7 @@ jobs:
   first:
     outputs:
       inventory_sha256: ${{ steps.execution.outputs.inventory_sha256 }}
-    if: github.repository == 'merkr-software/cadencr-registry-qa' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    if: github.repository == 'merkr-software/cadencr-registry-qa' && github.repository_id == '1420296872' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
@@ -38,10 +42,11 @@ jobs:
         env:
           QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: first
-          PHASE: ${{ inputs.phase }}
+          QA_PLAN: requests/${{ inputs.phase }}-plan.json
+          PLAN_SHA256: ${{ inputs.plan_sha256 }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
           REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
-        run: node scripts/guard.mjs
+        run: node scripts/registry-cli-qa/guard.mjs
       - name: Fetch exact distributed CLI (no source fallback)
         run: sh scripts/fetch-released-cli.sh cli-pin.env "$RUNNER_TEMP/qa-cli"
       - name: Run publication and same-state replay
@@ -49,12 +54,13 @@ jobs:
         env:
           QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: first
-          PHASE: ${{ inputs.phase }}
+          QA_PLAN: requests/${{ inputs.phase }}-plan.json
+          PLAN_SHA256: ${{ inputs.plan_sha256 }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
           REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
           QA_SIGNING_KEY_PEM: ${{ secrets.QA_SIGNING_KEY_PEM }}
           CADENCR_REGISTRY_GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/run.mjs
+        run: node scripts/registry-cli-qa/run.mjs
       - name: Retain public diagnostic receipts (never restored)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -62,17 +68,15 @@ jobs:
           name: qa-${{ inputs.phase }}-first-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/qa-public/*-index.json
-            ${{ runner.temp }}/qa-public/*-mirror.json
             ${{ runner.temp }}/qa-public/publish.json
             ${{ runner.temp }}/qa-public/same-state-replay.json
-            ${{ runner.temp }}/qa-public/interruption.json
           include-hidden-files: false
           retention-days: 14
           if-no-files-found: warn
 
   fresh:
     needs: first
-    if: github.repository == 'merkr-software/cadencr-registry-qa' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    if: github.repository == 'merkr-software/cadencr-registry-qa' && github.repository_id == '1420296872' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
@@ -87,10 +91,11 @@ jobs:
           QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: fresh
           QA_EXPECTED_INVENTORY_SHA256: ${{ needs.first.outputs.inventory_sha256 }}
-          PHASE: ${{ inputs.phase }}
+          QA_PLAN: requests/${{ inputs.phase }}-plan.json
+          PLAN_SHA256: ${{ inputs.plan_sha256 }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
           REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
-        run: node scripts/guard.mjs
+        run: node scripts/registry-cli-qa/guard.mjs
       - name: Fetch exact distributed CLI (no source fallback)
         run: sh scripts/fetch-released-cli.sh cli-pin.env "$RUNNER_TEMP/qa-cli"
       - name: Run publication and same-state replay
@@ -98,12 +103,13 @@ jobs:
           QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QA_RUNNER: fresh
           QA_EXPECTED_INVENTORY_SHA256: ${{ needs.first.outputs.inventory_sha256 }}
-          PHASE: ${{ inputs.phase }}
+          QA_PLAN: requests/${{ inputs.phase }}-plan.json
+          PLAN_SHA256: ${{ inputs.plan_sha256 }}
           REQUEST_SHA256: ${{ inputs.request_sha256 }}
           REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
           QA_SIGNING_KEY_PEM: ${{ secrets.QA_SIGNING_KEY_PEM }}
           CADENCR_REGISTRY_GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/run.mjs
+        run: node scripts/registry-cli-qa/run.mjs
       - name: Retain public diagnostic receipts (never restored)
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -111,10 +117,8 @@ jobs:
           name: qa-${{ inputs.phase }}-fresh-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/qa-public/*-index.json
-            ${{ runner.temp }}/qa-public/*-mirror.json
             ${{ runner.temp }}/qa-public/publish.json
             ${{ runner.temp }}/qa-public/same-state-replay.json
-            ${{ runner.temp }}/qa-public/interruption.json
           include-hidden-files: false
           retention-days: 14
           if-no-files-found: warn

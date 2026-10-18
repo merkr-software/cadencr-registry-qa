@@ -7,3 +7,8 @@ qualification harness actually runs its local plugin validate and pack-theme ste
 
 Reviewed source revision: ce63c6e4d4d2060cf7b4b3d4e72c7591c37b2e7a
 Original theme SHA-256: ec1af0e82fdaacbda8fd7648eafa638fa2e515fb0ca10c449d27c0eb9b2347c5
+
+fixtures/provider/ and fixtures/tab/ are original inert QA data authored for
+this harness. Provider bytes are not an ACP implementation or executable program.
+The tab is static HTML with no script, network, permissions, or runtime claim.
+Their metadata uses MIT; the theme metadata retains Apache-2.0.

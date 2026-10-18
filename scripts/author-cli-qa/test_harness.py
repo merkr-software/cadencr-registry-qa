@@ -3,6 +3,7 @@ import importlib.util
 import json
 import os
 import socket
+import subprocess
 import sys
 import threading
 from pathlib import Path
@@ -10,23 +11,66 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+ROOT = Path(__file__).resolve().parent
+
 spec = importlib.util.spec_from_file_location(
-    "qualification", Path(__file__).resolve().parents[1] / "qualify-author-cli.py")
+    "qualification", ROOT.parent / "qualify-author-cli.py")
 qa = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(qa)
 
 
 def candidate():
-    return dict(cli_version="1.2.3", cli_sha256="b"*64, repository=qa.REPOSITORY,
+    return dict(kind="theme", cli_version="1.2.3", cli_sha256="b"*64, repository=qa.REPOSITORY,
                 repository_id=qa.REPOSITORY_ID, public=True, expected_account="qa-author",
                 tag="qa-author-cli/fixture-001", source_commit="a"*40)
 
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(ROOT))
 from proxy import Gate, Tunnel
 
 
 class Guards(unittest.TestCase):
+    def test_symlink_entry_uses_canonical_fixture_roots(self):
+        with tempfile.TemporaryDirectory() as directory:
+            alias = Path(directory) / "scripts-alias"
+            alias.symlink_to(ROOT.parent, target_is_directory=True)
+            # Import fixtures through the alias before loading the canonical entrypoint.
+            # This reproduces mixed /tmp and /private/tmp module paths on macOS.
+            program = """
+import importlib.util
+import sys
+from pathlib import Path
+from unittest.mock import patch
+sys.path.insert(0, str(Path(sys.argv[1]) / "author-cli-qa"))
+import packages
+spec = importlib.util.spec_from_file_location("qualification", sys.argv[2])
+qa = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(qa)
+assert packages.ROOT == packages.ROOT.resolve()
+assert qa.SCRIPTS_ROOT == qa.SCRIPTS_ROOT.resolve()
+import base64
+for kind in ("provider", "theme", "tab"):
+    candidate = {"kind": kind, "tag": "qa-author-cli/fixture-001", "source_commit": "a" * 40}
+    inventory = qa.source_inventory(candidate)
+    assert inventory and all(key.startswith("author-cli-qa/") for key in inventory)
+    def get(path, token=None):
+        if path == "/repos/" + qa.REPOSITORY:
+            return {"id": qa.REPOSITORY_ID, "private": False, "full_name": qa.REPOSITORY}
+        if "/commits/" in path:
+            return {"sha": candidate["source_commit"]}
+        relative = path.split("/contents/scripts/", 1)[1].split("?", 1)[0]
+        data = (qa.SCRIPTS_ROOT / relative).read_bytes()
+        return {"type": "file", "encoding": "base64", "size": len(data),
+                "content": base64.b64encode(data).decode()}
+    network = qa.GitHub()
+    with patch.object(network, "get", side_effect=get):
+        network.identity(candidate, None)
+"""
+            result = subprocess.run([sys.executable, "-B", "-c", program,
+                str(alias), str(ROOT.parent / "qualify-author-cli.py")],
+                capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_proxy_upload_gate_and_destination_rejection(self):
         gate = Gate.__new__(Gate)
         gate.server_address = ("127.0.0.1", 1234)
@@ -132,7 +176,7 @@ class Guards(unittest.TestCase):
     def test_identity_requires_exact_tracked_source_fixture(self):
         import base64
         c = candidate()
-        theme = (Path(__file__).parent / "theme.json").read_bytes()
+        theme = (ROOT / "theme.json").read_bytes()
         trace = []
         def get(path, token=None):
             trace.append(path)
@@ -257,7 +301,7 @@ class Guards(unittest.TestCase):
                              ("public", False), ("source_commit", "main"),
                              ("tag", "v1"), ("cli_sha256", "bad"),
                              ("expected_account", "user/other"), ("cli_version", 123),
-                             ("unexpected", "secret")]:
+                             ("kind", "unknown"), ("unexpected", "secret")]:
             bad = {**c, field: value}
             data = json.dumps(bad).encode()
             with self.subTest(field=field), self.assertRaises(qa.Rejected):
@@ -353,6 +397,54 @@ class Guards(unittest.TestCase):
             serialized = json.dumps(proof)
             for secret in ("private-author-secret", "/scratch", "/reviewed", str(p)):
                 self.assertNotIn(secret, serialized)
+
+    def test_all_kinds_prepare_complete_metadata_without_executing_payload(self):
+        import packages
+        for kind in ("provider", "theme", "tab"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                home = root / "home"
+                home.mkdir()
+                calls = []
+                def invoke(cli, args, home):
+                    calls.append(args)
+                    if "--output" in args:
+                        Path(args[args.index("--output") + 1]).write_bytes(b"inert archive")
+                    return b"{}"
+                c = {**candidate(), "kind": kind}
+                data = json.dumps(c).encode()
+                self.assertEqual(qa.load_candidate(data, qa.digest(data)), c)
+                stage, archives = packages.prepare(Path("/released/cli"), c, root,
+                                                   home, invoke, qa.asset)
+                self.assertEqual(len(archives), 2 if kind == "provider" else 1)
+                validation = next(args for args in calls if args[:3] == ["--json", "plugin", "validate"])
+                self.assertEqual(Path(validation[3]).name, "qa-author-" + kind)
+                index = next(args for args in calls if args[:2] == ["registry", "build-index"])
+                from datetime import datetime, timedelta, timezone
+                generated = datetime.fromisoformat(index[index.index("--generated-at") + 1])
+                expires = datetime.fromisoformat(index[index.index("--expires-at") + 1])
+                self.assertEqual(expires - generated, timedelta(days=1))
+                self.assertLess(abs(datetime.now(timezone.utc) - generated), timedelta(minutes=1))
+                metadata = json.loads((stage / "metadata.json").read_bytes())
+                self.assertEqual(metadata["kind"], kind)
+                descriptor = metadata["package"]["agent" if kind == "provider" else kind]
+                self.assertEqual(descriptor["id"], "qa-author-" + kind)
+                distributions = descriptor["distribution"]
+                distributions = distributions["binary"].values() if kind == "provider" else [distributions]
+                for distribution in distributions:
+                    self.assertIn("qa-author-cli%2Ffixture-001/", distribution["archive"])
+                    self.assertEqual(distribution["sha256"], qa.digest(b"inert archive"))
+                self.assertTrue(any(args[:2] == ["registry", "build-index"] and
+                                    args[args.index("--schema-version") + 1] == "2" for args in calls))
+                self.assertTrue(all("/released/cli" not in args for args in calls))
+                self.assertTrue(packages.fixture_paths(kind))
+                self.assertTrue(all(path.is_file() for path in packages.fixture_paths(kind)))
+                if kind == "tab":
+                    paths = packages.fixture_paths(kind)
+                    self.assertEqual({path.name for path in paths}, {"tab.json", "index.html"})
+                    manifest = next(path for path in paths if path.name == "tab.json")
+                    entry = manifest.parent / json.loads(manifest.read_text())["entry"]
+                    self.assertIn(entry, paths)
 
     def test_actions_token_cannot_be_author_token(self):
         with tempfile.TemporaryDirectory() as root, patch.object(
