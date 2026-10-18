@@ -1,0 +1,5 @@
+dist/
+# Deliberate inert compiled-tab QA fixture, not generated build output.
+!scripts/author-cli-qa/fixtures/tab/dist/
+scripts/author-cli-qa/fixtures/tab/dist/*
+!scripts/author-cli-qa/fixtures/tab/dist/index.html

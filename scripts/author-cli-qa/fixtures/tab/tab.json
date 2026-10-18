@@ -5,7 +5,7 @@
   "name": "Author CLI QA tab",
   "version": "1.0.0",
   "api_version": 1,
-  "entry": "index.html",
+  "entry": "dist/index.html",
   "permissions": [],
   "configuration": []
 }

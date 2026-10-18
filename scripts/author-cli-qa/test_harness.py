@@ -427,6 +427,15 @@ for kind in ("provider", "theme", "tab"):
                 self.assertLess(abs(datetime.now(timezone.utc) - generated), timedelta(minutes=1))
                 metadata = json.loads((stage / "metadata.json").read_bytes())
                 self.assertEqual(metadata["kind"], kind)
+                planning = next(args for args in calls if args[:2] == ["registry", "plan-publication"])
+                submission = json.loads(Path(planning[planning.index("--submission") + 1]).read_text())
+                self.assertEqual(submission, {"schema_version": 2, "package": metadata,
+                    "source": {"repository": "https://github.com/" + c["repository"],
+                               "tag": c["tag"], "commit": c["source_commit"]},
+                    "changelog": "Inert original-author CLI qualification."})
+                self.assertEqual(Path(planning[planning.index("--output") + 1]), root / "plan.json")
+                self.assertEqual({path.name for path in stage.iterdir()},
+                                 {"metadata.json", *(archive["name"] for archive in archives)})
                 descriptor = metadata["package"]["agent" if kind == "provider" else kind]
                 self.assertEqual(descriptor["id"], "qa-author-" + kind)
                 distributions = descriptor["distribution"]
@@ -445,6 +454,77 @@ for kind in ("provider", "theme", "tab"):
                     manifest = next(path for path in paths if path.name == "tab.json")
                     entry = manifest.parent / json.loads(manifest.read_text())["entry"]
                     self.assertIn(entry, paths)
+
+    def test_tab_fixture_is_a_trackable_closed_compiled_payload(self):
+        import packages
+        source = ROOT / "fixtures/tab"
+        paths = {path.relative_to(source).as_posix() for path in packages.fixture_paths("tab")}
+        self.assertEqual(paths, {"tab.json", "dist/index.html"})
+        self.assertEqual(json.loads((source / "tab.json").read_text())["entry"], "dist/index.html")
+        # A global dist exclusion must not silently remove the fixture from delivery.
+        result = subprocess.run(["git", "check-ignore", "--no-index", "--stdin"],
+            input="scripts/author-cli-qa/fixtures/tab/dist/index.html\n"
+                  "scripts/author-cli-qa/fixtures/tab/dist/unexpected.js\n"
+                  "packages/desktop/dist/index.html\n", cwd=ROOT.parents[1],
+            capture_output=True, text=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines(), [
+            "scripts/author-cli-qa/fixtures/tab/dist/unexpected.js",
+            "packages/desktop/dist/index.html"])
+
+    def test_provider_publication_assets_are_present_and_bound_to_source_inventory(self):
+        import packages
+        package = packages.metadata("provider", qa.REPOSITORY, candidate()["tag"])["package"]
+        self.assertEqual(package["host"]["assets"], {
+            "icon": "icon.svg", "readme": "README.md", "license": "LICENSE"})
+        source = ROOT / "fixtures/provider"
+        paths = packages.fixture_paths("provider")
+        self.assertEqual({path.relative_to(source).as_posix() for path in paths},
+                         {"bin/provider", "icon.svg", "README.md", "LICENSE"})
+        inventory = qa.source_inventory({**candidate(), "kind": "provider"})
+        for asset in package["host"]["assets"].values():
+            path = source / asset
+            self.assertIn(path, paths)
+            self.assertEqual(inventory[path.relative_to(qa.SCRIPTS_ROOT).as_posix()],
+                             qa.digest(path.read_bytes()))
+        self.assertIn("dedicated inert author CLI QA provider fixture only",
+                      (source / "LICENSE").read_text())
+        self.assertIn("Never execute", (source / "README.md").read_text())
+
+    @unittest.skipUnless(os.environ.get("CADENCR_DEVELOPMENT_FIXTURE_CLI"),
+                         "explicit development CLI required; not released-CLI qualification")
+    def test_development_cli_packs_and_plans_real_fixtures(self):
+        import hashlib
+        import packages
+        import tarfile
+        cli = Path(os.environ["CADENCR_DEVELOPMENT_FIXTURE_CLI"]).resolve(strict=True)
+        with tempfile.TemporaryDirectory(prefix="author-fixture-development-") as scratch:
+            for kind in ("provider", "theme", "tab"):
+                with self.subTest(kind=kind):
+                    root = Path(scratch).resolve() / kind
+                    root.mkdir()
+                    home = root / "home"
+                    home.mkdir()
+                    def invoke(cli, args, home):
+                        # No credentials, ambient proxies, publication, or fixture execution.
+                        result = subprocess.run([str(cli), *map(str, args)],
+                            env=qa.cli_env(home), capture_output=True, timeout=30)
+                        self.assertEqual(result.returncode, 0, result.stderr.decode())
+                        return result.stdout
+                    stage, archives = packages.prepare(cli, {**candidate(), "kind": kind},
+                                                       root, home, invoke, qa.asset)
+                    metadata = json.loads((stage / "metadata.json").read_text())
+                    submission = json.loads((root / "submission.json").read_text())
+                    self.assertEqual(submission["schema_version"], 2)
+                    self.assertEqual(submission["package"], metadata)
+                    self.assertTrue((root / "plan.json").is_file())
+                    expected = {path.relative_to(ROOT / "fixtures" / kind).as_posix()
+                                for path in packages.fixture_paths(kind)} if kind != "theme" else {"theme.json"}
+                    for archive in archives:
+                        path = stage / archive["name"]
+                        self.assertEqual(archive["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
+                        with tarfile.open(path) as tar:
+                            self.assertEqual({member.name for member in tar if member.isfile()}, expected)
 
     def test_actions_token_cannot_be_author_token(self):
         with tempfile.TemporaryDirectory() as root, patch.object(

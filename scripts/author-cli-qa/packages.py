@@ -33,7 +33,7 @@ def metadata(kind, repository, tag):
         descriptor["distribution"] = {"binary": {
             target: {**distribution("provider-" + target + ".tar.gz"), "cmd": "bin/provider"}
             for target in TARGETS}}
-        host["assets"] = {"icon": "icon.svg"}
+        host["assets"] = {"icon": "icon.svg", "readme": "README.md", "license": "LICENSE"}
     else:
         descriptor["api_version" if kind == "tab" else "document_version"] = 1
         descriptor["distribution"] = distribution(kind + ".tar.gz")
@@ -70,6 +70,15 @@ def prepare(cli, c, root, home, invoke, asset):
     timestamp = lambda at: at.isoformat().replace("+00:00", "Z")
     invoke(cli, ["registry", "build-index", "--schema-version", "2", "--packages", str(packages),
         "--generated-at", timestamp(now), "--expires-at", timestamp(now + timedelta(days=1))], home)
+    # Catalog validation is deliberately looser than publication validation.
+    # Keep the submission/plan private scratch, never release assets.
+    submission = root / "submission.json"
+    write_json(submission, {"schema_version": 2, "package": package,
+        "source": {"repository": "https://github.com/" + c["repository"],
+                   "tag": c["tag"], "commit": c["source_commit"]},
+        "changelog": "Inert original-author CLI qualification."})
+    invoke(cli, ["registry", "plan-publication", "--submission", str(submission),
+        "--repository", c["repository"], "--output", str(root / "plan.json")], home)
     write_json(stage / "metadata.json", package)
     return stage, archives
 
