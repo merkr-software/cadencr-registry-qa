@@ -55,12 +55,19 @@ run() {
   result=0
   (ulimit -f 128; exec timeout --kill-after=2s 30s env -i PATH="$PATH" HOME="$CLI_WORK_ROOT/home" "$CLI" "$@") > "$CLI_WORK_ROOT/logs/$name.out" 2> "$CLI_WORK_ROOT/logs/$name.err" || result=$?
   [ "$result" -eq 0 ] || return "$result"
-  [ "$name" = version ] || touch "$CLI_WORK_ROOT/logs/$name.passed"
+  case "$name" in
+    version|validate-metadata-*|validate-submission-*|expiry-*) ;;
+    *) touch "$CLI_WORK_ROOT/logs/$name.passed" ;;
+  esac
 }
 reject() {
   name=$1; expected_code=$2; shift 2
   if run "$name" "$@"; then echo "unexpected acceptance: $name" >&2; exit 1; fi
   # Timeout, output overflow and launch failure are not semantic rejection proof.
+  expected_result=1
+  [ "$expected_code" != OUTPUT_WRITE_FAILED ] || expected_result=3
+  test "$result" -eq "$expected_result"
+  test ! -s "$CLI_WORK_ROOT/logs/$name.out"
   test -s "$CLI_WORK_ROOT/logs/$name.err"
   python3 - "$CLI_WORK_ROOT/logs/$name.err" "$expected_code" <<'PY'
 import json,sys
@@ -119,8 +126,88 @@ for name,value in [('example-provider-0.1.0.json',{'kind':'provider','package':p
 now=datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
 f=lambda d:d.isoformat().replace('+00:00','Z')
 (r/'generated').write_text(f(now-datetime.timedelta(minutes=1))); (r/'expires').write_text(f(now+datetime.timedelta(hours=1)))
+# Local diagnostic data; intentionally unauthenticated envelopes establish no trust.
+for kind,name in [('provider','example-provider-0.1.0.json'),('theme','qualification-1.0.0.json'),('tab','qualification-tab-1.0.0.json')]:
+ value=json.loads((r/'candidate/submissions'/name).read_text())
+ (r/('submission-'+kind+'.json')).write_text(json.dumps(value))
+ for label in ['nested','unknown','provenance']:
+  bad=json.loads(json.dumps(value))
+  if label=='nested': bad['package']={'kind':kind,'package':bad['package']}
+  elif label=='unknown': bad['source']['extra']=True
+  else: bad['source']['repository']='https://github.com/other/repository'
+  (r/('submission-'+kind+'-'+label+'.json')).write_text(json.dumps(bad))
+for label,hours in [('expired',-1),('renewal-due',24),('healthy',168)]:
+ (r/('expiry-'+label+'.json')).write_text(json.dumps({'signed':{'generated_at':f(now-datetime.timedelta(hours=48)),'expires_at':f(now+datetime.timedelta(hours=hours))},'signature':{}}))
+(r/'metadata-link.json').symlink_to(r/'provider-package.json')
+os.mkfifo(r/'metadata-fifo.json')
+(r/'expiry-link.json').symlink_to(r/'expiry-healthy.json')
+os.mkfifo(r/'expiry-fifo.json')
+for name,source,limit in [('metadata','provider-package.json',32*1024*1024),('submission','submission-provider.json',1024*1024),('expiry','expiry-healthy.json',32*1024*1024)]:
+ (r/(name+'-oversized.json')).write_text((r/source).read_text()+' '*limit)
 (r/'policy.json').write_text(json.dumps({'schema_version':1,'kind':'theme-blocklist','generated_at':f(now-datetime.timedelta(minutes=1)),'expires_at':f(now+datetime.timedelta(hours=1)),'entries':[]}))
 PY
+# Exercise the released semantic boundaries, never execute contributor fixtures.
+for kind in provider theme tab; do
+  case "$kind" in
+    provider) metadata="$CLI_WORK_ROOT/provider-package.json" ;;
+    theme) metadata="$CLI_WORK_ROOT/packages/qualification-1.0.0.json" ;;
+    tab) metadata="$CLI_WORK_ROOT/tab-package.json" ;;
+  esac
+  run "validate-metadata-$kind" --json registry validate-metadata "$metadata"
+  run "validate-submission-$kind" --json registry validate-submission "$CLI_WORK_ROOT/submission-$kind.json"
+  python3 - "$CLI_WORK_ROOT/logs/validate-metadata-$kind" "$CLI_WORK_ROOT/logs/validate-submission-$kind" <<'PY'
+import json,pathlib,sys
+for prefix in sys.argv[1:]:
+ value=json.loads(pathlib.Path(prefix+'.out').read_text())
+ assert value['ok'] is True and value['code']=='OK'
+ assert pathlib.Path(prefix+'.err').read_text()==''
+PY
+  touch "$CLI_WORK_ROOT/logs/validate-metadata-$kind.passed" "$CLI_WORK_ROOT/logs/validate-submission-$kind.passed"
+  for label in nested unknown provenance; do
+    reject "reject-submission-$kind-$label" REGISTRY_VALIDATION_FAILED --json registry validate-submission "$CLI_WORK_ROOT/submission-$kind-$label.json"
+  done
+done
+for label in nested malformed nonfinite; do
+  reject "reject-metadata-$label" REGISTRY_VALIDATION_FAILED --json registry validate-metadata "$CLI_WORK_ROOT/$label/bad.json"
+  reject "reject-submission-$label" REGISTRY_VALIDATION_FAILED --json registry validate-submission "$CLI_WORK_ROOT/$label/bad.json"
+done
+for label in link fifo oversized; do
+  reject "reject-metadata-$label" REGISTRY_VALIDATION_FAILED --json registry validate-metadata "$CLI_WORK_ROOT/metadata-$label.json"
+  reject "reject-expiry-$label" METADATA_EXPIRY_CHECK_FAILED --json registry check-metadata-expiry "$CLI_WORK_ROOT/expiry-$label.json"
+done
+reject reject-submission-oversized REGISTRY_VALIDATION_FAILED --json registry validate-submission "$CLI_WORK_ROOT/submission-oversized.json"
+reject reject-expiry-malformed METADATA_EXPIRY_CHECK_FAILED --json registry check-metadata-expiry "$CLI_WORK_ROOT/malformed/bad.json"
+# Unhealthy expiry emits a stdout report AND a stderr diagnostic; not reject().
+for state in expired renewal-due healthy; do
+  for mode in human json; do
+    name="expiry-$state-$mode"
+    result=0
+    if [ "$mode" = json ]; then
+      run "$name" --json registry check-metadata-expiry "$CLI_WORK_ROOT/expiry-$state.json" || result=$?
+    else
+      run "$name" registry check-metadata-expiry "$CLI_WORK_ROOT/expiry-$state.json" || result=$?
+    fi
+    python3 - "$CLI_WORK_ROOT/logs/$name" "$state" "$mode" "$result" <<'PY'
+import json,pathlib,sys
+prefix,state,mode,code=sys.argv[1:]
+report=json.loads(pathlib.Path(prefix+'.out').read_text())
+assert report['diagnostic_only'] is True and len(report['results'])==1
+entry=report['results'][0]
+assert entry['status']==state and entry['authenticated'] is False
+assert isinstance(entry['remaining_hours'],(int,float))
+stderr=pathlib.Path(prefix+'.err').read_text()
+if state=='healthy':
+ assert code=='0' and stderr==''
+else:
+ assert code=='1'
+ if mode=='json':
+  diagnostic=json.loads(stderr)
+  assert diagnostic['ok'] is False and diagnostic['code']=='METADATA_RENEWAL_DUE'
+ else: assert 'METADATA_RENEWAL_DUE' in stderr
+PY
+    touch "$CLI_WORK_ROOT/logs/$name.passed"
+  done
+done
 run validate-provider-folder plugin validate "$CLI_WORK_ROOT/provider" --descriptor "$CLI_WORK_ROOT/qualification.json"
 run validate-contributions registry validate --base "$CLI_WORK_ROOT/base" --candidate "$CLI_WORK_ROOT/candidate"
 run validate-tab plugin validate "$CLI_WORK_ROOT/qualification-tab" --kind tab
