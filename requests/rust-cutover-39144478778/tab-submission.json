@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "tab",
+    "package": {
+      "host": {
+        "compatibility": {
+          "min_app_version": "999.0.0"
+        },
+        "publisher": "qa-author"
+      },
+      "tab": {
+        "api_version": 1,
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Frust-cutover-tab-39144478778/tab.tar.gz",
+          "sha256": "4547bd6151b3e668dd16a3151451bbc83875fb313be7aa3b23d5a76a6f74a25a"
+        },
+        "id": "qa-author-tab",
+        "license": "MIT",
+        "name": "Author CLI QA tab",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.1"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "e47b9f3bcad3c55eb896dfa52850809ab8e2e26f",
+    "tag": "qa-author-cli/rust-cutover-tab-39144478778"
+  },
+  "changelog": "Inert immutable 1.0.1 update for Rust CLI cutover qualification."
+}

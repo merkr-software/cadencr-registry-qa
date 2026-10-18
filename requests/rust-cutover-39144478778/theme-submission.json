@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "theme",
+    "package": {
+      "host": {
+        "compatibility": {
+          "min_app_version": "1.0.0"
+        },
+        "publisher": "qa-author"
+      },
+      "theme": {
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Frust-cutover-theme-39144478778/theme.tar.gz",
+          "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500"
+        },
+        "document_version": 1,
+        "id": "qa-author-theme",
+        "license": "Apache-2.0",
+        "name": "Author CLI QA theme",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.1"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "e47b9f3bcad3c55eb896dfa52850809ab8e2e26f",
+    "tag": "qa-author-cli/rust-cutover-theme-39144478778"
+  },
+  "changelog": "Inert immutable 1.0.1 update for Rust CLI cutover qualification."
+}
