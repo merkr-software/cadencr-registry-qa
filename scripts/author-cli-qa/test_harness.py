@@ -1,5 +1,6 @@
 """Offline guard and orchestration tests: never authorize remote publication."""
 import importlib.util
+import io
 import json
 import os
 import socket
@@ -30,6 +31,86 @@ from proxy import Gate, Tunnel
 
 
 class Guards(unittest.TestCase):
+    def test_failure_json_never_exports_exception_payloads(self):
+        secret = "token-secret /private/scratch https://private.example/token-secret"
+        errors = [qa.Rejected(secret), OSError(secret), ValueError(secret),
+                  KeyError(secret), TypeError(secret),
+                  subprocess.CalledProcessError(1, [secret], output=secret, stderr=secret),
+                  subprocess.TimeoutExpired([secret], 1, output=secret, stderr=secret),
+                  qa.urllib.error.URLError(secret)]
+        for error in errors:
+            with self.subTest(kind=type(error).__name__), tempfile.TemporaryDirectory() as scratch:
+                c = Path(scratch) / "candidate.json"
+                c.write_text(json.dumps(candidate()))
+                stderr = io.StringIO()
+                args = ["qa", "--candidate", str(c), "--confirm-candidate-sha256",
+                        qa.digest(c.read_bytes()), "--cli", secret, "--output", str(c)]
+                with patch.object(sys, "argv", args), patch.object(
+                    qa, "qualify", side_effect=error
+                ), patch.object(sys, "stderr", stderr):
+                    self.assertEqual(qa.main(), 1)
+                diagnostic = json.loads(stderr.getvalue())
+                self.assertFalse(diagnostic["ok"])
+                self.assertNotIn(secret, stderr.getvalue())
+                self.assertNotIn(scratch, stderr.getvalue())
+                self.assertEqual(json.loads(c.read_text()), candidate())
+        poisoned = qa.Rejected(secret, code=secret, http_status=secret)
+        poisoned.operations = [secret] * 100 + ["get"] * 100
+        diagnostic = json.loads(qa.failure_json(poisoned))
+        self.assertEqual(diagnostic, {"ok": False, "code": "GUARD_REJECTED",
+            "category": "REJECTED", "operations": ["get"] * 4})
+
+    def test_real_qualification_failure_does_not_print_retained_scratch_path(self):
+        secret = "private-token https://secret.example/private /private/raw-secret"
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            c = root / "candidate.json"
+            c.write_text(json.dumps(candidate()))
+            stderr = io.StringIO()
+            args = ["qa", "--candidate", str(c), "--confirm-candidate-sha256",
+                    qa.digest(c.read_bytes()), "--cli", secret, "--output", str(root / "proof")]
+            with patch.object(sys, "argv", args), patch.object(qa, "check_cli"), patch.object(
+                qa.tempfile, "mkdtemp", return_value=scratch
+            ), patch.object(qa, "local", side_effect=ValueError(secret)), patch.object(
+                sys, "stderr", stderr
+            ):
+                self.assertEqual(qa.main(), 1)
+            lines = stderr.getvalue().splitlines()
+            self.assertEqual(lines[0], "Private QA scratch retained.")
+            self.assertEqual(json.loads(lines[1]), {
+                "ok": False, "code": "QUALIFICATION_FAILED", "category": "VALUE"})
+            self.assertNotIn(scratch, stderr.getvalue())
+            self.assertNotIn(secret, stderr.getvalue())
+            self.assertFalse((root / "proof").exists())
+
+    def test_http_failure_has_only_bounded_status_and_closed_operation_trace(self):
+        network = qa.GitHub()
+        error = qa.urllib.error.HTTPError("https://secret.example/private", 403,
+                                         "private-token", {"secret": "token"}, None)
+        with patch.object(network.opener, "open", side_effect=error):
+            with self.assertRaises(qa.Rejected) as caught:
+                network.identity(candidate(), "private-token")
+        self.assertEqual(json.loads(qa.failure_json(caught.exception)), {
+            "ok": False, "code": "HTTP_READ_FAILED", "category": "REJECTED",
+            "http_status": 403, "operations": ["get", "identity"]})
+        for operation in ("draft", "inventory"):
+            with patch.object(network.opener, "open", side_effect=error):
+                with self.assertRaises(qa.Rejected) as caught:
+                    getattr(network, operation)(candidate(), {} if operation == "inventory" else "token")
+            self.assertEqual(json.loads(qa.failure_json(caught.exception))["operations"],
+                             ["get", operation])
+        error.close()
+
+    def test_cli_environment_does_not_inherit_credentials(self):
+        with patch.dict(os.environ, {"GITHUB_TOKEN": "secret", "GH_TOKEN": "secret",
+                "QA_AUTHOR_GITHUB_TOKEN": "secret", "HTTPS_PROXY": "secret",
+                "CADENCR_AUTHOR_GITHUB_TOKEN": "ambient-secret"}):
+            env = qa.cli_env(Path("/scratch"))
+            self.assertEqual(set(env), {"PATH", "HOME", "XDG_CONFIG_HOME", "LANG"})
+            self.assertNotIn("secret", json.dumps(env))
+            self.assertEqual(qa.cli_env(Path("/scratch"), "explicit-token"),
+                             {**env, "CADENCR_AUTHOR_GITHUB_TOKEN": "explicit-token"})
+
     def test_symlink_entry_uses_canonical_fixture_roots(self):
         with tempfile.TemporaryDirectory() as directory:
             alias = Path(directory) / "scripts-alias"

@@ -24,14 +24,7 @@ SCRIPTS_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS_ROOT / "author-cli-qa"))
 from process_limits import bounded_command
 
-
-class Rejected(Exception):
-    pass
-
-
-def require(condition):
-    if not condition:
-        raise Rejected("qualification guard rejected input or observed state")
+from failure_diagnostics import Rejected, require, failure_json
 
 
 def digest(data):
@@ -115,6 +108,9 @@ def network_operation(method):
             result = method(self, *args, **kwargs)
             self.remaining()  # Never accept a valid-looking result after the shared deadline.
             return result
+        except Rejected as error:
+            error.operations.append(method.__name__)
+            raise
         finally:
             self.deadline = previous
     return bounded
@@ -164,7 +160,8 @@ class GitHub:
             self.remaining()
             if error.code == 404 and absent:
                 return None
-            raise Rejected("GitHub read failed") from None
+            raise Rejected("GitHub read failed", code="HTTP_READ_FAILED",
+                           http_status=error.code) from None
 
     @network_operation
     def identity(self, c, token):
@@ -294,7 +291,7 @@ def qualify(cli, c, publish, network=None, interrupt_draft=False):
     with nullcontext(tempfile.mkdtemp(prefix="author-cli-qa-")) as scratch:
         root = Path(scratch)
         root.chmod(0o700)
-        print("Private retained QA scratch: " + str(root), file=sys.stderr)
+        print("Private QA scratch retained.", file=sys.stderr)
         home, stage, request, sha, assets = local(cli, c, root)
         proof = {"schema_version": 1, "cli_sha256": c["cli_sha256"],
                  "cli_version": c["cli_version"], "request_sha256": sha,
@@ -376,8 +373,8 @@ def main():
         with args.output.open("x") as output:
             json.dump(proof, output, sort_keys=True, indent=2)
             output.write("\n")
-    except (Rejected, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
-        print("author CLI qualification failed; no diagnostics or credentials exported", file=sys.stderr)
+    except (Rejected, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
+        print(failure_json(error), file=sys.stderr)
         return 1
     return 0
 
