@@ -1,0 +1,62 @@
+{
+  "phase": "incremental",
+  "request": "requests/three-kind/incremental.json",
+  "previous": "requests/three-kind/previous.json",
+  "previous_sha256": "81c757faac2d2c83a3587001f70116f1f268162577b25b5d97d3bb5bc45158cd",
+  "public_key": "requests/three-kind/public.pem",
+  "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
+  "key_id": "qa-2026",
+  "inputs": {
+    "requests/three-kind/provider-submission.json": "c4b0ef4831821fb27c4820a419577098d03f58286408256a8c114c42b3b3306d",
+    "requests/three-kind/theme-submission.json": "1d012ba2ad736270c5a36eafe8097305b9ab84f9e9f23ccdaca3ccdc118da312",
+    "requests/three-kind/tab-submission.json": "9e40bdb22f63626d5181377867703d40591ae844863aba9223dfda6e64eafdcb"
+  },
+  "mirror_tags": [
+    "provider-qa-author-provider-v1.0.0",
+    "theme-qa-author-theme-v1.0.0",
+    "tab-qa-author-tab-v1.0.0"
+  ],
+  "added_entry_sha256": [
+    "33950f1b4c7a110465de11a6d40aa7cf21165cb63509de9ecc4d9edcc531930d",
+    "78c2037cf1c2eb8ec134096cb16a369d5b12e12916bcc6de590e50ade84b2759",
+    "b752fb7abd25f8bfd97a32d287a9cb1b0efa1e399120fc27b49dcb05c9be0715"
+  ],
+  "archives": [
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.0/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.0/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.0/tab.tar.gz",
+      "sha256": "e6823d9743c61bb7c54fa372f3c8095ece6f8d25dac1aa1d1aca09d54180df56",
+      "size": 297
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.0/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-inert-theme-v0.0.1/theme.tar.gz",
+      "sha256": "feb4ba028cbb4abf9014284322d7920ad647e7c26318db586c8a50d9326ceb17",
+      "size": 1100
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-inert-theme-v0.0.2/theme.tar.gz",
+      "sha256": "feb4ba028cbb4abf9014284322d7920ad647e7c26318db586c8a50d9326ceb17",
+      "size": 1100
+    }
+  ],
+  "fault": {
+    "submission": "requests/three-kind/theme-submission.json",
+    "tag": "theme-qa-author-theme-v1.0.0",
+    "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+    "size": 1115
+  }
+}

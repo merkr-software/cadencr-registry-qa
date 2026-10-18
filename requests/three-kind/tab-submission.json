@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "tab",
+    "package": {
+      "host": {
+        "compatibility": {
+          "min_app_version": "999.0.0"
+        },
+        "publisher": "qa-author"
+      },
+      "tab": {
+        "api_version": 1,
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fwave3-39108033875-tab-dist/tab.tar.gz",
+          "sha256": "e6823d9743c61bb7c54fa372f3c8095ece6f8d25dac1aa1d1aca09d54180df56"
+        },
+        "id": "qa-author-tab",
+        "license": "MIT",
+        "name": "Author CLI QA tab",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.0"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "e3a7054af53dcf05628872e8bad41b1bd4218fe1",
+    "tag": "qa-author-cli/wave3-39108033875-tab-dist"
+  },
+  "changelog": "Inert original-author CLI QA fixture; never execute."
+}
