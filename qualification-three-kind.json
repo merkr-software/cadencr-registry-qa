@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "qualification": "distributed-three-kind-producer-lifecycle",
+  "date": "2026-10-18",
+  "repository": "merkr-software/cadencr-registry-qa",
+  "cli_version": "0.13.1-dev.39108033875.1",
+  "cli_sha256": "d11bfade6297fa30e1e10e82605f5a221da8e07edeeee372e2c2f6185c6ff725",
+  "cli_source_commit": "88ead507983371e5c3df468c6d9bf7c6c12e5fbb",
+  "offline_run": 39120437491,
+  "authors": {
+    "provider": {
+      "kind": "provider",
+      "runs": {
+        "offline": 39121644092,
+        "publish": 39121664466,
+        "fresh": 39121723703
+      },
+      "request_sha256": "4c455ec610d6f5cb5f7d11217f022c56f57854f38d3941455af38ef0b02c163a",
+      "release_id": 416398434,
+      "release_url": "https://github.com/merkr-software/cadencr-registry-qa/releases/tag/qa-author-cli/wave3-39108033875-provider-assets",
+      "candidate_commit": "fa24adcc28582f67295975a027609c2eeac3c3de",
+      "source_commit": "e3a7054af53dcf05628872e8bad41b1bd4218fe1",
+      "tag": "qa-author-cli/wave3-39108033875-provider-assets",
+      "inventory": {
+        "assets": [
+          {
+            "id": 653274014,
+            "name": "metadata.json",
+            "sha256": "b44273dd6d23392d0fd22a6d8017566e3bb221324e068522c1714cbd66a0aeb6",
+            "size": 1004
+          },
+          {
+            "id": 653274090,
+            "name": "provider-darwin-aarch64.tar.gz",
+            "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+            "size": 1064
+          },
+          {
+            "id": 653273968,
+            "name": "provider-linux-x86_64.tar.gz",
+            "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+            "size": 1064
+          }
+        ],
+        "body_sha256": "ff094e2e8080664873dc64b34de96da8dc1c76c3d2163f9a1cd68150057f4bd3",
+        "release_id": 416398434
+      },
+      "assets_independently_verified": true,
+      "runtime": "not_executed",
+      "production_unchanged": true
+    },
+    "theme": {
+      "kind": "theme",
+      "runs": {
+        "offline": 39120858003,
+        "publish": 39120877981,
+        "fresh": 39120934544
+      },
+      "request_sha256": "e379e8e336471a0dc3fdd23cb9e57b222fad8dddab8ff2d7954ebe67dc010217",
+      "release_id": 416393129,
+      "release_url": "https://github.com/merkr-software/cadencr-registry-qa/releases/tag/qa-author-cli/wave3-39108033875-theme",
+      "candidate_commit": "91a8cced973b9fade7f5fabafb0942d2d6e475a8",
+      "source_commit": "0d6ba2948ed1636e1907533ea4e849041539aebd",
+      "tag": "qa-author-cli/wave3-39108033875-theme",
+      "inventory": {
+        "assets": [
+          {
+            "id": 653246851,
+            "name": "metadata.json",
+            "sha256": "8283a5c328570696eeba657e4c4f29dbf41b73bcf5f075444bcc5142ae2e21a8",
+            "size": 597
+          },
+          {
+            "id": 653246795,
+            "name": "theme.tar.gz",
+            "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+            "size": 1115
+          }
+        ],
+        "body_sha256": "b1d150b60a97a143a19d1b234592bc6ec2be437b252fc529e089c463293e08d4",
+        "release_id": 416393129
+      },
+      "assets_independently_verified": true,
+      "runtime": "not_executed",
+      "production_unchanged": true
+    },
+    "tab": {
+      "kind": "tab",
+      "runs": {
+        "offline": 39121802085,
+        "publish": 39121828269,
+        "fresh": 39121874148
+      },
+      "request_sha256": "af28f3546ded4b6e4bfeaedd210c77915c8b16710718c1c37a5140eb2b8d0837",
+      "release_id": 416399588,
+      "release_url": "https://github.com/merkr-software/cadencr-registry-qa/releases/tag/qa-author-cli/wave3-39108033875-tab-dist",
+      "candidate_commit": "857e242975ab02fd06bd02518ad9937828e3d1cb",
+      "source_commit": "e3a7054af53dcf05628872e8bad41b1bd4218fe1",
+      "tag": "qa-author-cli/wave3-39108033875-tab-dist",
+      "inventory": {
+        "assets": [
+          {
+            "id": 653279617,
+            "name": "metadata.json",
+            "sha256": "86e124590097d415a1d7db41c1427ac075a89a8651bc4eb4089311f13b756d96",
+            "size": 580
+          },
+          {
+            "id": 653279562,
+            "name": "tab.tar.gz",
+            "sha256": "e6823d9743c61bb7c54fa372f3c8095ece6f8d25dac1aa1d1aca09d54180df56",
+            "size": 297
+          }
+        ],
+        "body_sha256": "b9e700d8fcf4a89ab465ce6691790542e35a815028dc98c8328e6001cdcc1a7d",
+        "release_id": 416399588
+      },
+      "assets_independently_verified": true,
+      "runtime": "not_executed",
+      "production_unchanged": true
+    }
+  },
+  "mixed_registry": {
+    "phase": "incremental",
+    "run_id": 39121979554,
+    "url": "https://github.com/merkr-software/cadencr-registry-qa/actions/runs/39121979554",
+    "reviewed_commit": "2fdee87579519643be6b7aaa8ef28292749c0ef2",
+    "request_sha256": "8bdbbdfc8d1a042a97301652dda7fafc68be778040289714c8c22e758db68d19",
+    "plan_sha256": "9cc6f3fdffcece9e18064071bdca7439ee531eb66214d8764b8f3d7cfc150af2",
+    "catalog_sha256": "3bfe19ba7ccae6a742703c63a7797da849bcc467c668b0a0616fb777fccbc0ef",
+    "discovery_head": "9451e17c1bbb3af2954d279041a8b6968b5afbef",
+    "proof_sha256": {
+      "first-publish": "caf50389905c1b02a4cb35a08bdc9472003468fec4e0e22171b3cd18336b0f6f",
+      "first-same-state-replay": "532353519916a1eef86a230a519eb9557bb3d21475ec940838053e0cfdc8b4e5",
+      "fresh-publish": "ec863f0f6a5035df2a83c9a8c656c103cbb01cae87e066def3c753af4a31b5b0",
+      "fresh-same-state-replay": "6861e2e1be3933c814357886f90450840cc4362107b0c8ef78e86b2d960beb7a"
+    },
+    "catalog_entries": 5,
+    "anonymous_archives": 6,
+    "same_state_and_fresh_inventory_identical": true,
+    "historical_release_ids_preserved": true,
+    "production_unchanged": true
+  },
+  "renewal_original_intent_recovery": {
+    "phase": "renewal-original-intent-recovery",
+    "initial_run": 39122296869,
+    "initial_outcome": "CLI_error_after_publication_cause_unknown",
+    "earlier_recovery_read_failure": 39122903399,
+    "run_id": 39123128300,
+    "url": "https://github.com/merkr-software/cadencr-registry-qa/actions/runs/39123128300",
+    "workflow_commit": "66a77057e4db3392af5551f2b87878604a74e68b",
+    "operation_commit": "15a797ebfe0f108873471de63052fac3283ba768",
+    "request_sha256": "2cd78368ffe6f1831aabbbca023e6e5c20f54f792b85f2f4b3505058fbfdbbf0",
+    "plan_sha256": "6d67f6ee938af3101a691236dfec94cc7c4871b53254bf5501453a4cb377d2cc",
+    "catalog_sha256": "c7363e0af236bb38b16dc6a1f88fca7922ad56a6d6856852d88aed72c47f8ebf",
+    "inventory_sha256": "98e7ea81683a4384b41192bbbc9cbd54e363b84a8abd08e6b259da7c4d8a6b66",
+    "proof_sha256": {
+      "fresh-recovery": "5f16e96e8b9ba1cc28bfa1d94a1edd57ab3a411203f98a26f74a3ccf94e834e7",
+      "same-state-replay": "8e4f2be45431fcded53ec49ebe2267e5b08c0cf15095d264c359c6088d42b5b5"
+    },
+    "catalog_entries": 5,
+    "anonymous_archives": 6,
+    "fresh_recovery_and_same_state_replay": "verified_inventory_unchanged",
+    "production_unchanged": true
+  },
+  "runtime": "not_executed",
+  "production_pins_changed": false,
+  "production_authority_changed": false,
+  "desktop_activation": false,
+  "initial_renewal_error_cause": "unknown"
+}

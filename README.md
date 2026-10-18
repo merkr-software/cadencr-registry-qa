@@ -7,7 +7,10 @@
 - Offline workflow uses an explicit reviewed commit/pin hash, no credentials or network.
 - Author candidates require one explicit kind and immutable fixture source tag per reviewed dispatch.
 - Registry runs extend the existing authenticated catalog; they never reset discovery.
-- Qualification is pending; deployment alone does not qualify this binary or grant production authority.
+- Producer-lifecycle qualification completed with the exact downloaded ELF; see [`qualification-three-kind.json`](qualification-three-kind.json) for immutable run/content bindings. This does not grant production authority or qualify desktop/runtime behavior.
+- [Mixed publication, controlled interruption, replay and fresh recovery](https://github.com/merkr-software/cadencr-registry-qa/actions/runs/39121979554) passed.
+- [Original-intent renewal recovery](https://github.com/merkr-software/cadencr-registry-qa/actions/runs/39123128300) passed twice with unchanged inventory. Initial renewal run `39122296869` returned an error after remote publication; its original cause remains unknown and that initial run is not claimed green. No replacement request, dates or baseline was manufactured.
+- GET-only transport retries are bounded; no publication retry wrapper, production pin/key change, official plugin release or desktop activation occurred.
 - See `scripts/author-cli-qa/README.md` and `scripts/registry-cli-qa/README.md` for current contracts.
 
 ## Historical qualification runbook
