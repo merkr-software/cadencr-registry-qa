@@ -1,17 +1,32 @@
 import assert from "node:assert/strict";
 import { isDeepStrictEqual } from "node:util";
+import { setTimeout as delay } from "node:timers/promises";
 import { REPOSITORY, sha } from "./guard.mjs";
 export async function bytes(url, headers = {}, signal = AbortSignal.timeout(60000)) {
-  const response = await fetch(url, { headers, signal, redirect: "follow" });
-  assert.equal(response.status, 200);
-  const parts = [];
-  let size = 0;
-  for await (const part of response.body) {
-    size += part.length;
-    assert.ok(size <= 16777216, "response exceeds 16 MiB");
-    parts.push(part);
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    signal.throwIfAborted();
+    try {
+      const response = await fetch(url, { headers, signal, redirect: "follow" });
+      assert.equal(response.status, 200);
+      const parts = [];
+      let size = 0;
+      for await (const part of response.body) {
+        signal.throwIfAborted();
+        size += part.length;
+        assert.ok(size <= 16777216, "response exceeds 16 MiB");
+        parts.push(part);
+      }
+      signal.throwIfAborted();
+      return Buffer.concat(parts);
+    } catch (error) {
+      signal.throwIfAborted();
+      // Read-only transport recovery only; integrity/status/JSON failures stay terminal.
+      const transportFailure =
+        error instanceof TypeError && ["fetch failed", "terminated"].includes(error.message);
+      if (!transportFailure || attempt === 3) throw error;
+      await delay(250, undefined, { signal }); // One caller deadline, never reset per attempt.
+    }
   }
-  return Buffer.concat(parts);
 }
 export async function inventory(token, signal = AbortSignal.timeout(60000)) {
   const get = async (path) =>

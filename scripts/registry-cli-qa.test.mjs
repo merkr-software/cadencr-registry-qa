@@ -248,3 +248,94 @@ test("CLI failure diagnostics retain only bounded codes and message hashes", () 
     "ETIMEDOUT",
   );
 });
+
+test("read-only transport retries recover fetch and body failures under the same signal", async (t) => {
+  const controller = new AbortController();
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
+    calls++;
+    assert.equal(options.signal, controller.signal);
+    assert.deepEqual(options.headers, { Accept: "fixture" });
+    if (calls === 1) throw new TypeError("fetch failed");
+    if (calls === 2)
+      return {
+        status: 200,
+        body: (async function* () {
+          yield Buffer.from("discard-partial-body");
+          throw new TypeError("terminated");
+        })(),
+      };
+    return new Response("complete");
+  });
+  assert.equal(
+    (await bytes("https://fixture.invalid", { Accept: "fixture" }, controller.signal)).toString(),
+    "complete",
+  );
+  assert.equal(calls, 3);
+});
+
+test("read-only transport retries stop at three attempts", async (t) => {
+  let calls = 0;
+  const failure = new TypeError("fetch failed");
+  t.mock.method(globalThis, "fetch", async () => {
+    calls++;
+    throw failure;
+  });
+  await assert.rejects(bytes("https://fixture.invalid"), (error) => error === failure);
+  assert.equal(calls, 3);
+});
+
+test("caller abort interrupts transport retry backoff without another read", async (t) => {
+  const controller = new AbortController();
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => {
+    calls++;
+    setTimeout(() => controller.abort(new Error("caller deadline")), 10);
+    throw new TypeError("fetch failed");
+  });
+  await assert.rejects(bytes("https://fixture.invalid", {}, controller.signal), {
+    name: "AbortError",
+  });
+  assert.equal(calls, 1);
+  await assert.rejects(bytes("https://fixture.invalid", {}, controller.signal), /caller deadline/);
+  assert.equal(calls, 1);
+});
+
+test("HTTP, oversize, abort and non-transport errors never retry", async (t) => {
+  for (const respond of [
+    () => new Response("unavailable", { status: 503 }),
+    () => new Response(Buffer.alloc(16777217)),
+    () => {
+      throw new TypeError("other error");
+    },
+    () => {
+      throw new Error("fetch failed");
+    },
+    () => {
+      throw new DOMException("aborted", "AbortError");
+    },
+  ]) {
+    let calls = 0;
+    const mock = t.mock.method(globalThis, "fetch", async () => {
+      calls++;
+      return respond();
+    });
+    await assert.rejects(bytes("https://fixture.invalid"));
+    assert.equal(calls, 1);
+    mock.mock.restore();
+  }
+});
+
+test("JSON parsing and integrity checks remain outside read-only retry boundary", async (t) => {
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => {
+    calls++;
+    return new Response("not JSON or expected bytes");
+  });
+  await assert.rejects(async () => JSON.parse(await bytes("https://fixture.invalid")));
+  assert.equal(calls, 1);
+  await assert.rejects(async () =>
+    assert.equal((await bytes("https://fixture.invalid")).length, 1),
+  );
+  assert.equal(calls, 2);
+});
