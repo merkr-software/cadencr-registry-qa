@@ -13,6 +13,7 @@ import {
   childEnvironment,
   expectedDiscovery,
   inventoryHash,
+  failureDiagnostic,
 } from "./registry-cli-qa/evidence.mjs";
 import { guard, local } from "./registry-cli-qa/guard.mjs";
 test("guard rejects wrong repository before opening reviewed files", () => {
@@ -214,4 +215,36 @@ test("inventory rejects unsupported asset pagination", async (t) => {
 });
 test("inventory shares abort deadline across concurrent asset reads", async (t) => {
   await mockedInventory(t, { abort: true });
+});
+
+test("CLI failure diagnostics retain only bounded codes and message hashes", () => {
+  const secret = "private-key-or-token-do-not-retain";
+  const result = {
+    status: 1,
+    signal: null,
+    stderr: JSON.stringify({ ok: false, code: "REGISTRY_PIPELINE_FAILED", message: secret }),
+    stdout: secret,
+  };
+  const safe = failureDiagnostic(result);
+  assert.equal(safe.cli_code, "REGISTRY_PIPELINE_FAILED");
+  assert.match(safe.message_sha256, /^[a-f0-9]{64}$/);
+  assert.equal(safe.exit_status, 1);
+  assert.ok(!JSON.stringify(safe).includes(secret));
+  for (const stderr of [
+    secret,
+    "null",
+    "{}",
+    "x".repeat(16385),
+    JSON.stringify({ ok: false, code: secret, message: "x".repeat(8193) }),
+  ]) {
+    const diagnostic = failureDiagnostic({ ...result, stderr });
+    assert.equal(diagnostic.cli_code, null);
+    assert.equal(diagnostic.message_sha256, null);
+    assert.ok(!JSON.stringify(diagnostic).includes(secret));
+  }
+  assert.equal(
+    failureDiagnostic({ status: null, signal: "SIGKILL", error: { code: "ETIMEDOUT" } })
+      .process_error,
+    "ETIMEDOUT",
+  );
 });

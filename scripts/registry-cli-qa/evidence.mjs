@@ -179,3 +179,38 @@ export function archiveCoverage(catalog, archives) {
   }
   assert.deepEqual(actual, expected, "reviewed archives must exactly cover authenticated catalog");
 }
+
+// Keep failure diagnosis useful without exposing child output, paths, or secrets.
+export function failureDiagnostic(result) {
+  let code = null,
+    messageHash = null;
+  if (typeof result.stderr === "string" && Buffer.byteLength(result.stderr) <= 16384) {
+    try {
+      const value = JSON.parse(result.stderr);
+      if (
+        value?.ok === false &&
+        typeof value.code === "string" &&
+        /^[A-Z][A-Z0-9_]{0,79}$/.test(value.code)
+      )
+        code = value.code;
+      if (
+        value?.ok === false &&
+        typeof value.message === "string" &&
+        Buffer.byteLength(value.message) <= 8192
+      )
+        messageHash = sha(Buffer.from(value.message));
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) throw error;
+      // Malformed/unstructured child output is deliberately not disclosed.
+    }
+  }
+  return {
+    exit_status: Number.isInteger(result.status) ? result.status : null,
+    signal: ["SIGTERM", "SIGKILL"].includes(result.signal) ? result.signal : null,
+    process_error: ["ETIMEDOUT", "ENOBUFS", "ENOENT"].includes(result.error?.code)
+      ? result.error.code
+      : null,
+    cli_code: code,
+    message_sha256: messageHash,
+  };
+}

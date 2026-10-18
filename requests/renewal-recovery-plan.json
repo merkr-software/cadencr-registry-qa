@@ -1,0 +1,45 @@
+{
+  "phase": "renewal-recovery",
+  "request": "requests/three-kind/renewal.json",
+  "request_sha256": "2cd78368ffe6f1831aabbbca023e6e5c20f54f792b85f2f4b3505058fbfdbbf0",
+  "operation_commit": "15a797ebfe0f108873471de63052fac3283ba768",
+  "expected_catalog_sha256": "c7363e0af236bb38b16dc6a1f88fca7922ad56a6d6856852d88aed72c47f8ebf",
+  "previous": "requests/three-kind/mixed-previous.json",
+  "previous_sha256": "3bfe19ba7ccae6a742703c63a7797da849bcc467c668b0a0616fb777fccbc0ef",
+  "public_key": "requests/three-kind/public.pem",
+  "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
+  "key_id": "qa-2026",
+  "expected_inventory_sha256": "98e7ea81683a4384b41192bbbc9cbd54e363b84a8abd08e6b259da7c4d8a6b66",
+  "archives": [
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.0/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.0/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.0/tab.tar.gz",
+      "sha256": "e6823d9743c61bb7c54fa372f3c8095ece6f8d25dac1aa1d1aca09d54180df56",
+      "size": 297
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.0/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-inert-theme-v0.0.1/theme.tar.gz",
+      "sha256": "feb4ba028cbb4abf9014284322d7920ad647e7c26318db586c8a50d9326ceb17",
+      "size": 1100
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-inert-theme-v0.0.2/theme.tar.gz",
+      "sha256": "feb4ba028cbb4abf9014284322d7920ad647e7c26318db586c8a50d9326ceb17",
+      "size": 1100
+    }
+  ]
+}

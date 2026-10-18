@@ -15,6 +15,7 @@ import {
   initialObservation,
   replayUnchanged,
   archiveCoverage,
+  failureDiagnostic,
 } from "./evidence.mjs";
 const env = process.env;
 const { plan, request } = guard();
@@ -34,7 +35,7 @@ const binaryBytes = file(binary, 256 * 1024 * 1024);
 assert.equal(sha(binaryBytes), BINARY_SHA);
 assertX8664Elf(binaryBytes);
 function cli(args, timeout = 900000, authenticated = false) {
-  const result = spawnSync(binary, args, {
+  const result = spawnSync(binary, args[0] === "--version" ? args : ["--json", ...args], {
     env: childEnvironment(env, authenticated),
     encoding: "utf8",
     timeout,
@@ -43,7 +44,7 @@ function cli(args, timeout = 900000, authenticated = false) {
   });
   assert.ok(
     !result.error && result.status === 0,
-    "distributed CLI failed (raw output not retained)",
+    `distributed CLI failed: ${JSON.stringify(failureDiagnostic(result))}`,
   );
   return result.stdout;
 }
