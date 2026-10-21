@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "provider",
+    "package": {
+      "agent": {
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "binary": {
+            "darwin-aarch64": {
+              "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Frust-cutover-provider-39306959010/provider-darwin-aarch64.tar.gz",
+              "cmd": "bin/provider",
+              "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed"
+            },
+            "linux-x86_64": {
+              "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Frust-cutover-provider-39306959010/provider-linux-x86_64.tar.gz",
+              "cmd": "bin/provider",
+              "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed"
+            }
+          }
+        },
+        "id": "qa-author-provider",
+        "license": "MIT",
+        "name": "Author CLI QA provider",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.2"
+      },
+      "host": {
+        "assets": {
+          "icon": "icon.svg",
+          "license": "LICENSE",
+          "readme": "README.md"
+        },
+        "compatibility": {
+          "min_app_version": "1.0.0"
+        },
+        "publisher": "qa-author"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "523eb736f7ac9e9780be490d914763e3307b12ec",
+    "tag": "qa-author-cli/rust-cutover-provider-39306959010"
+  },
+  "changelog": "Inert immutable 1.0.2 three-kind qualification update."
+}

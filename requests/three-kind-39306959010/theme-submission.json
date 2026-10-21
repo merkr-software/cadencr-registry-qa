@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "theme",
+    "package": {
+      "host": {
+        "compatibility": {
+          "min_app_version": "1.0.0"
+        },
+        "publisher": "qa-author"
+      },
+      "theme": {
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Frust-cutover-theme-39306959010/theme.tar.gz",
+          "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500"
+        },
+        "document_version": 1,
+        "id": "qa-author-theme",
+        "license": "Apache-2.0",
+        "name": "Author CLI QA theme",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.2"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "523eb736f7ac9e9780be490d914763e3307b12ec",
+    "tag": "qa-author-cli/rust-cutover-theme-39306959010"
+  },
+  "changelog": "Inert immutable 1.0.2 three-kind qualification update."
+}

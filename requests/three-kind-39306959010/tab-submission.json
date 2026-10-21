@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "tab",
+    "package": {
+      "host": {
+        "compatibility": {
+          "min_app_version": "999.0.0"
+        },
+        "publisher": "qa-author"
+      },
+      "tab": {
+        "api_version": 1,
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Frust-cutover-tab-39306959010/tab.tar.gz",
+          "sha256": "736ed7b11e46462a43c032c9bf9f869192687ddf76b70db2949feac9e8689313"
+        },
+        "id": "qa-author-tab",
+        "license": "MIT",
+        "name": "Author CLI QA tab",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.2"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "523eb736f7ac9e9780be490d914763e3307b12ec",
+    "tag": "qa-author-cli/rust-cutover-tab-39306959010"
+  },
+  "changelog": "Inert immutable 1.0.2 three-kind qualification update."
+}

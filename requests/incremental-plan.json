@@ -1,25 +1,25 @@
 {
   "phase": "incremental",
-  "request": "requests/rust-cutover-39144478778/incremental.json",
-  "previous": "requests/rust-cutover-39144478778/previous.json",
-  "previous_sha256": "c7363e0af236bb38b16dc6a1f88fca7922ad56a6d6856852d88aed72c47f8ebf",
-  "public_key": "requests/rust-cutover-39144478778/public.pem",
+  "request": "requests/three-kind-39306959010/incremental.json",
+  "previous": "requests/three-kind-39306959010/previous.json",
+  "previous_sha256": "e9fc56363d8d39e3bc77b2d5e2004905e696b021f7463d93c586e9dac4e35bef",
+  "public_key": "requests/three-kind-39306959010/public.pem",
   "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
   "key_id": "qa-2026",
   "inputs": {
-    "requests/rust-cutover-39144478778/provider-submission.json": "b1459d768b04b60ef7a765987350fa9932cea29df0cbdbfc09164137690a36e6",
-    "requests/rust-cutover-39144478778/theme-submission.json": "81f3aef0a2e26db72cd96474e6583fd8f09c006c33070f36fc6062913944ad76",
-    "requests/rust-cutover-39144478778/tab-submission.json": "73fa6dbc5cba9b0d4c7227f426c46e08788ec2658b9d9757534b4e584b3df9c6"
+    "requests/three-kind-39306959010/provider-submission.json": "a586610dc2ca0690c0870d9fda7dca3052b6d104cbf1086fcd69443984745858",
+    "requests/three-kind-39306959010/theme-submission.json": "cb7b3a1c21817a5f5b3aa8fbce4e93263932b211655f7970cfbafaa903a5d9a3",
+    "requests/three-kind-39306959010/tab-submission.json": "f795ac2f7afe0de1439a63ba9bfe4c9c90c79e41f60ed28eadd5ef338d794a56"
   },
   "mirror_tags": [
-    "provider-qa-author-provider-v1.0.1",
-    "theme-qa-author-theme-v1.0.1",
-    "tab-qa-author-tab-v1.0.1"
+    "provider-qa-author-provider-v1.0.2",
+    "tab-qa-author-tab-v1.0.2",
+    "theme-qa-author-theme-v1.0.2"
   ],
   "added_entry_sha256": [
-    "b922c1e4665ae3876ec2ae8537b68e6876c1cddb69809449bff83740df0e9b52",
-    "250571ac8b3957729d8f8b6f5a0cec6b8ece90627bf9baf373a7beaf486b857d",
-    "682ee181f0422889caafd619a248270f0bf56696688ac7e6233aeb968462c71c"
+    "0d8af93cae1c58fd4b0b9714e7f647dd77add77ae6fd66c941c3f67779c6fe4d",
+    "8f6bbf36b98157c151962b8dff5f45249bde87d4dc2551c0c4c3d4ccd8951220",
+    "94091841d1bafff08a004a65f3111e7827073a2e132660af01d4394fbc84e6b4"
   ],
   "archives": [
     {
@@ -43,6 +43,16 @@
       "size": 1064
     },
     {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.2/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.2/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
       "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.0/tab.tar.gz",
       "sha256": "e6823d9743c61bb7c54fa372f3c8095ece6f8d25dac1aa1d1aca09d54180df56",
       "size": 297
@@ -53,12 +63,22 @@
       "size": 297
     },
     {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.2/tab.tar.gz",
+      "sha256": "736ed7b11e46462a43c032c9bf9f869192687ddf76b70db2949feac9e8689313",
+      "size": 298
+    },
+    {
       "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.0/theme.tar.gz",
       "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
       "size": 1115
     },
     {
       "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.1/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.2/theme.tar.gz",
       "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
       "size": 1115
     },
@@ -74,8 +94,8 @@
     }
   ],
   "fault": {
-    "submission": "requests/rust-cutover-39144478778/theme-submission.json",
-    "tag": "theme-qa-author-theme-v1.0.1",
+    "submission": "requests/three-kind-39306959010/theme-submission.json",
+    "tag": "theme-qa-author-theme-v1.0.2",
     "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
     "size": 1115
   }
