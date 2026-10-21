@@ -1,11 +1,11 @@
 {
-  "kind": "tab",
-  "cli_version": "0.13.1-dev.39144478778.1",
-  "cli_sha256": "be5a15c9d065670466511fa9e23ce6e5205c73fade4a5ed9320b262296fbb122",
+  "kind": "provider",
+  "cli_version": "0.13.1-dev.39306959010.1",
+  "cli_sha256": "251c5d0cc7120ccc44dc2d8ad473bd5bb31e3577542098feb72f31372ed7b88a",
   "repository": "merkr-software/cadencr-registry-qa",
   "repository_id": 1420296872,
   "public": true,
   "expected_account": "rle-mino",
-  "tag": "qa-author-cli/rust-cutover-tab-39144478778",
-  "source_commit": "e47b9f3bcad3c55eb896dfa52850809ab8e2e26f"
+  "tag": "qa-author-cli/rust-cutover-provider-39306959010",
+  "source_commit": "523eb736f7ac9e9780be490d914763e3307b12ec"
 }
