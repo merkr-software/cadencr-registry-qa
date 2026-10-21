@@ -1,9 +1,9 @@
 {
   "phase": "renewal",
-  "request": "requests/renewal-convergence-39306959010/renewal.json",
-  "previous": "requests/renewal-convergence-39306959010/previous-signed.json",
-  "previous_sha256": "a6a71f22e262ac1bc0f9c0843d2ed1590a616a101b4a3de47fbea55a000bf95c",
-  "public_key": "requests/renewal-convergence-39306959010/public.pem",
+  "request": "requests/three-kind-39306959010/renewal.json",
+  "previous": "requests/three-kind-39306959010/incremental-signed.json",
+  "previous_sha256": "eb255d333cf0f90c409ba0749c040dc4ff4ab83732e74fc131ed74ade2617490",
+  "public_key": "requests/three-kind-39306959010/public.pem",
   "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
   "key_id": "qa-2026",
   "inputs": {},
@@ -31,6 +31,16 @@
       "size": 1064
     },
     {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.2/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.2/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
       "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.0/tab.tar.gz",
       "sha256": "e6823d9743c61bb7c54fa372f3c8095ece6f8d25dac1aa1d1aca09d54180df56",
       "size": 297
@@ -41,12 +51,22 @@
       "size": 297
     },
     {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.2/tab.tar.gz",
+      "sha256": "736ed7b11e46462a43c032c9bf9f869192687ddf76b70db2949feac9e8689313",
+      "size": 298
+    },
+    {
       "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.0/theme.tar.gz",
       "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
       "size": 1115
     },
     {
       "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.1/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.2/theme.tar.gz",
       "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
       "size": 1115
     },
