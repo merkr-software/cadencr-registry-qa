@@ -146,6 +146,45 @@ test("archive coverage rejects omissions, extras, duplicates and wrong digests a
   }
 });
 
+test("native tab archive coverage includes UI and every backend without changing UI-only tabs", () => {
+  const distribution = (name) => ({
+    archive: `https://github.com/merkr-software/cadencr-registry-qa/releases/download/v1/${name}`,
+    sha256: name,
+  });
+  const values = ["ui", "linux", "darwin", "windows"].map(distribution);
+  const tab = {
+    ...values[0],
+    binary: {
+      "linux-x86_64": values[1],
+      "darwin-aarch64": values[2],
+      "windows-x86_64": values[3],
+    },
+  };
+  const catalog = {
+    signed: { packages: [{ kind: "tab", package: { tab: { distribution: tab } } }] },
+  };
+  const archives = values.map((value) => ({ url: value.archive, sha256: value.sha256, size: 10 }));
+  archiveCoverage(catalog, archives);
+  for (let index = 0; index < archives.length; index++) {
+    assert.throws(() =>
+      archiveCoverage(
+        catalog,
+        archives.filter((_, i) => i !== index),
+      ),
+    );
+    assert.throws(() => archiveCoverage(catalog, [...archives, { ...archives[index] }]));
+    const tampered = archives.map((value, i) =>
+      i === index ? { ...value, sha256: "wrong" } : value,
+    );
+    assert.throws(() => archiveCoverage(catalog, tampered));
+  }
+  const extra = { url: distribution("extra").archive, sha256: "extra", size: 10 };
+  assert.throws(() => archiveCoverage(catalog, [...archives, extra]));
+  delete tab.binary;
+  archiveCoverage(catalog, archives.slice(0, 1));
+  assert.throws(() => archiveCoverage(catalog, archives));
+});
+
 async function mockedInventory(t, { assetCount = 0, pages = 1, abort = false } = {}) {
   let active = 0,
     maximum = 0;

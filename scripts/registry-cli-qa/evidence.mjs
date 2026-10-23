@@ -178,7 +178,8 @@ export function archiveCoverage(catalog, archives) {
     const body = entry.kind ? entry.package : entry;
     const descriptor = body.agent ?? body.theme ?? body.tab;
     const distribution = descriptor.distribution;
-    const values = body.agent ? Object.values(distribution.binary ?? {}) : [distribution];
+    const binaries = Object.values(distribution.binary ?? {});
+    const values = body.agent ? binaries : body.tab ? [distribution, ...binaries] : [distribution];
     for (const value of values) {
       const prior = expected.get(value.archive);
       assert.ok(prior === undefined || prior === value.sha256, "conflicting archive digests");

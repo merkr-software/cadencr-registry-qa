@@ -130,8 +130,11 @@ spec.loader.exec_module(qa)
 assert packages.ROOT == packages.ROOT.resolve()
 assert qa.SCRIPTS_ROOT == qa.SCRIPTS_ROOT.resolve()
 import base64
-for kind in ("provider", "theme", "tab"):
+for kind, variant in (("provider", "ui-only"), ("theme", "ui-only"),
+                      ("tab", "ui-only"), ("tab", "native-backend")):
     candidate = {"kind": kind, "tag": "qa-author-cli/fixture-001", "source_commit": "a" * 40}
+    if kind == "tab":
+        candidate["tab_variant"] = variant
     inventory = qa.source_inventory(candidate)
     assert inventory and all(key.startswith("author-cli-qa/") for key in inventory)
     def get(path, token=None):
@@ -146,6 +149,19 @@ for kind in ("provider", "theme", "tab"):
     network = qa.GitHub()
     with patch.object(network, "get", side_effect=get):
         network.identity(candidate, None)
+    if variant == "native-backend":
+        def changed_generator(path, token=None):
+            response = get(path, token)
+            if "/native_fixture.py?" in path:
+                response["content"] = base64.b64encode(b"tampered generator").decode()
+            return response
+        try:
+            with patch.object(network, "get", side_effect=changed_generator):
+                network.identity(candidate, None)
+        except qa.Rejected:
+            pass
+        else:
+            raise RuntimeError("source generator tampering was accepted")
 """
             result = subprocess.run([sys.executable, "-B", "-c", program,
                 str(alias), str(ROOT.parent / "qualify-author-cli.py")],
@@ -376,6 +392,16 @@ for kind in ("provider", "theme", "tab"):
         c = candidate()
         data = json.dumps(c).encode()
         self.assertEqual(qa.load_candidate(data, qa.digest(data)), c)
+        for variant in ("ui-only", "native-backend"):
+            valid = {**c, "kind": "tab", "tab_variant": variant}
+            encoded = json.dumps(valid).encode()
+            self.assertEqual(qa.load_candidate(encoded, qa.digest(encoded)), valid)
+        for kind, variant in (("theme", "native-backend"), ("provider", "ui-only"),
+                              ("tab", None), ("tab", "native"), ("tab", True),
+                              ("tab", ["native-backend"])):
+            encoded = json.dumps({**c, "kind": kind, "tab_variant": variant}).encode()
+            with self.subTest(kind=kind, variant=variant), self.assertRaises(qa.Rejected):
+                qa.load_candidate(encoded, qa.digest(encoded))
         with self.assertRaises(qa.Rejected):
             qa.load_candidate(data, "0"*64)
         for field, value in [("repository", "CadencR/registry"), ("repository_id", True),
@@ -562,6 +588,12 @@ for kind in ("provider", "theme", "tab"):
         paths = packages.fixture_paths("provider")
         self.assertEqual({path.relative_to(source).as_posix() for path in paths},
                          {"bin/provider", "icon.svg", "README.md", "LICENSE"})
+        native = qa.source_inventory({**candidate(), "kind": "tab",
+                                      "tab_variant": "native-backend"})
+        self.assertEqual(set(native), {"author-cli-qa/fixtures/tab/tab.json",
+            "author-cli-qa/fixtures/tab/dist/index.html", "author-cli-qa/native_fixture.py"})
+        self.assertEqual(native["author-cli-qa/native_fixture.py"],
+                         qa.digest((ROOT / "native_fixture.py").read_bytes()))
         inventory = qa.source_inventory({**candidate(), "kind": "provider"})
         for asset in package["host"]["assets"].values():
             path = source / asset
@@ -606,6 +638,78 @@ for kind in ("provider", "theme", "tab"):
                         self.assertEqual(archive["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
                         with tarfile.open(path) as tar:
                             self.assertEqual({member.name for member in tar if member.isfile()}, expected)
+
+    @unittest.skipUnless(os.environ.get("CADENCR_DEVELOPMENT_FIXTURE_CLI"),
+                         "explicit development CLI required; not released-CLI qualification")
+    def test_development_cli_packs_and_plans_a_backend_tab(self):
+        """Exercise the shared publication request path, without running native headers."""
+        import packages
+        import native_fixture
+        import tarfile
+        cli = Path(os.environ["CADENCR_DEVELOPMENT_FIXTURE_CLI"]).resolve(strict=True)
+        with tempfile.TemporaryDirectory(prefix="author-fixture-backend-") as scratch:
+            root = Path(scratch).resolve()
+            c = {**candidate(), "kind": "tab", "tab_variant": "native-backend"}
+            version = subprocess.run([str(cli), "--version"], capture_output=True,
+                                     check=True, text=True, timeout=30).stdout.strip().split(" ")[1]
+            c["cli_version"] = version
+            calls = []
+            original_invoke = qa.invoke
+            def traced(cli, args, home, *a, **kw):
+                calls.append(args)
+                return original_invoke(cli, args, home, *a, **kw)
+            # Development macOS runs lack Linux prlimit; production guards stay unchanged.
+            with patch.object(qa, "bounded_command", side_effect=lambda cli, args, limit:
+                              [str(cli), *map(str, args)]):
+                with patch.object(qa, "invoke", side_effect=traced):
+                    home, stage, request, sha, assets = qa.local(cli, c, root)
+                    ui_root = root / "ui-only"
+                    ui_root.mkdir()
+                    _, ui_stage, ui_request, _, ui_assets = qa.local(
+                        cli, {**c, "tab_variant": "ui-only"}, ui_root)
+                    self.assertEqual(json.loads(ui_request.read_text())["additional_archives"], [])
+                    self.assertEqual(set(ui_assets), {"tab.tar.gz", "metadata.json"})
+                    self.assertNotIn("backend", json.loads((ui_stage / "metadata.json").read_text())
+                                     ["package"]["tab"])
+            validate = next(args for args in calls if args[:3] == ["--json", "plugin", "validate"])
+            self.assertIn("--no-run", validate)
+            commands = [args[1] for args in calls if args[0] == "registry"]
+            self.assertEqual(commands[:4], ["pack-tab-backend"] * 3 + ["pack-tab"])
+            ui_pack = next(args for args in calls if args[:2] == ["registry", "pack-tab"])
+            self.assertIn("--package", ui_pack)
+            bound = json.loads(request.read_text())
+            self.assertEqual(bound["archive"]["name"], "tab.tar.gz")
+            self.assertEqual([a["name"] for a in bound["additional_archives"]],
+                             ["tab-backend-" + t + ".tar.gz" for t in native_fixture.TARGETS])
+            metadata = json.loads((stage / "metadata.json").read_text())
+            binary = metadata["package"]["tab"]["distribution"]["binary"]
+            self.assertEqual(set(binary), set(native_fixture.TARGETS))
+            for target, header in native_fixture.headers().items():
+                entry = binary[target]
+                archive = stage / ("tab-backend-" + target + ".tar.gz")
+                self.assertEqual(entry["sha256"], qa.digest(archive.read_bytes()))
+                self.assertEqual(entry["executable_sha256"], qa.digest(header))
+                self.assertEqual(entry["executable_size"], len(header))
+                with tarfile.open(archive) as tar:
+                    members = tar.getmembers()
+                    self.assertEqual([(m.name, m.mode, m.isfile()) for m in members],
+                                     [("bin/" + target + "/backend", 0o755, True)])
+                    self.assertEqual(tar.extractfile(members[0]).read(), header)
+            with tarfile.open(stage / "tab.tar.gz") as tar:
+                self.assertEqual({m.name for m in tar if m.isfile()},
+                                 {"tab.json", "dist/index.html"})
+            plan = json.loads((root / "plan.json").read_text())
+            self.assertEqual([t["target"] for t in plan["targets"]],
+                             ["tab", *("backend-" + t for t in sorted(binary))])
+            class Network:
+                def inventory(self, c, assets):
+                    return "unchanged"
+            from negative_probes import reject_changes
+            # Local validation must reject every changed archive and metadata before auth.
+            with patch.object(qa, "bounded_command", side_effect=lambda cli, args, limit:
+                              [str(cli), *map(str, args)]):
+                reject_changes(cli, home, stage, request, sha, None, Network(), c, assets,
+                               "unchanged", qa.invoke, qa.require)
 
     def test_actions_token_cannot_be_author_token(self):
         with tempfile.TemporaryDirectory() as root, patch.object(

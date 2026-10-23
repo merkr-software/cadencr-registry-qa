@@ -42,10 +42,13 @@ def unique_object(pairs):
 def load_candidate(data, confirmation):
     require(len(data) <= 65536 and digest(data) == confirmation)
     c = json.loads(data, object_pairs_hook=unique_object)
-    require(type(c) is dict and set(c) == {
+    require(type(c) is dict and set(c) - {"tab_variant"} == {
         "cli_version", "cli_sha256", "repository", "repository_id",
         "public", "expected_account", "tag", "source_commit", "kind"})
     require(c["kind"] in ("provider", "theme", "tab"))
+    if "tab_variant" in c:
+        require(c["kind"] == "tab" and type(c["tab_variant"]) is str
+                and c["tab_variant"] in ("ui-only", "native-backend"))
     require(c["repository"] == REPOSITORY and type(c["repository_id"]) is int
             and c["repository_id"] == REPOSITORY_ID and c["public"] is True)
     for field, pattern in {
@@ -172,7 +175,7 @@ class GitHub:
         commit = self.get("/repos/" + REPOSITORY + "/commits/" + tag)
         require(commit["sha"] == c["source_commit"])
         from packages import fixture_paths
-        for path in fixture_paths(c["kind"]):
+        for path in fixture_paths(c["kind"], c.get("tab_variant", "ui-only")):
             relative = path.relative_to(SCRIPTS_ROOT).as_posix()
             source = self.get("/repos/" + REPOSITORY + "/contents/scripts/" +
                               relative + "?ref=" + c["source_commit"])
@@ -282,7 +285,7 @@ def local(cli, c, root):
 def source_inventory(c):
     from packages import fixture_paths
     return {p.relative_to(SCRIPTS_ROOT).as_posix(): digest(p.read_bytes())
-            for p in fixture_paths(c["kind"])}
+            for p in fixture_paths(c["kind"], c.get("tab_variant", "ui-only"))}
 
 
 def qualify(cli, c, publish, network=None, interrupt_draft=False):
@@ -299,6 +302,8 @@ def qualify(cli, c, publish, network=None, interrupt_draft=False):
                  "source_fixtures": source_inventory(c),
                  "local_inspect": "passed", "bad_confirmation": "rejected",
                  "interrupted_draft": "not_exercised", "publication": "not_requested"}
+        if c["kind"] == "tab":
+            proof["tab_variant"] = c.get("tab_variant", "ui-only")
         if not publish:
             return proof
         token = os.environ.get("QA_AUTHOR_GITHUB_TOKEN")

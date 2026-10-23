@@ -64,8 +64,8 @@ node --test scripts/qualify-author-cli.test.mjs scripts/author-cli-qa-workflow.t
 Each dispatch reads one exact reviewed `author-cli-candidate.json`. `kind` is
 required and is exactly `provider`, `theme`, or `tab`; theme-only candidates
 without it are deliberately rejected. Use a distinct `qa-author-cli/<suffix>`
-tag per kind, all bound to the committed fixture source SHA. Preserve old tags
-and releases. Deploy the complete `scripts/author-cli-qa/` tree and
+tag per kind, each bound to its committed fixture source SHA (sources may differ by kind).
+Preserve old tags and releases. Deploy the complete `scripts/author-cli-qa/` tree and
 `scripts/qualify-author-cli.py` before creating those source tags. Then commit
 candidate and binary pin, and dispatch with that final reviewed commit and the
 SHA-256 of the exact candidate bytes.
@@ -87,15 +87,20 @@ SHA-256 of the exact candidate bytes.
 - `fixtures/provider/bin/provider` is inert text, never executed. Packaging marks
   only its private scratch copy executable. Two archives exercise
   `additional_archives`: `linux-x86_64` and `darwin-aarch64`.
-- `fixtures/tab/` contains static HTML with no script, permissions, or network.
+- `fixtures/tab/dist/index.html` is a deliberately tracked compiled-entry fixture;
+  preserve its narrow `.gitignore` exceptions when deploying tracking tests.
+  `fixtures/tab/` contains static HTML with no script, permissions, or network.
   It is inspected and packaged, never loaded into a renderer. Its package requires
   app version `999.0.0` to make the QA-only identity unmistakable; no released-app
   runtime support is claimed. Proof explicitly records `runtime: not_executed`.
 - `theme.json` remains the original declarative theme fixture.
 - Package metadata uses the full schema-2 `{kind, package}` envelope with
   `qa-author-provider`, `qa-author-theme`, and `qa-author-tab` identities. The
-  released CLI validates it through `registry build-index --schema-version 2`;
-  no Python business validator substitutes for Rust validation. Disposable index
+  released CLI validates it through `registry build-index --schema-version 2` and
+  `registry plan-publication` before author publication. README/license assets are
+  included in the provider inventory and archive; the submission/plan remain
+  private scratch, not release assets. No Python business validator substitutes
+  for Rust validation. Disposable index
   validation uses current UTC plus one day only in CLI arguments; timestamps do
   not enter the published metadata or content-bound author request.
 - The portable **author release request** remains schema version `1`, as required
@@ -105,3 +110,37 @@ SHA-256 of the exact candidate bytes.
   publication probe; immutable public inventory must remain exactly unchanged.
 - Mocked orchestration tests are not released-ELF qualification evidence. A Linux
   runner must execute offline and public jobs using the reviewed released binary.
+
+## Development regression, not released-binary qualification
+
+The Rust CI job builds the current source CLI and enables this additional fixture
+contract test. It catches compiled-entry and publication-metadata errors before
+hosted author QA; it does not replace the downloaded Linux executable checks.
+It also packs a backend tab (`pack-tab` plus `pack-tab-backend` for every
+platform, from synthesized inert native headers that are never executed) and
+checks the `backend-<platform>` publication targets. Native-backend candidates are supported by the harness but are not qualified
+until the separately reviewed distributed workflow is exercised.
+
+```sh
+CADENCR_DEVELOPMENT_FIXTURE_CLI="$PWD/target/debug/cadencr" \
+  python3 -B scripts/author-cli-qa/test_harness.py
+```
+
+## Native-backend tab candidate
+
+For a new tab-only candidate, optionally set `"tab_variant": "native-backend"`.
+Omission or `"ui-only"` preserves existing tab behavior; this field is rejected
+for providers/themes and all other values are rejected. Never change an existing
+request, candidate tag, or release to switch variants: create a fresh source tag
+and reviewed candidate instead.
+
+The native variant binds both static UI fixtures and the tracked deterministic
+`native_fixture.py` generator bytes to the source commit. That generator contains
+all inert Mach-O/ELF header data (macOS arm64/x64 and Linux x64); no compiler,
+download, credentials, or runnable backend is involved. Static validation always
+uses `--no-run`. The Rust CLI packs each backend first, supplying its exact
+archive/executable receipt fields to `pack-tab --package`; the UI archive remains
+the primary author archive and every platform is an `additional_archives` entry.
+Publication, retry, independent inventory and tamper probes reuse the same author
+request path. This is harness coverage, **not distributed-CLI qualification**;
+that still requires the separately reviewed deployed workflow and real evidence.

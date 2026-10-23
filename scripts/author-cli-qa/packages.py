@@ -9,10 +9,11 @@ ROOT = Path(__file__).resolve().parent
 TARGETS = ("linux-x86_64", "darwin-aarch64")
 
 
-def fixture_paths(kind):
+def fixture_paths(kind, tab_variant="ui-only"):
     if kind == "theme":
         return [ROOT / "theme.json"]
-    return sorted(p for p in (ROOT / "fixtures" / kind).rglob("*") if p.is_file())
+    paths = sorted(p for p in (ROOT / "fixtures" / kind).rglob("*") if p.is_file())
+    return paths + ([ROOT / "native_fixture.py"] if tab_variant == "native-backend" else [])
 
 
 def write_json(path, value):
@@ -23,7 +24,7 @@ def metadata(kind, repository, tag):
     url = "https://github.com/" + repository
     descriptor = {"id": "qa-author-" + kind, "name": "Author CLI QA " + kind,
                   "description": "Inert original-author qualification; never execute.",
-                  "version": "1.0.2", "repository": url,
+                  "version": "1.0.3", "repository": url,
                   "license": "Apache-2.0" if kind == "theme" else "MIT"}
     def distribution(name):
         return {"archive": url + "/releases/download/" + urllib.parse.quote(tag, safe="") +
@@ -60,8 +61,19 @@ def prepare(cli, c, root, home, invoke, asset):
         write_json(descriptor, {"schema_version": 1, "agent": package["package"]["agent"],
             "installation": {"executable": {"command": str(source / "bin/provider")}}})
         validation += ["--descriptor", str(descriptor)]
+    native = c.get("tab_variant") == "native-backend"
+    backends = []
+    if native:
+        import native_fixture
+        ui = root / "tab-ui"
+        shutil.copytree(source, ui)
+        native_fixture.prepare(source, ui)
+        validation += ["--no-run"]
+        backends = native_fixture.pack(cli, source, stage, package["package"]["tab"],
+                                      home, invoke, asset)
+        write_json(package_path, package)
     invoke(cli, validation, home)
-    archives = pack(cli, kind, source, stage, package, package_path, home, invoke, asset)
+    archives = pack(cli, kind, ui if native else source, stage, package, package_path, home, invoke, asset) + backends
     packages = root / "packages"
     packages.mkdir()
     write_json(packages / "package.json", package)

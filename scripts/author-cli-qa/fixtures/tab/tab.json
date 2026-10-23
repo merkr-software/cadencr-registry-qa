@@ -3,7 +3,7 @@
   "kind": "tab",
   "id": "qa-author-tab",
   "name": "Author CLI QA tab",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "api_version": 1,
   "entry": "dist/index.html",
   "permissions": [],
