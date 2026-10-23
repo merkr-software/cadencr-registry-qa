@@ -92,7 +92,7 @@ test("candidate must preserve original dates and empty-delta packages", () => {
       packages: [],
     },
   };
-  // This synthetic fixture deliberately has no six archives: admission must still fail closed.
+  // This synthetic fixture deliberately has no ten archives: admission must still fail closed.
   assert.throws(() => bindIntent({ ...plan(), archives: [] }, req, prior, candidate));
   assert.throws(() =>
     bindIntent(plan(), req, prior, {
@@ -160,7 +160,7 @@ test("reviewed plan hash and original request byte changes fail closed", () => {
 });
 
 test("authenticated-candidate intent accepts exact renewal and rejects package or date drift", () => {
-  const packages = Array.from({ length: 6 }, (_, index) => ({
+  const packages = Array.from({ length: 10 }, (_, index) => ({
     kind: "theme",
     package: {
       theme: {

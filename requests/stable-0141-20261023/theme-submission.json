@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "theme",
+    "package": {
+      "host": {
+        "compatibility": {
+          "min_app_version": "1.0.0"
+        },
+        "publisher": "qa-author"
+      },
+      "theme": {
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fstable-0141-theme-20261023/theme.tar.gz",
+          "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500"
+        },
+        "document_version": 1,
+        "id": "qa-author-theme",
+        "license": "Apache-2.0",
+        "name": "Author CLI QA theme",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.3"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "bccab3b3b642fd38b8cb361ac35db92ef337e6b4",
+    "tag": "qa-author-cli/stable-0141-theme-20261023"
+  },
+  "changelog": "Inert immutable 1.0.3 stable CLI qualification update."
+}
