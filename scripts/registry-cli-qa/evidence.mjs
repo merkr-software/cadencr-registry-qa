@@ -196,10 +196,26 @@ export function archiveCoverage(catalog, archives) {
   assert.deepEqual(actual, expected, "reviewed archives must exactly cover authenticated catalog");
 }
 
+// Whole-string allowlist only: never return message fragments or inferred stages.
+function failureReason(message) {
+  const reasons = new Map([
+    ["public discovery: convergence read budget exhausted", "discovery_convergence_exhausted"],
+    ["public discovery: read budget exhausted", "discovery_read_exhausted"],
+    ["GitHub discovery verification deadline exceeded", "discovery_deadline"],
+    ["GitHub API request failed", "github_transport"],
+  ]);
+  const status = /^GitHub API request failed with status ([1-5][0-9]{2})$/.exec(message);
+  // JS $ also matches before a final newline; enforce the complete message.
+  if (status && status[0] === message)
+    return { reason: "github_status", http_status: Number(status[1]) };
+  return { reason: reasons.get(message) ?? null, http_status: null };
+}
+
 // Keep failure diagnosis useful without exposing child output, paths, or secrets.
 export function failureDiagnostic(result) {
   let code = null,
     messageHash = null;
+  let classification = { reason: null, http_status: null };
   if (typeof result.stderr === "string" && Buffer.byteLength(result.stderr) <= 16384) {
     try {
       const value = JSON.parse(result.stderr);
@@ -213,8 +229,10 @@ export function failureDiagnostic(result) {
         value?.ok === false &&
         typeof value.message === "string" &&
         Buffer.byteLength(value.message) <= 8192
-      )
+      ) {
         messageHash = sha(Buffer.from(value.message));
+        classification = failureReason(value.message);
+      }
     } catch (error) {
       if (!(error instanceof SyntaxError)) throw error;
       // Malformed/unstructured child output is deliberately not disclosed.
@@ -228,5 +246,6 @@ export function failureDiagnostic(result) {
       : null,
     cli_code: code,
     message_sha256: messageHash,
+    ...classification,
   };
 }

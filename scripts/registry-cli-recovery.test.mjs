@@ -3,12 +3,18 @@ import test from "node:test";
 import {
   bindIntent,
   bindBytes,
+  bindFailedRun,
   recoveryGuard,
   sanitizedFailure,
   verifyBinary,
   ORIGINAL_REQUEST,
   OPERATION_COMMIT,
   CATALOG_SHA,
+  ORIGINAL_PLAN,
+  GENERATED_AT,
+  EXPIRES_AT,
+  EXPECTED_INVENTORY,
+  FAILED_RUN,
 } from "./registry-cli-qa/recovery.mjs";
 import { REPOSITORY, BINARY_SHA, sha } from "./registry-cli-qa/guard.mjs";
 import { replayUnchanged, childEnvironment } from "./registry-cli-qa/evidence.mjs";
@@ -18,6 +24,10 @@ const plan = () => ({
   request_sha256: ORIGINAL_REQUEST,
   expected_catalog_sha256: CATALOG_SHA,
   key_id: "qa-2026",
+  original_plan_sha256: ORIGINAL_PLAN,
+  expected_inventory_sha256: EXPECTED_INVENTORY,
+  failed_run: FAILED_RUN,
+  previous_sha256: "73859a9154828f8d49d52f367960174adb7e166f8be3f0aa09432d59bc9a6187",
 });
 const request = () => ({
   repository: REPOSITORY,
@@ -26,6 +36,8 @@ const request = () => ({
   key_id: "qa-2026",
   previous_index: "previous.json",
   publications: [],
+  generated_at: GENERATED_AT,
+  expires_at: EXPIRES_AT,
 });
 const env = () => ({
   GITHUB_REPOSITORY: REPOSITORY,
@@ -60,6 +72,9 @@ test("recovery binds original request and operation, not workflow delivery commi
     { operation_commit: "a".repeat(40) },
     { request_sha256: "f".repeat(64) },
     { expected_catalog_sha256: "e".repeat(64) },
+    { original_plan_sha256: "e".repeat(64) },
+    { expected_inventory_sha256: "e".repeat(64) },
+    { failed_run: 1 },
   ])
     assert.throws(() => bindIntent({ ...plan(), ...patch }, request(), undefined));
   for (const patch of [
@@ -67,6 +82,8 @@ test("recovery binds original request and operation, not workflow delivery commi
     { previous_index: "bootstrap" },
     { discovery_branch: "main" },
     { schema_version: 1 },
+    { generated_at: "2026-10-24T00:00:00Z" },
+    { expires_at: "2026-10-31T00:00:00Z" },
   ])
     assert.throws(() => bindIntent(plan(), { ...request(), ...patch }, undefined));
 });
@@ -74,8 +91,8 @@ test("recovery binds original request and operation, not workflow delivery commi
 test("candidate must preserve original dates and empty-delta packages", () => {
   const req = {
     ...request(),
-    generated_at: "2026-10-18T01:00:00Z",
-    expires_at: "2026-10-25T01:00:00Z",
+    generated_at: GENERATED_AT,
+    expires_at: EXPIRES_AT,
   };
   const prior = {
     signed: {
@@ -92,13 +109,35 @@ test("candidate must preserve original dates and empty-delta packages", () => {
       packages: [],
     },
   };
-  // This synthetic fixture deliberately has no ten archives: admission must still fail closed.
+  // This synthetic fixture deliberately has no twenty-one archives: admission must still fail closed.
   assert.throws(() => bindIntent({ ...plan(), archives: [] }, req, prior, candidate));
   assert.throws(() =>
     bindIntent(plan(), req, prior, {
       signed: { ...candidate.signed, generated_at: "2026-10-19T00:00:00Z" },
     }),
   );
+});
+
+test("recovery authenticates the original failed run rather than accepting successful or unrelated runs", () => {
+  const run = {
+    id: FAILED_RUN,
+    repository: { id: 1420296872 },
+    head_sha: OPERATION_COMMIT,
+    head_branch: "main",
+    event: "workflow_dispatch",
+    path: ".github/workflows/qa.yml",
+    status: "completed",
+    conclusion: "failure",
+  };
+  bindFailedRun(run);
+  for (const patch of [
+    { conclusion: "success" },
+    { id: 1 },
+    { head_sha: "a".repeat(40) },
+    { path: ".github/workflows/recovery.yml" },
+    { event: "push" },
+  ])
+    assert.throws(() => bindFailedRun({ ...run, ...patch }));
 });
 
 test("full inventory equality includes discovery, releases and asset identities", () => {
@@ -160,7 +199,7 @@ test("reviewed plan hash and original request byte changes fail closed", () => {
 });
 
 test("authenticated-candidate intent accepts exact renewal and rejects package or date drift", () => {
-  const packages = Array.from({ length: 10 }, (_, index) => ({
+  const packages = Array.from({ length: 14 }, (_, index) => ({
     kind: "theme",
     package: {
       theme: {
@@ -172,18 +211,39 @@ test("authenticated-candidate intent accepts exact renewal and rejects package o
       },
     },
   }));
+  for (let index = 0; index < 7; index++) {
+    const distribution = packages[index].package.theme.distribution;
+    packages[index] = {
+      kind: "provider",
+      package: {
+        agent: {
+          distribution: {
+            binary: {
+              linux: distribution,
+              darwin: { ...distribution, archive: distribution.archive + "-darwin" },
+            },
+          },
+        },
+      },
+    };
+  }
+  const distributions = packages.flatMap((entry) =>
+    entry.kind === "provider"
+      ? Object.values(entry.package.agent.distribution.binary)
+      : [entry.package.theme.distribution],
+  );
   const reviewed = {
     ...plan(),
-    archives: packages.map((entry) => ({
-      url: entry.package.theme.distribution.archive,
-      sha256: entry.package.theme.distribution.sha256,
+    archives: distributions.map((distribution) => ({
+      url: distribution.archive,
+      sha256: distribution.sha256,
       size: 1,
     })),
   };
   const req = {
     ...request(),
-    generated_at: "2026-10-18T01:00:00Z",
-    expires_at: "2026-10-25T01:00:00Z",
+    generated_at: GENERATED_AT,
+    expires_at: EXPIRES_AT,
   };
   const previous = {
     signed: { packages, generated_at: "2026-10-17T01:00:00Z", expires_at: "2026-10-24T01:00:00Z" },
@@ -197,6 +257,10 @@ test("authenticated-candidate intent accepts exact renewal and rejects package o
     },
   };
   bindIntent(reviewed, req, previous, candidate);
+  assert.equal(reviewed.archives.length, 21);
+  assert.throws(() =>
+    bindIntent({ ...reviewed, archives: reviewed.archives.slice(1) }, req, previous, candidate),
+  );
   for (const patch of [{ packages: packages.slice(1) }, { expires_at: "2026-10-26T01:00:00Z" }])
     assert.throws(() =>
       bindIntent(reviewed, req, previous, { signed: { ...candidate.signed, ...patch } }),

@@ -16,15 +16,31 @@ import {
   failureDiagnostic,
 } from "./evidence.mjs";
 
-export const ORIGINAL_REQUEST = "f1cf2b60e13f5c867f0b72de4b60ee48bfa3400f4d6aa7b2faf94d705b349c8d";
-export const OPERATION_COMMIT = "e8fbdc424dfc14717db2ea4ca325e35d169a00c4";
-export const CATALOG_SHA = "a6a71f22e262ac1bc0f9c0843d2ed1590a616a101b4a3de47fbea55a000bf95c";
+export const ORIGINAL_REQUEST = "b6201b5e76ad91fecee2c3c2629b518875d90f9f4e88b9035f263b4e3297b739";
+export const OPERATION_COMMIT = "b63364e2f84e9e5e0cadbb05134d6b7db8a94854";
+export const CATALOG_SHA = "9001895ef154cb0c312032b22dce73e593b8ac36a86924d5dee5224ab61fdb30";
+export const ORIGINAL_PLAN = "9a3d0a2dc713a1cb2c5576e3e7db20436ed7917690e0b89eb06995147f727259";
+export const GENERATED_AT = "2026-10-23T22:12:32Z";
+export const EXPIRES_AT = "2026-10-30T22:12:32Z";
+export const EXPECTED_INVENTORY =
+  "9a61b85ebf21b741c68283a8f7bca2f32e6d639fe98d2cd08b40f54daa144f99";
+export const EXPECTED_HEAD = "cf2cd4228df8c7321d913020f414163b44a848d5";
+export const FAILED_RUN = 40032302758;
 const HELPER_SHA = "57ff31556ee87708a8fcb197e635513e4ee3fc0013d91c1131fd0648836471ba";
 
 export function bindIntent(plan, request, previous, candidate) {
   assert.equal(plan.operation_commit, OPERATION_COMMIT);
   assert.equal(plan.request_sha256, ORIGINAL_REQUEST);
   assert.equal(plan.expected_catalog_sha256, CATALOG_SHA);
+  assert.equal(plan.original_plan_sha256, ORIGINAL_PLAN);
+  assert.equal(plan.expected_inventory_sha256, EXPECTED_INVENTORY);
+  assert.equal(plan.failed_run, FAILED_RUN);
+  assert.equal(
+    plan.previous_sha256,
+    "73859a9154828f8d49d52f367960174adb7e166f8be3f0aa09432d59bc9a6187",
+  );
+  assert.equal(request.generated_at, GENERATED_AT);
+  assert.equal(request.expires_at, EXPIRES_AT);
   assert.equal(request.repository, REPOSITORY);
   assert.equal(request.schema_version, 2);
   assert.equal(request.discovery_branch, "marketplace-v2");
@@ -37,7 +53,8 @@ export function bindIntent(plan, request, previous, candidate) {
     assert.equal(candidate.signed.expires_at, request.expires_at);
     continuity(previous, candidate, { phase: "renewal" });
     archiveCoverage(candidate, plan.archives);
-    assert.equal(plan.archives.length, 10);
+    assert.equal(plan.archives.length, 21);
+    assert.equal(candidate.signed.packages.length, 14);
   }
 }
 
@@ -63,6 +80,16 @@ export function recoveryGuard(env = process.env) {
   assert.equal(sha(planBytes), env.PLAN_SHA256);
   const plan = JSON.parse(planBytes);
   assert.equal(plan.phase, "renewal-recovery");
+  const originalPlanBytes = file(local(plan.original_plan));
+  assert.equal(sha(originalPlanBytes), ORIGINAL_PLAN);
+  const originalPlan = JSON.parse(originalPlanBytes);
+  assert.equal(originalPlan.phase, "renewal");
+  assert.equal(originalPlan.request, plan.request);
+  assert.equal(originalPlan.previous, plan.previous);
+  assert.equal(originalPlan.previous_sha256, plan.previous_sha256);
+  assert.equal(originalPlan.public_key, plan.public_key);
+  assert.equal(originalPlan.public_key_sha256, plan.public_key_sha256);
+  assert.deepEqual(originalPlan.archives, plan.archives);
   const requestBytes = file(local(plan.request));
   bindBytes(planBytes, env.PLAN_SHA256, requestBytes);
   assert.equal(sha(file(local(plan.previous))), plan.previous_sha256);
@@ -121,6 +148,8 @@ async function observePublic(plan, baseline, expectedBytes, signal) {
   assert.equal(inventoryHash(observed), plan.expected_inventory_sha256);
   replayUnchanged(observed, baseline);
   assert.equal(observed.discovery_sha256, CATALOG_SHA);
+  assert.equal(observed.head, EXPECTED_HEAD);
+  assert.equal(observed.releases.length, 42);
   const stable = `https://raw.githubusercontent.com/${REPOSITORY}/refs/heads/marketplace-v2/managed-index.json`;
   for (const url of [
     stable,
@@ -139,8 +168,27 @@ async function publicArchives(candidate, plan, signal) {
   }
 }
 
+export function bindFailedRun(run) {
+  assert.equal(run.id, FAILED_RUN);
+  assert.equal(run.repository.id, 1420296872);
+  assert.equal(run.head_sha, OPERATION_COMMIT);
+  assert.equal(run.head_branch, "main");
+  assert.equal(run.event, "workflow_dispatch");
+  assert.equal(run.path, ".github/workflows/qa.yml");
+  assert.equal(run.status, "completed");
+  assert.equal(run.conclusion, "failure");
+}
+
 async function admission(plan, request, previous, root, verify) {
   const signal = AbortSignal.timeout(60000);
+  const failedRun = JSON.parse(
+    await bytes(
+      `https://api.github.com/repos/${REPOSITORY}/actions/runs/${FAILED_RUN}`,
+      {},
+      signal,
+    ),
+  );
+  bindFailedRun(failedRun);
   const url = `https://github.com/${REPOSITORY}/releases/download/marketplace-v2-${CATALOG_SHA}/managed-index.json`;
   const data = await bytes(url, {}, signal);
   assert.equal(sha(data), CATALOG_SHA);
@@ -193,6 +241,8 @@ async function replay(context, attempt) {
       request_sha256: ORIGINAL_REQUEST,
       plan_sha256: env.PLAN_SHA256,
       operation_commit: OPERATION_COMMIT,
+      failed_run: FAILED_RUN,
+      original_plan_sha256: ORIGINAL_PLAN,
       workflow_commit: env.REVIEWED_COMMIT,
       cli_sha256: BINARY_SHA,
       cli_version: VERSION,
