@@ -10,7 +10,7 @@ const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 // Each case works in a scratch copy of the reviewed request directory, then returns.
 function scratch() {
   const directory = mkdtempSync(join(tmpdir(), "policy-guard-"));
-  cpSync(join(repository, "requests/stable-0150-20261025"), join(directory, "requests/stable-0150-20261025"), {
+  cpSync(join(repository, "requests/stable-0151-20261025"), join(directory, "requests/stable-0151-20261025"), {
     recursive: true,
   });
   return directory;
@@ -64,7 +64,7 @@ test("policy guard rejects re-bound payloads, non-empty entries and over-long wi
     (p) => ({ ...p, generated_at: "2026-10-25T17:30:00.000Z" }),
   ]) {
     const directory = scratch();
-    const path = join(directory, "requests/stable-0150-20261025/provider-policy.json");
+    const path = join(directory, "requests/stable-0151-20261025/provider-policy.json");
     const bytes = Buffer.from(JSON.stringify(mutate(JSON.parse(readFileSync(path)))));
     writeFileSync(path, bytes);
     // Re-bind the digest so the semantic checks, not the digest check, must reject the change.
@@ -74,6 +74,14 @@ test("policy guard rejects re-bound payloads, non-empty entries and over-long wi
     writeFileSync(requestPath, JSON.stringify(request));
     assert.throws(() => inside(directory, () => policyGuard(environment(directory))));
   }
+});
+test("policy guard rejects an unreviewed discovery branch", () => {
+  const directory = scratch();
+  const path = join(directory, REQUEST);
+  const request = JSON.parse(readFileSync(path));
+  request.discovery_branch = "main";
+  writeFileSync(path, JSON.stringify(request));
+  assert.throws(() => inside(directory, () => policyGuard(environment(directory))));
 });
 test("policy guard rejects a renewal that does not outlive the bootstrap", () => {
   const directory = scratch();

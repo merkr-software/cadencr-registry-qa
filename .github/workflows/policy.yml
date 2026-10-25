@@ -7,7 +7,7 @@ on:
         required: true
         type: string
       request_sha256:
-        description: Exact SHA-256 of reviewed requests/stable-0150-20261025/policy.json
+        description: Exact SHA-256 of reviewed requests/stable-0151-20261025/policy.json
         required: true
         type: string
 permissions:

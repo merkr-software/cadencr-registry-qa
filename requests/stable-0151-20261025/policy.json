@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "repository": "merkr-software/cadencr-registry-qa",
+  "discovery_branch": "qa-policy-0151",
+  "key_id": "qa-2026",
+  "public_key": "public.pem",
+  "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
+  "renewal_expires_at": "2026-11-07T00:00:00Z",
+  "policies": [
+    {
+      "kind": "provider",
+      "file": "managed-blocklist.json",
+      "payload": "provider-policy.json",
+      "payload_sha256": "04ca00f7b218c2c77ca5fab2dc4786ae3445b69a29b899962177969753627714"
+    },
+    {
+      "kind": "theme",
+      "file": "managed-theme-blocklist.json",
+      "payload": "theme-policy.json",
+      "payload_sha256": "0627d9d88772d2058a7f068aaa67dabf476d28ccd69b63a0660ad293fc9575b7"
+    },
+    {
+      "kind": "tab",
+      "file": "managed-tab-blocklist.json",
+      "payload": "tab-policy.json",
+      "payload_sha256": "4d95d189c8f1c1561e5854547df68b040ee0b32eee4c05966ebd37a3b2b2292a"
+    }
+  ]
+}

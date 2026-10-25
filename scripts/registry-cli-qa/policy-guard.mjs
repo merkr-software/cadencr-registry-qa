@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { file, local, sha, REPOSITORY } from "./guard.mjs";
-export const REQUEST = "requests/stable-0150-20261025/policy.json";
+export const REQUEST = "requests/stable-0151-20261025/policy.json";
 export const KINDS = ["provider", "theme", "tab"];
 const FILES = {
   provider: "managed-blocklist.json",
@@ -29,7 +29,8 @@ export function policyGuard(env = process.env) {
   const request = JSON.parse(requestBytes);
   assert.equal(request.schema_version, 1);
   assert.equal(request.repository, REPOSITORY);
-  assert.equal(request.discovery_branch, "marketplace-v2");
+  // Policy files live on a QA-only branch; never the production registry or an unreviewed branch.
+  assert.ok(["marketplace-v2", "qa-policy-0151"].includes(request.discovery_branch));
   assert.match(request.key_id, /^[a-z0-9][a-z0-9-]{0,63}$/);
   const directory = dirname(REQUEST);
   const publicKey = local(join(directory, request.public_key));
