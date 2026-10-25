@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "tab",
+    "package": {
+      "host": {
+        "compatibility": {
+          "min_app_version": "999.0.0"
+        },
+        "publisher": "qa-author"
+      },
+      "tab": {
+        "api_version": 1,
+        "backend": {
+          "protocol": 1,
+          "reasoning": "Inert author CLI QA backend; never executed."
+        },
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fstable-0151-tab-20261025/tab.tar.gz",
+          "binary": {
+            "darwin-aarch64": {
+              "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fstable-0151-tab-20261025/tab-backend-darwin-aarch64.tar.gz",
+              "cmd": "bin/darwin-aarch64/backend",
+              "executable_sha256": "3ca3a7ad5f92533ad9898f6b0b517eab0b48e7ae091c41f895a896a39f08447a",
+              "executable_size": 72,
+              "sha256": "93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5",
+              "size": 140
+            },
+            "darwin-x86_64": {
+              "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fstable-0151-tab-20261025/tab-backend-darwin-x86_64.tar.gz",
+              "cmd": "bin/darwin-x86_64/backend",
+              "executable_sha256": "78f6827373136b2c545efd5fb3024ad9eaa309e760aadf54fda140890961a067",
+              "executable_size": 56,
+              "sha256": "da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df",
+              "size": 128
+            },
+            "linux-x86_64": {
+              "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fstable-0151-tab-20261025/tab-backend-linux-x86_64.tar.gz",
+              "cmd": "bin/linux-x86_64/backend",
+              "executable_sha256": "be545f141006f3df3092d8edd3f569aae2c5cdd5a9989fcbbd534e0dda061830",
+              "executable_size": 20,
+              "sha256": "19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8",
+              "size": 120
+            }
+          },
+          "sha256": "6e6043c1554c1adeb61adcedd2bb27492adf6074690c74266e0ba465dd412b8e"
+        },
+        "id": "qa-author-tab",
+        "license": "MIT",
+        "name": "Author CLI QA tab",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.6"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "dfe04d5d7d797a97b28b35aa5038f0728a3df768",
+    "tag": "qa-author-cli/stable-0151-tab-20261025"
+  },
+  "changelog": "Inert immutable 1.0.6 stable CLI qualification update."
+}
