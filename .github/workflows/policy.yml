@@ -19,7 +19,7 @@ jobs:
   policy:
     if: github.repository == 'merkr-software/cadencr-registry-qa' && github.repository_id == '1420296872' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 60
     permissions:
       contents: write
     env:

@@ -3,8 +3,8 @@ import { createHash } from "node:crypto";
 import { lstatSync, readFileSync } from "node:fs";
 import { resolve, sep, dirname, join } from "node:path";
 export const REPOSITORY = "merkr-software/cadencr-registry-qa";
-export const VERSION = "0.15.1";
-export const BINARY_SHA = "466b7b6c3be2e2092b5b79264c204cd7ad987da58b8b0d403cc47634406a6199";
+export const VERSION = "0.15.2";
+export const BINARY_SHA = "f4a719871f776bdbbb9845ac98eb381a85da5730237e0c9b50c2e15198fc4031";
 export const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export function file(path, max = 4194304) {
   const stat = lstatSync(path);
