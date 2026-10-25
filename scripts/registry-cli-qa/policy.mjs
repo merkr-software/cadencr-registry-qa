@@ -3,7 +3,6 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { setTimeout as delay } from "node:timers/promises";
 import { file, sha, VERSION, BINARY_SHA, REPOSITORY } from "./guard.mjs";
 import { policyGuard, KINDS } from "./policy-guard.mjs";
 import {
@@ -145,8 +144,11 @@ function checkReceipt(kind, receipt, outcome, digest) {
 async function publicBytes(url) {
   return bytes(url); // Deliberately anonymous.
 }
+const timings = [];
 const publishOk = (kind, signed, flags, receiptPath) => {
+  const started = Date.now();
   const result = publish(kind, signed, flags, receiptPath);
+  timings.push({ kind, mode: flags[0] ?? "plain", elapsed_ms: Date.now() - started });
   assert.ok(
     !result.error && result.status === 0,
     `${kind} publish-policy failed: ${JSON.stringify(failureDiagnostic(result))}`,
@@ -208,9 +210,6 @@ try {
     assert.equal(bootstrapped.files[kind].sha256, proof.policies[kind].signed_sha256);
   proof.after_bootstrap = bootstrapped;
 
-  // The raw CDN may serve the cached bootstrap body for up to 300 s after any later write; the
-  // reviewed settle delay separates bootstrap from renewal, as real renewals are never seconds apart.
-  await delay(request.cdn_settle_seconds * 1000);
   // 4. Renew from the authenticated fetch-policy baseline.
   for (const kind of KINDS) {
     const baseline = fileOf(kind, "baseline");
@@ -325,6 +324,7 @@ try {
   assert.equal(inventoryBefore.discovery_sha256, inventoryAfter.discovery_sha256);
   proof.catalog_unchanged = { discovery_sha256: inventoryAfter.discovery_sha256 };
   proof.releases_unchanged = inventoryAfter.releases.length;
+  proof.publish_elapsed_ms = timings;
   // Strict allowlist: no environment, private state, raw CLI output or unknown receipt fields.
   writeFileSync(join(root, "policy-proof.json"), JSON.stringify(proof) + "\n", { flag: "wx" });
 } catch (error) {
