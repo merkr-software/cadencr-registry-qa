@@ -1,1 +1,1 @@
-{"signature":{"algorithm":"ed25519","key_id":"qa-2026","value":"F+7uhQ21ctsjbLEjJgfom+Rj340HMehiPXhPG0Yomo0Of4LWWe/wAgGLUpQUFC4F8HIpsfFbs+AyduzVMuVGAQ=="},"signed":{"entries":[],"expires_at":"2026-11-01T19:05:00Z","generated_at":"2026-10-25T19:05:00Z","schema_version":1}}
+{"signature":{"algorithm":"ed25519","key_id":"qa-2026","value":"VJR74+NpUOgHISfpn2PbcAteOlxAkEoWk/b/hsGhPOz1ULtzmj9aZaC/rU+nu8Y54i61y1bh6O66XsEqrS8fBw=="},"signed":{"entries":[],"expires_at":"2026-11-07T00:00:00Z","generated_at":"2026-10-25T19:36:25Z","schema_version":1}}
