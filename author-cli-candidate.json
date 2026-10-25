@@ -1,11 +1,12 @@
 {
-  "kind": "theme",
+  "kind": "tab",
   "cli_version": "0.15.0",
   "cli_sha256": "90b18bf95f3809b5735a272b9f7c089549c25629e115e99422dd4c770656fd15",
   "repository": "merkr-software/cadencr-registry-qa",
   "repository_id": 1420296872,
   "public": true,
   "expected_account": "rle-mino",
-  "tag": "qa-author-cli/stable-0150-theme-20261025",
-  "source_commit": "c589553bc491c45f2063e40e77c5a1dee0be9708"
+  "tag": "qa-author-cli/stable-0150-tab-20261025",
+  "source_commit": "c589553bc491c45f2063e40e77c5a1dee0be9708",
+  "tab_variant": "native-backend"
 }
