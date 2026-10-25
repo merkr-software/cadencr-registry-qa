@@ -83,6 +83,16 @@ test("policy guard rejects an unreviewed discovery branch", () => {
   writeFileSync(path, JSON.stringify(request));
   assert.throws(() => inside(directory, () => policyGuard(environment(directory))));
 });
+test("policy guard requires a CDN settle delay of at least the raw cache lifetime", () => {
+  for (const settle of [undefined, 0, 299, 1000, 330.5]) {
+    const directory = scratch();
+    const path = join(directory, REQUEST);
+    const request = JSON.parse(readFileSync(path));
+    request.cdn_settle_seconds = settle;
+    writeFileSync(path, JSON.stringify(request));
+    assert.throws(() => inside(directory, () => policyGuard(environment(directory))));
+  }
+});
 test("policy guard rejects a renewal that does not outlive the bootstrap", () => {
   const directory = scratch();
   const path = join(directory, REQUEST);

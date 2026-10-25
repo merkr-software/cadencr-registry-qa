@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { setTimeout as delay } from "node:timers/promises";
 import { file, sha, VERSION, BINARY_SHA, REPOSITORY } from "./guard.mjs";
 import { policyGuard, KINDS } from "./policy-guard.mjs";
 import {
@@ -118,6 +119,7 @@ const proof = {
   cli_sha256: BINARY_SHA,
   discovery_branch: BRANCH,
   renewal_expires_at: request.renewal_expires_at,
+  cdn_settle_seconds: request.cdn_settle_seconds,
   policies: {},
 };
 const fileOf = (kind, name) => join(scratch, `${kind}-${name}.json`);
@@ -206,6 +208,9 @@ try {
     assert.equal(bootstrapped.files[kind].sha256, proof.policies[kind].signed_sha256);
   proof.after_bootstrap = bootstrapped;
 
+  // The raw CDN may serve the cached bootstrap body for up to 300 s after any later write; the
+  // reviewed settle delay separates bootstrap from renewal, as real renewals are never seconds apart.
+  await delay(request.cdn_settle_seconds * 1000);
   // 4. Renew from the authenticated fetch-policy baseline.
   for (const kind of KINDS) {
     const baseline = fileOf(kind, "baseline");

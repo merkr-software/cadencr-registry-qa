@@ -30,7 +30,7 @@ export function policyGuard(env = process.env) {
   assert.equal(request.schema_version, 1);
   assert.equal(request.repository, REPOSITORY);
   // Policy files live on a QA-only branch; never the production registry or an unreviewed branch.
-  assert.ok(["marketplace-v2", "qa-policy-0151"].includes(request.discovery_branch));
+  assert.ok(["marketplace-v2", "qa-policy-0151", "qa-policy-0151-r2"].includes(request.discovery_branch));
   assert.match(request.key_id, /^[a-z0-9][a-z0-9-]{0,63}$/);
   const directory = dirname(REQUEST);
   const publicKey = local(join(directory, request.public_key));
@@ -40,6 +40,9 @@ export function policyGuard(env = process.env) {
     KINDS,
   );
   assert.match(request.renewal_expires_at, WHOLE_SECOND);
+  // Raw CDN entries live up to 300 s; a renewal must not race the cached bootstrap body.
+  assert.ok(Number.isInteger(request.cdn_settle_seconds));
+  assert.ok(request.cdn_settle_seconds >= 330 && request.cdn_settle_seconds <= 900);
   const payloads = {};
   for (const policy of request.policies) {
     assert.equal(policy.file, FILES[policy.kind]);
