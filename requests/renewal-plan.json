@@ -1,9 +1,9 @@
 {
   "phase": "renewal",
-  "request": "requests/stable-0151-20261025/renewal.json",
-  "previous": "requests/stable-0151-20261025/renewal-previous.json",
-  "previous_sha256": "1204a8f0cbac5c79c6635e2e2e96dc297341d4ed4de8b894a98c66491b81f63e",
-  "public_key": "requests/stable-0151-20261025/renewal-public.pem",
+  "request": "requests/stable-0151-20261025/renewal2.json",
+  "previous": "requests/stable-0151-20261025/renewal2-previous.json",
+  "previous_sha256": "cf90ae76d17ff80144645096ac78a818a01b0fe637c461cd4b749c07e31271e3",
+  "public_key": "requests/stable-0151-20261025/renewal2-public.pem",
   "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
   "key_id": "qa-2026",
   "inputs": {},
