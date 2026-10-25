@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "package": {
+    "kind": "provider",
+    "package": {
+      "agent": {
+        "description": "Inert original-author qualification; never execute.",
+        "distribution": {
+          "binary": {
+            "darwin-aarch64": {
+              "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fstable-0152-provider-20261025/provider-darwin-aarch64.tar.gz",
+              "cmd": "bin/provider",
+              "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed"
+            },
+            "linux-x86_64": {
+              "archive": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/qa-author-cli%2Fstable-0152-provider-20261025/provider-linux-x86_64.tar.gz",
+              "cmd": "bin/provider",
+              "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed"
+            }
+          }
+        },
+        "id": "qa-author-provider",
+        "license": "MIT",
+        "name": "Author CLI QA provider",
+        "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+        "version": "1.0.7"
+      },
+      "host": {
+        "assets": {
+          "icon": "icon.svg",
+          "license": "LICENSE",
+          "readme": "README.md"
+        },
+        "compatibility": {
+          "min_app_version": "1.0.0"
+        },
+        "publisher": "qa-author"
+      }
+    }
+  },
+  "source": {
+    "repository": "https://github.com/merkr-software/cadencr-registry-qa",
+    "commit": "3c8035b279bd7c2bf944ad7900ab5d30cc10f4fd",
+    "tag": "qa-author-cli/stable-0152-provider-20261025"
+  },
+  "changelog": "Inert immutable 1.0.7 stable CLI qualification update."
+}
