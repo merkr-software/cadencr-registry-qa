@@ -30,7 +30,7 @@ export function policyGuard(env = process.env) {
   assert.equal(request.schema_version, 1);
   assert.equal(request.repository, REPOSITORY);
   // Policy files live on a QA-only branch; never the production registry or an unreviewed branch.
-  assert.ok(["marketplace-v2", "qa-policy-0152"].includes(request.discovery_branch));
+  assert.ok(["marketplace-v2", "qa-policy-0152", "qa-policy-0152-r2"].includes(request.discovery_branch));
   assert.match(request.key_id, /^[a-z0-9][a-z0-9-]{0,63}$/);
   const directory = dirname(REQUEST);
   const publicKey = local(join(directory, request.public_key));

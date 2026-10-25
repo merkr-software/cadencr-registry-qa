@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { setTimeout as delay } from "node:timers/promises";
 import { file, sha, VERSION, BINARY_SHA, REPOSITORY } from "./guard.mjs";
 import { policyGuard, KINDS } from "./policy-guard.mjs";
 import {
@@ -141,8 +142,24 @@ function checkReceipt(kind, receipt, outcome, digest) {
   assert.equal(receipt.sha256, digest);
   assert.match(receipt.blob_sha, /^[a-f0-9]{40}$/);
 }
-async function publicBytes(url) {
-  return bytes(url); // Deliberately anonymous.
+// Independent anonymous read of the public feed. The CLI has already verified it; this check only
+// polls (read-only, bounded) until the raw CDN serves the expected bytes and records how long it took.
+const publicWaits = [];
+async function publicEquals(kind, phase, url, expected) {
+  const started = Date.now();
+  for (;;) {
+    const observed = await bytes(
+      url,
+      { "Cache-Control": "no-cache", Pragma: "no-cache" },
+      AbortSignal.timeout(30000),
+    );
+    if (observed.equals(expected)) {
+      publicWaits.push({ kind, phase, waited_ms: Date.now() - started });
+      return;
+    }
+    assert.ok(Date.now() - started < 360000, `${kind} public feed did not converge`);
+    await delay(2000);
+  }
 }
 const timings = [];
 const publishOk = (kind, signed, flags, receiptPath) => {
@@ -202,7 +219,7 @@ try {
     const receipt = publishOk(kind, signed, ["--bootstrap"], fileOf(kind, "bootstrap-receipt"));
     checkReceipt(kind, receipt, "bootstrapped", sha(read(signed)));
     assert.equal(receipt.previous_sha256, null);
-    assert.deepEqual(await publicBytes(receipt.url), read(signed));
+    await publicEquals(kind, "bootstrap", receipt.url, read(signed));
     proof.policies[kind].bootstrap = fields(receipt);
   }
   const bootstrapped = await branchState();
@@ -268,7 +285,7 @@ try {
     const receipt = publishOk(kind, renewed, ["--renewal"], fileOf(kind, "renewal-receipt"));
     checkReceipt(kind, receipt, "advanced", digest);
     assert.equal(receipt.previous_sha256, proof.policies[kind].signed_sha256);
-    assert.deepEqual(await publicBytes(receipt.url), read(renewed));
+    await publicEquals(kind, "renewal", receipt.url, read(renewed));
     proof.policies[kind].renewal = fields(receipt);
   }
   const renewedState = await branchState();
@@ -325,6 +342,7 @@ try {
   proof.catalog_unchanged = { discovery_sha256: inventoryAfter.discovery_sha256 };
   proof.releases_unchanged = inventoryAfter.releases.length;
   proof.publish_elapsed_ms = timings;
+  proof.independent_public_read_wait_ms = publicWaits;
   // Strict allowlist: no environment, private state, raw CLI output or unknown receipt fields.
   writeFileSync(join(root, "policy-proof.json"), JSON.stringify(proof) + "\n", { flag: "wx" });
 } catch (error) {
