@@ -24,7 +24,7 @@ def metadata(kind, repository, tag):
     url = "https://github.com/" + repository
     descriptor = {"id": "qa-author-" + kind, "name": "Author CLI QA " + kind,
                   "description": "Inert original-author qualification; never execute.",
-                  "version": "1.0.5", "repository": url,
+                  "version": "1.0.6", "repository": url,
                   "license": "Apache-2.0" if kind == "theme" else "MIT"}
     def distribution(name):
         return {"archive": url + "/releases/download/" + urllib.parse.quote(tag, safe="") +
