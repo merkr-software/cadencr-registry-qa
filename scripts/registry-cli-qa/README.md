@@ -71,3 +71,11 @@ Supply `requests/incremental-plan.json`, later `requests/renewal-plan.json`. Pat
 - Before creating signing-key material or publishing, the first job requires live discovery bytes to match the reviewed previous catalog digest. A stale reviewed baseline is rejected rather than silently replacing a newer feed. The fresh runner instead binds to the first job's final inventory hash; its very first publication attempt must preserve that complete inventory, including discovery head.
 - Anonymous archive checks require exact URL/digest coverage of the authenticated catalog's provider binary targets and theme/tab distributions. Omissions, duplicates and unrelated extras are rejected; reviewed sizes remain independently checked against downloaded bytes.
 - Asset inventory uses at most four concurrent reads under the same 60-second inventory signal, with deterministic sorted results and fail-closed asset pagination. ELF architecture/header validation reuses the checksum-bound existing QA helper rather than duplicating a weaker header check.
+
+## Revocation policy lifecycle (`policy.yml`)
+
+- QA ONLY. One `workflow_dispatch` job on `main` guards the exact reviewed commit and `requests/stable-0150-20261025/policy.json` SHA-256 before any secret is read, fetches the pinned released ELF, and only the final step receives `QA_SIGNING_KEY_PEM`.
+- The request binds three inert empty-entries payloads (provider, theme, tab) and the QA public key by SHA-256. Payload dates are committed bytes; only the renewal generation time comes from the CLI's own clock.
+- The job signs and verifies each policy, bootstraps `managed-blocklist.json`, `managed-theme-blocklist.json` and `managed-tab-blocklist.json` on `marketplace-v2`, renews from an authenticated `fetch-policy` baseline, publishes with `--renewal`, replays (must be `unchanged` with no branch write) and attempts a rollback (must be refused with no branch write).
+- It refuses to start if any policy file already exists; it never deletes or resets the discovery branch. The catalog and release inventory must be unchanged by the policy lifecycle.
+- Uploaded artifacts: a strict key-free proof, the sanitized failure record, and the public signed envelopes.
