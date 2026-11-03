@@ -125,9 +125,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Both labels succeeded in CadencR Cursor build run 41538781384.
+          # ARM: CadencR run 41614614792; Intel: Cursor run 41538781384.
           - target: darwin-aarch64
-            runner: macos-26
+            runner: macos-15
             node_arch: arm64
           - target: darwin-x86_64
             runner: macos-15-intel
