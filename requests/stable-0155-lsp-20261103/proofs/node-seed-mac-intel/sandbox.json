@@ -1,0 +1,10 @@
+{
+  "network_checks": [
+    "ipv4-loopback-bind-EPERM",
+    "ipv4-outbound-connect-EPERM",
+    "ipv6-loopback-bind-EPERM"
+  ],
+  "profile_sha256": "80de7c41c4cac0234db39d259c29450b17c4e5768f24bc7dd9f9f8c75d2c12a3",
+  "smoke_status": "passed",
+  "status": "passed"
+}

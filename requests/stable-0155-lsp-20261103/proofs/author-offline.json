@@ -1,0 +1,15 @@
+{
+  "bad_confirmation": "rejected",
+  "cli_sha256": "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441",
+  "cli_version": "0.15.5",
+  "interrupted_draft": "not_exercised",
+  "kind": "lsp",
+  "local_inspect": "passed",
+  "publication": "not_requested",
+  "request_sha256": "395c5175ba83df1a17004332837e04052fd7ea9d75480153bddb51fddb3886e1",
+  "runtime": "not_executed",
+  "schema_version": 1,
+  "source_fixtures": {
+    "author-cli-qa/fixtures/lsp/server.js": "49c3b5352eeee07e26aa780d319b3f22f0ab808856b58d82a0e5e0190aaf036b"
+  }
+}

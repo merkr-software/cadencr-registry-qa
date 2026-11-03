@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "scope": "Retained key-free public QA evidence; no production activation authority",
+  "files": [
+    {
+      "file": "offline-general.json",
+      "run": 41714090100,
+      "size": 4543,
+      "sha256": "b7c693aeca8bba4954d04c918b3a8f75ac08a6c4d3166f587d155a8e6b752d91"
+    },
+    {
+      "file": "offline-lsp.json",
+      "run": 41714090100,
+      "size": 2514,
+      "sha256": "2995771cf4ef1a5d7de66527ea3dd4443fb9b46441297ea6b59984f03f0a4101"
+    },
+    {
+      "file": "author-offline.json",
+      "run": 41714112082,
+      "size": 547,
+      "sha256": "4f689c334e48ba821716f470da23194a5122b65a5f3035338a6f5fa181f83f4c"
+    },
+    {
+      "file": "author-publication.json",
+      "run": 41714469620,
+      "size": 1640,
+      "sha256": "e66918cd536a79f164002d495371fcc3168b98b73cb324c3dfb2cbd0164278c8"
+    },
+    {
+      "file": "author-fresh.json",
+      "run": 41714892549,
+      "size": 1596,
+      "sha256": "b68c8e0e3b4f30d1d5b2a6eddd2401f6e4f1bc63bd1e3d8a74dfad48e0d20928"
+    },
+    {
+      "file": "node-seed-evidence.json",
+      "run": 41714122497,
+      "size": 2232,
+      "sha256": "799a80dd9e8a5fbfec731a3db743f6af4489489eca6d2ca4762e8658538a7a82"
+    },
+    {
+      "file": "node-seed-smoke.json",
+      "run": 41714122497,
+      "size": 776,
+      "sha256": "616c587b9e0d313b10bcae74d766f747a9f684ea8d4b1c467d7768400205cd42"
+    },
+    {
+      "file": "registry-first/same-state-replay-index.json",
+      "run": 41717653667,
+      "size": 29202,
+      "sha256": "e023a9d370f81de2feb647e01408f12b3b63e16052d8f35cbc047adf6660fd1b"
+    },
+    {
+      "file": "registry-first/publish-index.json",
+      "run": 41717653667,
+      "size": 29202,
+      "sha256": "e023a9d370f81de2feb647e01408f12b3b63e16052d8f35cbc047adf6660fd1b"
+    },
+    {
+      "file": "registry-first/same-state-replay.json",
+      "run": 41717653667,
+      "size": 46170,
+      "sha256": "3d958c5f8e24994fcbc15f137f0d2a196694d21e3e9821adecb8a72218cef029"
+    },
+    {
+      "file": "registry-first/publish.json",
+      "run": 41717653667,
+      "size": 46160,
+      "sha256": "a9107c4c170eef8c94b388c677d001f1a7700349a8f21a896479d8eff05b1a49"
+    },
+    {
+      "file": "registry-fresh/same-state-replay-index.json",
+      "run": 41717653667,
+      "size": 29202,
+      "sha256": "e023a9d370f81de2feb647e01408f12b3b63e16052d8f35cbc047adf6660fd1b"
+    },
+    {
+      "file": "registry-fresh/publish-index.json",
+      "run": 41717653667,
+      "size": 29202,
+      "sha256": "e023a9d370f81de2feb647e01408f12b3b63e16052d8f35cbc047adf6660fd1b"
+    },
+    {
+      "file": "registry-fresh/same-state-replay.json",
+      "run": 41717653667,
+      "size": 46170,
+      "sha256": "f58f6efcad040c93c11eba149829d366088c5e5c4b8949ea3660c7f42d172f8b"
+    },
+    {
+      "file": "registry-fresh/publish.json",
+      "run": 41717653667,
+      "size": 46160,
+      "sha256": "77742da7c54dce21b33a006c75e4487d4e74d732affdd6ad8442bf83a0ae512a"
+    },
+    {
+      "file": "renewal-first/same-state-replay-index.json",
+      "run": 41719150203,
+      "size": 29202,
+      "sha256": "b9189c29393c17e3cfc8d2825e50d1a61333e8c46809087b780f21ae1e09b87f"
+    },
+    {
+      "file": "renewal-first/publish-index.json",
+      "run": 41719150203,
+      "size": 29202,
+      "sha256": "b9189c29393c17e3cfc8d2825e50d1a61333e8c46809087b780f21ae1e09b87f"
+    },
+    {
+      "file": "renewal-first/same-state-replay.json",
+      "run": 41719150203,
+      "size": 46483,
+      "sha256": "6789040adbb970a3d89d06589e6b150e19cffc854018585698789d5cba587ae9"
+    },
+    {
+      "file": "renewal-first/publish.json",
+      "run": 41719150203,
+      "size": 46473,
+      "sha256": "fe6bec0fe55f8ce1b87a152331370a7118b989d3e4aa6a9cac2077bfa2b1bd26"
+    },
+    {
+      "file": "renewal-fresh/same-state-replay-index.json",
+      "run": 41719150203,
+      "size": 29202,
+      "sha256": "b9189c29393c17e3cfc8d2825e50d1a61333e8c46809087b780f21ae1e09b87f"
+    },
+    {
+      "file": "renewal-fresh/publish-index.json",
+      "run": 41719150203,
+      "size": 29202,
+      "sha256": "b9189c29393c17e3cfc8d2825e50d1a61333e8c46809087b780f21ae1e09b87f"
+    },
+    {
+      "file": "renewal-fresh/same-state-replay.json",
+      "run": 41719150203,
+      "size": 46483,
+      "sha256": "7ab36c62273f0c71f4bb1552bb338686ae8997e2ca7535b3975947b1375dae35"
+    },
+    {
+      "file": "renewal-fresh/publish.json",
+      "run": 41719150203,
+      "size": 46473,
+      "sha256": "16fd8c5a81f90d47e7a7eb47873d3273cff9166b718e423504689606a9d6b6b3"
+    },
+    {
+      "file": "policy-recovery/proof.json",
+      "run": 41725197485,
+      "size": 2956,
+      "sha256": "02da7220f7fc21a4975fe8f77b7e17be809d49c335e4632394c4cb6eff2cdb62"
+    },
+    {
+      "file": "policy-recovery/fresh-recovery-fetched.json",
+      "run": 41725197485,
+      "size": 296,
+      "sha256": "59e218c0ca59b3f4b5b1cfa0df44c4e4eeb64ab499a68ccb927baf1c15846632"
+    },
+    {
+      "file": "policy-recovery/same-state-replay-fetched.json",
+      "run": 41725197485,
+      "size": 296,
+      "sha256": "59e218c0ca59b3f4b5b1cfa0df44c4e4eeb64ab499a68ccb927baf1c15846632"
+    },
+    {
+      "file": "node-seed-mac-intel/runtime-evidence.json",
+      "run": 41724182698,
+      "size": 1385,
+      "sha256": "6fce96737b1862d5889c254a22bd9da3ca2a05b971ca05fd1036779460bb0344"
+    },
+    {
+      "file": "node-seed-mac-intel/smoke.json",
+      "run": 41724182698,
+      "size": 777,
+      "sha256": "75116144b63b07be84b19bb15242ee2a2f5b71288f6a7a8ca57bbefcb62c657d"
+    },
+    {
+      "file": "node-seed-mac-intel/sandbox.json",
+      "run": 41724182698,
+      "size": 266,
+      "sha256": "d7a0a1d37072c348f590c493a2e6fbe498a6b366630df1a8cedad09dd87a0866"
+    },
+    {
+      "file": "node-seed-matrix-prepare/evidence.json",
+      "run": 41724182698,
+      "size": 2417,
+      "sha256": "7c8c936b74924f2ba4418a742617485e37711096088f0cccdb8979bbca891e29"
+    },
+    {
+      "file": "node-seed-matrix-prepare/smoke.json",
+      "run": 41724182698,
+      "size": 776,
+      "sha256": "616c587b9e0d313b10bcae74d766f747a9f684ea8d4b1c467d7768400205cd42"
+    },
+    {
+      "file": "node-seed-matrix-prepare/package.json",
+      "run": 41724182698,
+      "size": 3149,
+      "sha256": "cea23ecd78255d6afc313b737ec16704f4ccbfc028625147a8582bfaa40b7b26"
+    }
+  ]
+}

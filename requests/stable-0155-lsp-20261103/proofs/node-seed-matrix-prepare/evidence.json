@@ -1,0 +1,51 @@
+{
+  "checks": [
+    "locked-source-tree",
+    "real-node-stdio-smoke",
+    "three-target-pack",
+    "double-pack-determinism",
+    "independent-archive-inventory",
+    "CLI-manifest-validation"
+  ],
+  "cli_provenance_sha256": "ab5f563db1ec8430292fc2e593a5581f3050263f923fbd5018e582a03a8799ae",
+  "contract_targets": [
+    "darwin-aarch64",
+    "darwin-x86_64",
+    "linux-x86_64"
+  ],
+  "credentials": "none",
+  "expanded_bytes": 26682278,
+  "files": 145,
+  "harness_sha256": {
+    "common.py": "0a25fc9852af1fccd7b26b8e35e3437d274d17edf88452d72aa3129ee06a5f9c",
+    "guard.py": "4142d1fe2c18556236ac0a83b9240911405003affcf85f001058f77099128cc4",
+    "local_check.py": "4c0da173bb2d8dfbcaf1e2532def7960e2e738359aab10b0c85531a32a21daef",
+    "mac_runtime.py": "ed6d1ea8a86a1a0b51a7ec4771d672eea0610fa560ef24db4b0ca1b552b63ca6",
+    "packaging.py": "558de9c589d4faa34595ec4c3cd1912f7918fe64edd6d00493f926e3064d1ec7",
+    "prepare.py": "20147f0404c106d6a4557f12630e3765b35a3efb722dedfc511951835316736d",
+    "smoke.py": "798d19b320f30bd176a3009233e23edb9fc193a504079111d2279457df1350bd",
+    "sources.py": "efbcb4334c9811ecb7763197cc4b36d73ad45000c4ac876270d6a08b8a1528d6",
+    "test_mac_runtime.py": "65ce5c1a1ae29005337badec0f8dc216512cc65b71920643edf25b757094a6ad",
+    "test_seed.py": "7cad9ad388f1cc8b16dbd8bf8e44a4ea0624da6aa06fa89da98019669cefe987"
+  },
+  "lifecycle_qualified": false,
+  "min_app_version": "0.16.1",
+  "network": "isolated-loopback-only",
+  "node": "22.19.0",
+  "package_version": "0.1.0",
+  "pins_sha256": "dfdcb3de13285e11b6f89b50d8f2da61a6119c5622e9cedb4e08432cde6780da",
+  "planned_release_not_created": true,
+  "planned_release_tag": "lsp-typescript-language-server-v0.1.0",
+  "platform_limit": "Only the current Linux x86_64 runtime is exercised; both macOS runtimes remain unqualified.",
+  "privileges": "non-root-capabilities-dropped-no-new-privs",
+  "production_unchanged": true,
+  "publication_not_requested": true,
+  "reviewed_qa_commit": "35a9eb8c2ed3bcc7e1d2f96725621d0d63d3f589",
+  "runtime_minimum": "Node>=20 prerequisite; schema has no signed runtime minimum",
+  "runtime_platform": "Linux/x86_64",
+  "schema_version": 1,
+  "scope": "held-real-node-seed-preparation",
+  "source_acquisition": "pre-namespace pinned official npm bytes; no npm or lifecycle scripts",
+  "source_lock_sha256": "dfd04ebc92a461bf968e65bdc78d421a956dec7dfce655d17531c5518769f387",
+  "status": "passed"
+}

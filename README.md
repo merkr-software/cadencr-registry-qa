@@ -1,3 +1,14 @@
+# LSP CLI 0.15.5 qualification — 2026-11-03
+
+- Exact public Linux ELF: `0.15.5`, SHA-256 `b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441`, source `cfbb3b0d7c94a5d0fe91a3a642c5c1debf917239`.
+- General offline (91 checks), LSP supplement (32), author draft resume and fresh runner, additive LSP catalog and unchanged renewal passed.
+- Policy run `41720393138` failed after the renewal was written remotely. Exact-byte recovery `41725197485` passed: two unchanged replays, two older-policy refusals, unchanged 80-release inventory. The original failure remains recorded; its underlying wait cause is not established.
+- Public key-free receipts and signed catalogs are retained in [`requests/stable-0155-lsp-20261103/proofs/manifest.json`](requests/stable-0155-lsp-20261103/proofs/manifest.json). Original policy artifacts remain in the adjacent `policy-recovery/` directory.
+- The TypeScript Node bundle is held QA preparation, minimum app `0.16.1`; it is not a public LSP package release or production catalog entry.
+- No desktop app release, production LSP catalog admission, production feed activation or production registry pin deployment is authorized by this QA record. Production LSP rollout remains held for app `v0.16.1`.
+
+## Retained earlier qualification
+
 # Three-kind distributed CLI QA — 2026-10-18
 
 - QA ONLY: inert provider/theme/tab publication and mixed catalog lifecycle.

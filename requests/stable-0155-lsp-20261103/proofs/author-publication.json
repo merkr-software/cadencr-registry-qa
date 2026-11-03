@@ -1,0 +1,46 @@
+{
+  "bad_confirmation": "rejected",
+  "changed_bytes": "rejected_inventory_unchanged",
+  "changed_request": "rejected_inventory_unchanged",
+  "cli_sha256": "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441",
+  "cli_version": "0.15.5",
+  "completed_retries": 2,
+  "interrupted_draft": "observed_empty_draft_terminated_owned_cli_resumed_same_id",
+  "inventory": {
+    "assets": [
+      {
+        "id": 707015674,
+        "name": "lsp-darwin-aarch64.tar.gz",
+        "sha256": "e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c",
+        "size": 207
+      },
+      {
+        "id": 707015488,
+        "name": "lsp-linux-x86_64.tar.gz",
+        "sha256": "e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c",
+        "size": 207
+      },
+      {
+        "id": 707015560,
+        "name": "metadata.json",
+        "sha256": "daeb9f8410ae64901e0afe63854d147fbbe467832a82328d3c08abc158987304",
+        "size": 1329
+      }
+    ],
+    "body_sha256": "6d9a9a469e881e643647177de5040e685f1a428a879ab15d34601b2b13180dc4",
+    "release_id": 433192928
+  },
+  "kind": "lsp",
+  "local_inspect": "passed",
+  "publication": "verified",
+  "repository": "merkr-software/cadencr-registry-qa",
+  "repository_id": 1420296872,
+  "request_sha256": "395c5175ba83df1a17004332837e04052fd7ea9d75480153bddb51fddb3886e1",
+  "runtime": "not_executed",
+  "schema_version": 1,
+  "source_commit": "33591d7b2f409b313fa0eadd9d1aedf709a625be",
+  "source_fixtures": {
+    "author-cli-qa/fixtures/lsp/server.js": "49c3b5352eeee07e26aa780d319b3f22f0ab808856b58d82a0e5e0190aaf036b"
+  },
+  "tag": "qa-author-cli/stable-0155-lsp-20261103"
+}
