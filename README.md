@@ -4,7 +4,8 @@
 - General offline (91 checks), LSP supplement (32), author draft resume and fresh runner, additive LSP catalog and unchanged renewal passed.
 - Policy run `41720393138` failed after the renewal was written remotely. Exact-byte recovery `41725197485` passed: two unchanged replays, two older-policy refusals, unchanged 80-release inventory. The original failure remains recorded; its underlying wait cause is not established.
 - Public key-free receipts and signed catalogs are retained in [`requests/stable-0155-lsp-20261103/proofs/manifest.json`](requests/stable-0155-lsp-20261103/proofs/manifest.json). Original policy artifacts remain in the adjacent `policy-recovery/` directory.
-- The TypeScript Node bundle is held QA preparation, minimum app `0.16.1`; it is not a public LSP package release or production catalog entry.
+- Real TypeScript Node bundle runtime passes on Linux x86_64, macOS ARM `15.8.2` and macOS Intel `15.7.9`, Node `22.19.0`, in complete run `41727012894`. Both Macs consume the exact Ubuntu artifact from the same run and enforce tested network denial. Earlier run `41724182698` retains its capacity failure (ARM never acquired a runner); its Linux/Intel proofs remain separate.
+- The TypeScript Node bundle is held QA preparation, minimum app `0.16.1`; it is not a public LSP package release or production catalog entry. Managed client installation/revocation and minimum macOS `12` are not qualified.
 - No desktop app release, production LSP catalog admission, production feed activation or production registry pin deployment is authorized by this QA record. Production LSP rollout remains held for app `v0.16.1`.
 
 ## Retained earlier qualification

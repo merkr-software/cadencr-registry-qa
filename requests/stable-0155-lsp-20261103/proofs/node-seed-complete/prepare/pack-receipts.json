@@ -1,0 +1,38 @@
+{
+  "darwin-aarch64": {
+    "archive": "lsp-typescript-language-server-0.1.0-darwin-aarch64.tar.gz",
+    "deterministic": true,
+    "entry": "lib/cli.mjs",
+    "entry_sha256": "86ef128358dcd71d0c684d786d7751ee09fbbbbb2a521482b160007b8228be2e",
+    "entry_size": 890213,
+    "kind": "lsp",
+    "runtime": "node",
+    "sha256": "295472a5ede14af100e3a0fb0eb121d71d2818ee05399ffb3dac3290b0ec7286",
+    "size": 5014231,
+    "target": "darwin-aarch64"
+  },
+  "darwin-x86_64": {
+    "archive": "lsp-typescript-language-server-0.1.0-darwin-x86_64.tar.gz",
+    "deterministic": true,
+    "entry": "lib/cli.mjs",
+    "entry_sha256": "86ef128358dcd71d0c684d786d7751ee09fbbbbb2a521482b160007b8228be2e",
+    "entry_size": 890213,
+    "kind": "lsp",
+    "runtime": "node",
+    "sha256": "295472a5ede14af100e3a0fb0eb121d71d2818ee05399ffb3dac3290b0ec7286",
+    "size": 5014231,
+    "target": "darwin-x86_64"
+  },
+  "linux-x86_64": {
+    "archive": "lsp-typescript-language-server-0.1.0-linux-x86_64.tar.gz",
+    "deterministic": true,
+    "entry": "lib/cli.mjs",
+    "entry_sha256": "86ef128358dcd71d0c684d786d7751ee09fbbbbb2a521482b160007b8228be2e",
+    "entry_size": 890213,
+    "kind": "lsp",
+    "runtime": "node",
+    "sha256": "295472a5ede14af100e3a0fb0eb121d71d2818ee05399ffb3dac3290b0ec7286",
+    "size": 5014231,
+    "target": "linux-x86_64"
+  }
+}

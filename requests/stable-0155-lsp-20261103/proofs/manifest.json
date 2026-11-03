@@ -223,6 +223,90 @@
       "run": 41724182698,
       "size": 341,
       "sha256": "a43bd09c118f09d2769a7f615f7898cfde5cae11a14f8c3b644a7c1e71f10cf0"
+    },
+    {
+      "file": "node-seed-complete/prepare/evidence.json",
+      "run": 41727012894,
+      "size": 2417,
+      "sha256": "33af77a9eb2efac537bf07a9700e22cf6c0d1a88f9824b98c8c73acc12bed8e7"
+    },
+    {
+      "file": "node-seed-complete/prepare/smoke.json",
+      "run": 41727012894,
+      "size": 776,
+      "sha256": "616c587b9e0d313b10bcae74d766f747a9f684ea8d4b1c467d7768400205cd42"
+    },
+    {
+      "file": "node-seed-complete/prepare/package.json",
+      "run": 41727012894,
+      "size": 3149,
+      "sha256": "cea23ecd78255d6afc313b737ec16704f4ccbfc028625147a8582bfaa40b7b26"
+    },
+    {
+      "file": "node-seed-complete/prepare/prepared-files.json",
+      "run": 41727012894,
+      "size": 23300,
+      "sha256": "8c6a043828841c2c9021dd3d895d290246d4cf167b160aee2c6171c87386b1c3"
+    },
+    {
+      "file": "node-seed-complete/prepare/source-lock.json",
+      "run": 41727012894,
+      "size": 20846,
+      "sha256": "dfd04ebc92a461bf968e65bdc78d421a956dec7dfce655d17531c5518769f387"
+    },
+    {
+      "file": "node-seed-complete/prepare/pack-receipts.json",
+      "run": 41727012894,
+      "size": 1341,
+      "sha256": "12d4f347ed1fd15ec0477f84863fe746e593df3f9115f6663190f8fce42dadba"
+    },
+    {
+      "file": "node-seed-complete/prepare/acquisition.json",
+      "run": 41727012894,
+      "size": 975,
+      "sha256": "fcb522caa8d3c94a6fa8b308aa9a338328c87bd3e4c84ef898eae85aa9899e00"
+    },
+    {
+      "file": "node-seed-complete/prepare/cli-provenance.json",
+      "run": 41727012894,
+      "size": 341,
+      "sha256": "a43bd09c118f09d2769a7f615f7898cfde5cae11a14f8c3b644a7c1e71f10cf0"
+    },
+    {
+      "file": "node-seed-complete/darwin-aarch64/runtime-evidence.json",
+      "run": 41727012894,
+      "size": 1387,
+      "sha256": "87945568774d38908d0d67d810f7de19715f0870eaacaffd990941297fcf78c5"
+    },
+    {
+      "file": "node-seed-complete/darwin-aarch64/smoke.json",
+      "run": 41727012894,
+      "size": 776,
+      "sha256": "24d04c72a967643fa256a3125816eb6c35a474f15982edb60d3a88ffd5adc10c"
+    },
+    {
+      "file": "node-seed-complete/darwin-aarch64/sandbox.json",
+      "run": 41727012894,
+      "size": 266,
+      "sha256": "d7a0a1d37072c348f590c493a2e6fbe498a6b366630df1a8cedad09dd87a0866"
+    },
+    {
+      "file": "node-seed-complete/darwin-x86_64/runtime-evidence.json",
+      "run": 41727012894,
+      "size": 1385,
+      "sha256": "a1aceaa4f49fa9229352372ef1b80a6d472ef04a18e214611e398a8b4e80d3e5"
+    },
+    {
+      "file": "node-seed-complete/darwin-x86_64/smoke.json",
+      "run": 41727012894,
+      "size": 777,
+      "sha256": "75116144b63b07be84b19bb15242ee2a2f5b71288f6a7a8ca57bbefcb62c657d"
+    },
+    {
+      "file": "node-seed-complete/darwin-x86_64/sandbox.json",
+      "run": 41727012894,
+      "size": 266,
+      "sha256": "d7a0a1d37072c348f590c493a2e6fbe498a6b366630df1a8cedad09dd87a0866"
     }
   ]
 }
