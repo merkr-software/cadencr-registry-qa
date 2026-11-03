@@ -193,6 +193,36 @@
       "run": 41724182698,
       "size": 3149,
       "sha256": "cea23ecd78255d6afc313b737ec16704f4ccbfc028625147a8582bfaa40b7b26"
+    },
+    {
+      "file": "node-seed-matrix-prepare/prepared-files.json",
+      "run": 41724182698,
+      "size": 23300,
+      "sha256": "8c6a043828841c2c9021dd3d895d290246d4cf167b160aee2c6171c87386b1c3"
+    },
+    {
+      "file": "node-seed-matrix-prepare/source-lock.json",
+      "run": 41724182698,
+      "size": 20846,
+      "sha256": "dfd04ebc92a461bf968e65bdc78d421a956dec7dfce655d17531c5518769f387"
+    },
+    {
+      "file": "node-seed-matrix-prepare/pack-receipts.json",
+      "run": 41724182698,
+      "size": 1341,
+      "sha256": "12d4f347ed1fd15ec0477f84863fe746e593df3f9115f6663190f8fce42dadba"
+    },
+    {
+      "file": "node-seed-matrix-prepare/acquisition.json",
+      "run": 41724182698,
+      "size": 975,
+      "sha256": "fcb522caa8d3c94a6fa8b308aa9a338328c87bd3e4c84ef898eae85aa9899e00"
+    },
+    {
+      "file": "node-seed-matrix-prepare/cli-provenance.json",
+      "run": 41724182698,
+      "size": 341,
+      "sha256": "a43bd09c118f09d2769a7f615f7898cfde5cae11a14f8c3b644a7c1e71f10cf0"
     }
   ]
 }

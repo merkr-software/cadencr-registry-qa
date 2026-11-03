@@ -1,0 +1,24 @@
+{
+  "installers_or_scripts_executed": false,
+  "integrity": "exact SHA512 npm and SHA256 plus every locked file verified",
+  "schema_version": 1,
+  "source_lock_sha256": "dfd04ebc92a461bf968e65bdc78d421a956dec7dfce655d17531c5518769f387",
+  "sources": [
+    {
+      "commit": "589044479e4bc2bffb796b593242136f5323b582",
+      "integrity": "sha512-5puofxZHgFdAYtfNpmwCAvgtaYgg8wrUnH30m7Ze3QuguId5RNRadKASpOpyDxTyUdAF51FjhTdjntLw/EuWcQ==",
+      "name": "typescript-language-server",
+      "sha256": "398cacc17fff2108652e7b4050e3182008d17063246b3fea7dcf5fae2ce1560e",
+      "size": 501633,
+      "version": "5.3.0"
+    },
+    {
+      "commit": "050880ce59e30b356b686bd3144efe24f875ebc8",
+      "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
+      "name": "typescript",
+      "sha256": "33cd0ee1beaa8c9e9d15a9da836c62ddea4c34a42d7c2d349dbc80d94165d22a",
+      "size": 4515854,
+      "version": "6.0.3"
+    }
+  ]
+}
