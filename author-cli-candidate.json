@@ -1,11 +1,11 @@
 {
-  "kind": "provider",
-  "cli_version": "0.15.4",
-  "cli_sha256": "d925f203c3fd2e51621ad00ef1413bb25fdf8bc25792dbec9d5d2a67b1d4244d",
+  "kind": "lsp",
+  "cli_version": "0.15.5",
+  "cli_sha256": "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441",
   "repository": "merkr-software/cadencr-registry-qa",
   "repository_id": 1420296872,
   "public": true,
   "expected_account": "rle-mino",
-  "tag": "qa-author-cli/stable-0154-provider-20261102",
-  "source_commit": "d038e040cddba615891da19a24e362c1cf7abeb3"
+  "tag": "qa-author-cli/stable-0155-lsp-20261103",
+  "source_commit": "33591d7b2f409b313fa0eadd9d1aedf709a625be"
 }
