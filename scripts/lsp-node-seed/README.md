@@ -77,9 +77,26 @@ are planning metadata, not evidence of existing remote artifacts. No fictitious
 `submission.source.commit` is generated.
 
 Linux workflow execution qualifies only the current Linux x86_64 upstream
-runtime. The two macOS archive targets express the portable Node contract;
-they do not prove Intel Mac or Apple Silicon runtime qualification. Cadencr
-installation, UI, revocation and packaged-client checks remain separate.
+runtime. The downstream `mac-runtime` matrix consumes the prepare job's artifact
+by artifact ID from the same run. Job outputs bind archive, manifest, Ubuntu
+evidence and file-inventory SHA256 values. No source tarball is downloaded again.
+
+The Mac consumer checks the reviewed lock, 145 files, archive/entry hashes,
+canonical modes, compatibility and planned URLs before manual extraction into
+fresh private scratch. It checks actual Darwin hardware and Node architecture,
+including rejection of Rosetta, then reuses the existing real stdio smoke.
+`macos-26` ARM and `macos-15-intel` labels both succeeded in CadencR Cursor build
+run `41538781384`; these are the two matrix runners.
+
+Every Mac smoke executes with an empty inherited environment, private HOME and
+`sandbox-exec` denying network operations. A positive loopback bind outside the
+sandbox and required `EPERM` results for IPv4 bind/connect and IPv6 bind inside
+it prove the network restriction is active. Missing or ineffective sandboxing
+fails the job. Only smoke, sandbox and runtime evidence are uploaded.
+
+Both Mac matrix jobs must succeed to qualify both hosted architectures alongside
+the Ubuntu runtime. This does not establish macOS12 minimum-system support.
+Cadencr installation, UI, revocation and packaged-client checks remain separate.
 
 ## Local checks
 
@@ -87,6 +104,7 @@ Run the adversarial extraction, lock, metadata and guard tests without network:
 
 ```sh
 python3 -B scripts/lsp-node-seed/test_seed.py
+python3 -B scripts/lsp-node-seed/test_mac_runtime.py
 ```
 
 The explicitly named local helper exercises locked cached npm tarballs and an

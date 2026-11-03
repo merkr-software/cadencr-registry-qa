@@ -27,6 +27,13 @@ jobs:
       github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      archive_arm_sha256: ${{ steps.bind.outputs.archive_arm_sha256 }}
+      archive_intel_sha256: ${{ steps.bind.outputs.archive_intel_sha256 }}
+      manifest_sha256: ${{ steps.bind.outputs.manifest_sha256 }}
+      evidence_sha256: ${{ steps.bind.outputs.evidence_sha256 }}
+      inventory_sha256: ${{ steps.bind.outputs.inventory_sha256 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -67,7 +74,26 @@ jobs:
             --reviewed-commit "$REVIEWED_COMMIT" \
             --work "$RUNNER_TEMP/lsp-seed-private" \
             --output "$RUNNER_TEMP/lsp-seed-public"
+      - name: Bind downstream Mac jobs to these exact Ubuntu artifacts
+        id: bind
+        run: |
+          python3 - <<'PY'
+          import hashlib, os, pathlib
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'lsp-seed-public'
+          names = {
+            'archive_arm_sha256': 'lsp-typescript-language-server-0.1.0-darwin-aarch64.tar.gz',
+            'archive_intel_sha256': 'lsp-typescript-language-server-0.1.0-darwin-x86_64.tar.gz',
+            'manifest_sha256': 'package.json', 'evidence_sha256': 'evidence.json',
+            'inventory_sha256': 'prepared-files.json',
+          }
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+            for key, name in names.items():
+              path = root / name
+              assert path.is_file() and not path.is_symlink() and path.stat().st_size < 67108864
+              output.write(key + '=' + hashlib.sha256(path.read_bytes()).hexdigest() + '\n')
+          PY
       - name: Retain only held candidate archives, metadata and public evidence
+        id: upload
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: held-lsp-node-seed-${{ github.run_id }}-${{ github.run_attempt }}
@@ -85,6 +111,82 @@ jobs:
             ${{ runner.temp }}/lsp-seed-public/cli-provenance.json
             ${{ runner.temp }}/lsp-seed-public/acquisition.json
             ${{ runner.temp }}/lsp-seed-public/SHA256SUMS
+          include-hidden-files: false
+          if-no-files-found: error
+          retention-days: 14
+
+  mac-runtime:
+    needs: prepare
+    if: >-
+      github.repository == 'merkr-software/cadencr-registry-qa' &&
+      github.repository_id == '1420296872' &&
+      github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Both labels succeeded in CadencR Cursor build run 41538781384.
+          - target: darwin-aarch64
+            runner: macos-26
+            node_arch: arm64
+          - target: darwin-x86_64
+            runner: macos-15-intel
+            node_arch: x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Require the same reviewed commit, source lock and pins on Mac
+        env:
+          REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+          SOURCE_LOCK_SHA256: ${{ inputs.source_lock_sha256 }}
+          PINS_SHA256: ${{ inputs.pins_sha256 }}
+        run: python3 -B scripts/lsp-node-seed/guard.py
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.19.0'
+          architecture: ${{ matrix.node_arch }}
+          check-latest: false
+      - name: Download only the prepare job artifact from this workflow run
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.artifact_id }}
+          path: ${{ runner.temp }}/lsp-seed-from-ubuntu
+          merge-multiple: true
+      - name: Verify and smoke the existing archive with tested deny-network sandbox
+        env:
+          TARGET: ${{ matrix.target }}
+          ARCHIVE_SHA256: ${{ matrix.target == 'darwin-aarch64' && needs.prepare.outputs.archive_arm_sha256 || needs.prepare.outputs.archive_intel_sha256 }}
+          MANIFEST_SHA256: ${{ needs.prepare.outputs.manifest_sha256 }}
+          EVIDENCE_SHA256: ${{ needs.prepare.outputs.evidence_sha256 }}
+          INVENTORY_SHA256: ${{ needs.prepare.outputs.inventory_sha256 }}
+          SOURCE_LOCK_SHA256: ${{ inputs.source_lock_sha256 }}
+          PINS_SHA256: ${{ inputs.pins_sha256 }}
+          REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+          ARTIFACT_ID: ${{ needs.prepare.outputs.artifact_id }}
+        run: |
+          NODE=$(node -p 'process.execPath')
+          python3 -B scripts/lsp-node-seed/mac_runtime.py \
+            --artifact "$RUNNER_TEMP/lsp-seed-from-ubuntu" \
+            --lock "$GITHUB_WORKSPACE/scripts/lsp-node-seed/source-lock.json" \
+            --node "$NODE" --target "$TARGET" \
+            --archive-sha256 "$ARCHIVE_SHA256" --manifest-sha256 "$MANIFEST_SHA256" \
+            --evidence-sha256 "$EVIDENCE_SHA256" --inventory-sha256 "$INVENTORY_SHA256" \
+            --source-lock-sha256 "$SOURCE_LOCK_SHA256" --pins-sha256 "$PINS_SHA256" \
+            --reviewed-commit "$REVIEWED_COMMIT" --artifact-id "$ARTIFACT_ID" \
+            --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --work "$RUNNER_TEMP/lsp-mac-private" --output "$RUNNER_TEMP/lsp-mac-public"
+      - name: Retain only public runtime evidence for this real Mac architecture
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: held-lsp-node-runtime-${{ matrix.target }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/lsp-mac-public/runtime-evidence.json
+            ${{ runner.temp }}/lsp-mac-public/smoke.json
+            ${{ runner.temp }}/lsp-mac-public/sandbox.json
           include-hidden-files: false
           if-no-files-found: error
           retention-days: 14
