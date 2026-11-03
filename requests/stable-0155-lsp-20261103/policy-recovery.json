@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "failed_run": 41720393138,
+  "operation_commit": "97e199f88f0cd975d623cf45b497a0cb5cb4c07a",
+  "files": {
+    "request": "requests/stable-0155-lsp-20261103/policy.json",
+    "cli_pin": "cli-pin.env",
+    "public_key": "requests/stable-0155-lsp-20261103/public.pem",
+    "bootstrap": "requests/stable-0155-lsp-20261103/policy-recovery/bootstrap.json",
+    "renewed": "requests/stable-0155-lsp-20261103/policy-recovery/renewed.json",
+    "failure": "requests/stable-0155-lsp-20261103/policy-recovery/failure.json",
+    "catalog_baseline_proof": "requests/stable-0155-lsp-20261103/policy-recovery/registry-before-policy.json"
+  }
+}

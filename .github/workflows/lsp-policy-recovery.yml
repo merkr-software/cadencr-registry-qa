@@ -1,0 +1,53 @@
+name: Recover exact already-live QA LSP policy
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_commit:
+        description: Exact reviewed QA main workflow and recovery-input commit
+        required: true
+        type: string
+      config_sha256:
+        description: Exact SHA-256 of the sealed policy-recovery.json
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: registry-qa-lifecycle
+  cancel-in-progress: false
+jobs:
+  replay:
+    if: github.repository == 'merkr-software/cadencr-registry-qa' && github.repository_id == '1420296872' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    env:
+      REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+      CONFIG_SHA256: ${{ inputs.config_sha256 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Validate sealed incident inputs before the token-bearing step
+        run: node scripts/registry-cli-qa/lsp-policy-recovery.mjs --guard-only
+      - name: Fetch the exact public 0.15.5 ELF without source fallback
+        run: sh scripts/fetch-released-cli.sh cli-pin.env "$RUNNER_TEMP/qa-cli"
+      - name: Replay only the identical already-live renewal and verify immutable state
+        env:
+          CADENCR_REGISTRY_GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/registry-cli-qa/lsp-policy-recovery.mjs
+      - name: Preserve only explicit key-free public proofs and fetched signed policies
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: qa-lsp-policy-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/qa-lsp-policy-recovery-public/proof.json
+            ${{ runner.temp }}/qa-lsp-policy-recovery-public/failure.json
+            ${{ runner.temp }}/qa-lsp-policy-recovery-public/fresh-recovery-fetched.json
+            ${{ runner.temp }}/qa-lsp-policy-recovery-public/same-state-replay-fetched.json
+          include-hidden-files: false
+          retention-days: 14
+          if-no-files-found: warn

@@ -26,7 +26,8 @@ function run(args, authenticated = false) {
   return spawnSync(binary, args[0] === "--version" ? args : ["--json", ...args], {
     env: childEnvironment(env, authenticated),
     encoding: "utf8",
-    timeout: 300000,
+    // The released CLI may spend 360 s verifying the public feed after a write.
+    timeout: 900000,
     killSignal: "SIGKILL",
     maxBuffer: 1048576,
   });
