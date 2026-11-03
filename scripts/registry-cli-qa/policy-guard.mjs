@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { file, local, sha, REPOSITORY } from "./guard.mjs";
 export const REQUEST = "requests/stable-0152-20261025/policy.json";
+export const LSP_REQUEST = "requests/stable-0155-lsp-20261103/policy.json";
 export const KINDS = ["provider", "theme", "tab"];
 const FILES = {
   provider: "managed-blocklist.json",
   theme: "managed-theme-blocklist.json",
   tab: "managed-tab-blocklist.json",
+  lsp: "managed-lsp-blocklist.json",
 };
 const WHOLE_SECOND = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 const FOURTEEN_DAYS = 14 * 24 * 3600 * 1000;
@@ -24,20 +26,28 @@ export function policyGuard(env = process.env) {
   assert.match(env.REVIEWED_COMMIT ?? "", /^[a-f0-9]{40}$/);
   assert.equal(env.GITHUB_SHA, env.REVIEWED_COMMIT);
   assert.match(env.REQUEST_SHA256 ?? "", /^[a-f0-9]{64}$/);
-  const requestBytes = file(local(REQUEST));
+  const profile = env.QA_POLICY_PROFILE ?? "legacy";
+  assert.ok(["legacy", "lsp"].includes(profile), "unknown QA policy profile");
+  const requestPath = profile === "lsp" ? LSP_REQUEST : REQUEST;
+  const kinds = profile === "lsp" ? ["lsp"] : KINDS;
+  const requestBytes = file(local(requestPath));
   assert.equal(sha(requestBytes), env.REQUEST_SHA256);
   const request = JSON.parse(requestBytes);
   assert.equal(request.schema_version, 1);
   assert.equal(request.repository, REPOSITORY);
   // Policy files live on a QA-only branch; never the production registry or an unreviewed branch.
-  assert.ok(["marketplace-v2", "qa-policy-0152", "qa-policy-0152-r2"].includes(request.discovery_branch));
+  const branches =
+    profile === "lsp"
+      ? ["qa-policy-0155-lsp"]
+      : ["marketplace-v2", "qa-policy-0152", "qa-policy-0152-r2"];
+  assert.ok(branches.includes(request.discovery_branch));
   assert.match(request.key_id, /^[a-z0-9][a-z0-9-]{0,63}$/);
-  const directory = dirname(REQUEST);
+  const directory = dirname(requestPath);
   const publicKey = local(join(directory, request.public_key));
   assert.equal(sha(file(publicKey, 16384)), request.public_key_sha256);
   assert.deepEqual(
     request.policies.map((p) => p.kind),
-    KINDS,
+    kinds,
   );
   assert.match(request.renewal_expires_at, WHOLE_SECOND);
   // The released CLI absorbs the raw CDN window itself: renewal follows bootstrap with no settle delay.
@@ -60,7 +70,7 @@ export function policyGuard(env = process.env) {
     assert.equal(payload.kind, policy.kind === "provider" ? undefined : `${policy.kind}-blocklist`);
     payloads[policy.kind] = { path, bytes, payload };
   }
-  return { request, payloads, publicKey };
+  return { request, payloads, publicKey, kinds, profile };
 }
 if (process.argv[1] === new URL(import.meta.url).pathname && process.argv[2] === "--guard-only")
   policyGuard();

@@ -1,5 +1,6 @@
 """LSP harness tests; synthetic checks and optional source-built CLI smoke only."""
 import importlib.util
+import copy
 import json
 import os
 from pathlib import Path
@@ -36,7 +37,84 @@ def receipt(args):
         entry_sha256=qa.digest(data), entry_size=len(data), runtime="node")
 
 
+def plan_fixture(root):
+    source = packages.metadata("lsp", qa.REPOSITORY, candidate()["tag"])
+    release = "lsp-qa-author-lsp-v1.0.0"
+    mirrored = copy.deepcopy(source)
+    targets = []
+    for target in packages.TARGETS:
+        original = source["package"]["lsp"]["distribution"]["binary"][target]
+        original.update(sha256="a" * 64, size=81, entry="server.js",
+                        entry_sha256="b" * 64, entry_size=71, runtime="node")
+        asset = target + "-" + original["sha256"] + ".tar.gz"
+        destination = "https://github.com/" + qa.REPOSITORY + "/releases/download/" + release + "/" + asset
+        targets.append(dict(target=target, asset=asset, source_url=original["archive"],
+                            destination_url=destination, sha256=original["sha256"]))
+        mirrored["package"]["lsp"]["distribution"]["binary"][target] = {**original, "archive": destination}
+    mirrored["package"]["lsp"]["distribution"]["repository"] = "https://github.com/" + qa.REPOSITORY
+    # Deliberate Rust-style ordering variation to catch recursive proof re-sorting.
+    mirrored = {"package": mirrored["package"], "kind": mirrored["kind"]}
+    plan = dict(schema_version=2, repository=qa.REPOSITORY, release={"tag": release},
+                source={"private_path": "/private/scratch-not-exported"},
+                mirrored_package=mirrored, targets=targets)
+    (root / "stage").mkdir()
+    packages.write_json(root / "stage/metadata.json", source)
+    packages.write_json(root / "plan.json", plan)
+    return plan, source
+
+
 class LspTests(unittest.TestCase):
+    def test_lsp_plan_projection_exports_only_public_bound_fields(self):
+        from lsp_plan import registry_plan
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            plan, _ = plan_fixture(root)
+            # Preserve the order delivered by the actual plan parser.
+            (root / "plan.json").write_text(json.dumps(plan))
+            projection = registry_plan(root, candidate())
+            self.assertEqual(set(projection), {"release_tag", "mirrored_package", "targets"})
+            self.assertEqual(projection["release_tag"], plan["release"]["tag"])
+            self.assertEqual(projection["targets"], plan["targets"])
+            self.assertEqual(list(projection["mirrored_package"]), ["package", "kind"])
+            self.assertNotIn("private_path", json.dumps(projection))
+            self.assertNotIn("/private/", json.dumps(projection))
+
+    def test_lsp_plan_projection_refuses_private_fields_credentials_and_binding_changes(self):
+        from lsp_plan import registry_plan
+        for change in (
+            lambda p: p.update(release={"tag": "/private/scratch"}),
+            lambda p: p["targets"][0].update(private_path="/private/scratch"),
+            lambda p: p["targets"][0].update(source_url="file:///private/scratch"),
+            lambda p: p["targets"][0].update(source_url="https://token@github.com/qa/private"),
+            lambda p: p["targets"][0].update(destination_url=p["targets"][0]["destination_url"] + "?token=secret"),
+            lambda p: p["targets"][0].update(sha256="f" * 64),
+            lambda p: p["mirrored_package"]["package"]["lsp"].update(args=["/private/scratch"]),
+            lambda p: p["mirrored_package"]["package"]["lsp"].update(initialization_options={"token": "secret"}),
+            lambda p: p["targets"].pop(),
+        ):
+            with tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                plan, _ = plan_fixture(root)
+                change(plan)
+                packages.write_json(root / "plan.json", plan)
+                with self.assertRaises(qa.Rejected):
+                    registry_plan(root, candidate())
+
+    def test_lsp_proof_writer_preserves_plan_order_and_legacy_sorting(self):
+        for kind, ordered in (("lsp", ["package", "kind"]), ("theme", ["kind", "package"])):
+            with tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                c = {**candidate(), "kind": kind}
+                path = root / "candidate.json"
+                packages.write_json(path, c)
+                output = root / "proof.json"
+                proof = {"registry_plan": {"mirrored_package": {"package": {}, "kind": "lsp"}}}
+                args = ["qa", "--candidate", str(path), "--confirm-candidate-sha256", qa.digest(path.read_bytes()),
+                        "--cli", "/not-executed", "--output", str(output)]
+                with patch.object(sys, "argv", args), patch.object(qa, "qualify", return_value=proof):
+                    self.assertEqual(qa.main(), 0)
+                self.assertEqual(list(json.loads(output.read_bytes())["registry_plan"]["mirrored_package"]), ordered)
+
     def test_lsp_candidate_keeps_exact_shape_repository_and_variant_guards(self):
         c = candidate()
         raw = json.dumps(c).encode()
@@ -150,6 +228,14 @@ class LspTests(unittest.TestCase):
                 self.assertEqual(assets, fresh_assets)
                 plan = json.loads((root / "plan.json").read_bytes())
                 self.assertEqual([p["target"] for p in plan["targets"]], list(packages.TARGETS[::-1]))
+                projected_root = root / "qualification"
+                projected_root.mkdir()
+                with patch.object(qa, "check_cli"), patch.object(qa.tempfile, "mkdtemp", return_value=str(projected_root)):
+                    proof = qa.qualify(cli, candidate(), False)
+                actual_plan = json.loads((projected_root / "plan.json").read_bytes())
+                self.assertEqual(proof["registry_plan"], {"release_tag": actual_plan["release"]["tag"],
+                    "mirrored_package": actual_plan["mirrored_package"], "targets": actual_plan["targets"]})
+                self.assertNotIn(str(root), json.dumps(proof))
                 class Network:
                     checks = 0
                     def inventory(self, c, bound):

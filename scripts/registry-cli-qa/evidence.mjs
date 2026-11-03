@@ -2,11 +2,16 @@ import assert from "node:assert/strict";
 import { isDeepStrictEqual } from "node:util";
 import { setTimeout as delay } from "node:timers/promises";
 import { REPOSITORY, sha } from "./guard.mjs";
+import { publicationCount, lspBinding } from "./profiles.mjs";
 export async function bytes(url, headers = {}, signal = AbortSignal.timeout(60000)) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     signal.throwIfAborted();
     try {
-      const response = await fetch(url, { headers, signal, redirect: "follow" });
+      const response = await fetch(url, {
+        headers,
+        signal,
+        redirect: "follow",
+      });
       assert.equal(response.status, 200);
       const parts = [];
       let size = 0;
@@ -33,7 +38,10 @@ export async function inventory(token, signal = AbortSignal.timeout(60000)) {
     JSON.parse(
       await bytes(
         `https://api.github.com/repos/${REPOSITORY}${path}`,
-        { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" },
+        {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+        },
         signal,
       ),
     );
@@ -107,8 +115,8 @@ export function continuity(previous, current, plan) {
     assert.ok(Date.parse(current.signed.expires_at) > Date.parse(previous.signed.expires_at));
     assert.ok(Date.parse(current.signed.generated_at) > Date.parse(previous.signed.generated_at));
   } else {
-    assert.equal(added.length, 3);
-    // Exact CLI-generated entry hashes bind all three reviewed fixtures, including unwrapped providers.
+    assert.equal(added.length, publicationCount(plan));
+    // Exact CLI-generated entry hashes bind reviewed fixtures, including unwrapped providers.
     assert.deepEqual(
       added.map((e) => sha(Buffer.from(JSON.stringify(e)))).sort(),
       [...plan.added_entry_sha256].sort(),
@@ -174,16 +182,23 @@ export function replayUnchanged(observation, baseline) {
 
 export function archiveCoverage(catalog, archives) {
   const expected = new Map();
+  const lsp = new Map();
   for (const entry of catalog.signed.packages) {
     const body = entry.kind ? entry.package : entry;
-    const descriptor = body.agent ?? body.theme ?? body.tab;
+    const descriptor = body.agent ?? body.theme ?? body.tab ?? body.lsp;
     const distribution = descriptor.distribution;
     const binaries = Object.values(distribution.binary ?? {});
-    const values = body.agent ? binaries : body.tab ? [distribution, ...binaries] : [distribution];
+    const values =
+      body.agent || body.lsp ? binaries : body.tab ? [distribution, ...binaries] : [distribution];
     for (const value of values) {
       const prior = expected.get(value.archive);
       assert.ok(prior === undefined || prior === value.sha256, "conflicting archive digests");
       expected.set(value.archive, value.sha256);
+      if (body.lsp) {
+        const bound = lspBinding(value);
+        if (lsp.has(value.archive)) assert.deepEqual(lsp.get(value.archive), bound);
+        lsp.set(value.archive, bound);
+      }
     }
   }
   const actual = new Map();
@@ -192,6 +207,16 @@ export function archiveCoverage(catalog, archives) {
     assert.ok(archive.url.startsWith(`https://github.com/${REPOSITORY}/releases/download/`));
     assert.ok(Number.isSafeInteger(archive.size) && archive.size > 0);
     actual.set(archive.url, archive.sha256);
+    if (lsp.has(archive.url)) {
+      const reviewed = Object.fromEntries(
+        Object.keys(lsp.get(archive.url)).map((key) => [key, archive[key]]),
+      );
+      assert.deepEqual(
+        reviewed,
+        lsp.get(archive.url),
+        "reviewed LSP archive/entry binding differs",
+      );
+    }
   }
   assert.deepEqual(actual, expected, "reviewed archives must exactly cover authenticated catalog");
 }

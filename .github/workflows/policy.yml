@@ -2,12 +2,18 @@ name: Public registry revocation policy QA
 on:
   workflow_dispatch:
     inputs:
+      profile:
+        description: Fixed QA-only request and feed namespace to exercise
+        required: true
+        default: legacy
+        type: choice
+        options: [legacy, lsp]
       reviewed_commit:
         description: Exact reviewed workflow commit on main
         required: true
         type: string
       request_sha256:
-        description: Exact SHA-256 of reviewed requests/stable-0152-20261025/policy.json
+        description: Exact SHA-256 of the reviewed request selected by the fixed profile
         required: true
         type: string
 permissions:
@@ -24,6 +30,7 @@ jobs:
       contents: write
     env:
       QA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      QA_POLICY_PROFILE: ${{ inputs.profile }}
       REQUEST_SHA256: ${{ inputs.request_sha256 }}
       REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
     steps:
@@ -54,6 +61,8 @@ jobs:
             ${{ runner.temp }}/qa-policy-public/theme-renewed.json
             ${{ runner.temp }}/qa-policy-public/tab-bootstrap.json
             ${{ runner.temp }}/qa-policy-public/tab-renewed.json
+            ${{ runner.temp }}/qa-policy-public/lsp-bootstrap.json
+            ${{ runner.temp }}/qa-policy-public/lsp-renewed.json
           include-hidden-files: false
           retention-days: 14
           if-no-files-found: warn

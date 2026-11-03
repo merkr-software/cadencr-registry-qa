@@ -4,6 +4,7 @@ import { mkdirSync, writeFileSync, unlinkSync, readdirSync, appendFileSync } fro
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { guard, file, local, sha, VERSION, BINARY_SHA, REPOSITORY } from "./guard.mjs";
+import { publicationCount, verificationArgs } from "./profiles.mjs";
 import {
   bytes,
   inventory,
@@ -49,22 +50,10 @@ function cli(args, timeout = 900000, authenticated = false) {
   return result.stdout;
 }
 assert.equal(cli(["--version"], 30000), `cadencr ${VERSION}\n`);
-function verify(path) {
-  cli(
-    [
-      "registry",
-      "verify-index",
-      "--index",
-      path,
-      "--public-key",
-      plan.public_key,
-      "--key-id",
-      request.key_id,
-    ],
-    60000,
-  );
+function verify(path, mode = "current") {
+  cli(verificationArgs(path, plan.public_key, request.key_id, mode), 60000);
 }
-verify(plan.previous);
+verify(plan.previous, "baseline");
 const readInventory = (signal) => inventory(env.CADENCR_REGISTRY_GITHUB_TOKEN, signal);
 const before =
   env.QA_RUNNER === "fresh"
@@ -155,7 +144,7 @@ try {
         : readdirSync(join(state, "publications")).map((dir) =>
             JSON.parse(file(join(state, "publications", dir, "mirror-receipt.json"))),
           );
-    assert.equal(mirrors.length, plan.phase === "renewal" ? 0 : 3);
+    assert.equal(mirrors.length, publicationCount(plan));
     assert.deepEqual(mirrors.map((m) => m.release_tag).sort(), [...plan.mirror_tags].sort());
     if (env.QA_RUNNER === "fresh")
       for (const mirror of mirrors) assert.equal(mirror.status, "published_recovered");
@@ -199,6 +188,7 @@ try {
         cli_version: VERSION,
         attempt,
         runner: env.QA_RUNNER,
+        profile: plan.profile ?? "legacy",
         catalog_sha256: catalog.catalog_sha256,
         mirror_tags: mirrors.map((m) => m.release_tag),
         interruption_observed: Boolean(interrupted),

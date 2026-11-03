@@ -5,16 +5,10 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { file, sha, VERSION, BINARY_SHA, REPOSITORY } from "./guard.mjs";
-import { policyGuard, KINDS } from "./policy-guard.mjs";
-import {
-  bytes,
-  inventory,
-  preserved,
-  childEnvironment,
-  failureDiagnostic,
-} from "./evidence.mjs";
+import { policyGuard } from "./policy-guard.mjs";
+import { bytes, inventory, preserved, childEnvironment, failureDiagnostic } from "./evidence.mjs";
 const env = process.env;
-const { request, payloads, publicKey } = policyGuard();
+const { request, payloads, publicKey, kinds: KINDS, profile } = policyGuard();
 assert.equal(
   sha(file("scripts/evidence.mjs")),
   "57ff31556ee87708a8fcb197e635513e4ee3fc0013d91c1131fd0648836471ba",
@@ -49,7 +43,10 @@ assert.equal(cli(["--version"]), `cadencr ${VERSION}\n`);
 
 const api = async (path) => {
   const response = await fetch(`https://api.github.com/repos/${REPOSITORY}${path}`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+    },
     signal: AbortSignal.timeout(60000),
   });
   if (response.status === 404) return null;
@@ -64,7 +61,10 @@ async function branchState() {
   for (const policy of request.policies) {
     const content = await api(`/contents/${policy.file}?ref=${head}`);
     files[policy.kind] = content
-      ? { blob: content.sha, sha256: sha(Buffer.from(content.content, "base64")) }
+      ? {
+          blob: content.sha,
+          sha256: sha(Buffer.from(content.content, "base64")),
+        }
       : null;
   }
   return { head, files };
@@ -112,6 +112,7 @@ assert.ok(env.QA_SIGNING_KEY_PEM && Buffer.byteLength(env.QA_SIGNING_KEY_PEM) <=
 writeFileSync(key, env.QA_SIGNING_KEY_PEM, { flag: "wx", mode: 0o600 });
 delete env.QA_SIGNING_KEY_PEM;
 const proof = {
+  profile,
   repository: REPOSITORY,
   commit: env.REVIEWED_COMMIT,
   request_sha256: env.REQUEST_SHA256,
@@ -165,7 +166,11 @@ const timings = [];
 const publishOk = (kind, signed, flags, receiptPath) => {
   const started = Date.now();
   const result = publish(kind, signed, flags, receiptPath);
-  timings.push({ kind, mode: flags[0] ?? "plain", elapsed_ms: Date.now() - started });
+  timings.push({
+    kind,
+    mode: flags[0] ?? "plain",
+    elapsed_ms: Date.now() - started,
+  });
   assert.ok(
     !result.error && result.status === 0,
     `${kind} publish-policy failed: ${JSON.stringify(failureDiagnostic(result))}`,
@@ -211,7 +216,9 @@ try {
     assert.equal(envelope.signed.generated_at, payloads[kind].payload.generated_at);
     assert.equal(envelope.signed.expires_at, payloads[kind].payload.expires_at);
     proof.policies[kind].signed_sha256 = sha(read(signed));
-    writeFileSync(join(root, `${kind}-bootstrap.json`), read(signed), { flag: "wx" });
+    writeFileSync(join(root, `${kind}-bootstrap.json`), read(signed), {
+      flag: "wx",
+    });
   }
   // 3. Bootstrap publication, then the published bytes through API and anonymous raw read.
   for (const kind of KINDS) {
@@ -276,7 +283,9 @@ try {
     proof.policies[kind].baseline_sha256 = sha(read(baseline));
     proof.policies[kind].renewed_sha256 = sha(read(renewed));
     proof.policies[kind].renewed_generated_at = after.generated_at;
-    writeFileSync(join(root, `${kind}-renewed.json`), read(renewed), { flag: "wx" });
+    writeFileSync(join(root, `${kind}-renewed.json`), read(renewed), {
+      flag: "wx",
+    });
   }
   // 5. Publish the renewals; 6. replay is idempotent.
   for (const kind of KINDS) {
@@ -339,12 +348,16 @@ try {
   preserved(inventoryBefore.releases, inventoryAfter.releases);
   assert.equal(inventoryBefore.releases.length, inventoryAfter.releases.length);
   assert.equal(inventoryBefore.discovery_sha256, inventoryAfter.discovery_sha256);
-  proof.catalog_unchanged = { discovery_sha256: inventoryAfter.discovery_sha256 };
+  proof.catalog_unchanged = {
+    discovery_sha256: inventoryAfter.discovery_sha256,
+  };
   proof.releases_unchanged = inventoryAfter.releases.length;
   proof.publish_elapsed_ms = timings;
   proof.independent_public_read_wait_ms = publicWaits;
   // Strict allowlist: no environment, private state, raw CLI output or unknown receipt fields.
-  writeFileSync(join(root, "policy-proof.json"), JSON.stringify(proof) + "\n", { flag: "wx" });
+  writeFileSync(join(root, "policy-proof.json"), JSON.stringify(proof) + "\n", {
+    flag: "wx",
+  });
 } catch (error) {
   // Sanitized failure record only: message text may quote untrusted child or API output.
   writeFileSync(

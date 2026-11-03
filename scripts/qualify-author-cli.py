@@ -304,6 +304,9 @@ def qualify(cli, c, publish, network=None, interrupt_draft=False):
                  "interrupted_draft": "not_exercised", "publication": "not_requested"}
         if c["kind"] == "tab":
             proof["tab_variant"] = c.get("tab_variant", "ui-only")
+        if c["kind"] == "lsp":
+            from lsp_plan import registry_plan
+            proof["registry_plan"] = registry_plan(root, c)
         if not publish:
             return proof
         token = os.environ.get("QA_AUTHOR_GITHUB_TOKEN")
@@ -376,7 +379,7 @@ def main():
         proof = qualify(args.cli.absolute(), c, args.publish, interrupt_draft=args.interrupt_draft)
         # Exclusive creation prevents accidentally replacing reviewed evidence.
         with args.output.open("x") as output:
-            json.dump(proof, output, sort_keys=True, indent=2)
+            json.dump(proof, output, sort_keys=c["kind"] != "lsp", indent=2)
             output.write("\n")
     except (Rejected, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         print(failure_json(error), file=sys.stderr)

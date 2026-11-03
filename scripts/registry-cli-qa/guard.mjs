@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { lstatSync, readFileSync } from "node:fs";
 import { resolve, sep, dirname, join } from "node:path";
+import { validateProfile } from "./profiles.mjs";
 export const REPOSITORY = "merkr-software/cadencr-registry-qa";
-export const VERSION = "0.15.2";
-export const BINARY_SHA = "f4a719871f776bdbbb9845ac98eb381a85da5730237e0c9b50c2e15198fc4031";
+export const VERSION = "0.15.5";
+export const BINARY_SHA = "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441";
 export const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export function file(path, max = 4194304) {
   const stat = lstatSync(path);
@@ -44,13 +45,16 @@ export function guard(env = process.env) {
   assert.equal(resolve(plan.public_key), resolve(dirname(plan.request), request.public_key));
   assert.equal(resolve(plan.previous), resolve(dirname(plan.request), request.previous_index));
   assert.equal(request.key_id, plan.key_id);
-  assert.equal(request.publications.length, plan.phase === "renewal" ? 0 : 3);
+  const submissions = [];
   for (const publication of request.publications) {
     const path = local(join(dirname(plan.request), publication.submission));
     assert.ok(Object.hasOwn(plan.inputs, path), "every submission must be hash-bound");
+    submissions.push(JSON.parse(file(path)));
   }
   for (const [path, digest] of Object.entries(plan.inputs))
     assert.equal(sha(file(local(path))), digest);
+  const previous = plan.profile ? JSON.parse(file(local(plan.previous))) : undefined;
+  validateProfile(plan, request, submissions, env.QA_PHASE, previous);
   if (plan.fault) {
     const faultSubmission = local(plan.fault.submission);
     assert.ok(Object.hasOwn(plan.inputs, faultSubmission));
