@@ -49,7 +49,7 @@ jobs:
       - name: Exercise qualification harness guards
         run: python3 -B scripts/author-cli-qa/test_harness.py
       - name: Fetch exact released CLI without source fallback
-        run: sh scripts/fetch-released-cli.sh author-cli-pin.env "$RUNNER_TEMP/author-cli"
+        run: sh scripts/fetch-cli0155.sh author-cli-pin.env "$RUNNER_TEMP/author-cli"
       - name: Exercise the distributed ELF without network or credentials
         env:
           CANDIDATE_SHA256: ${{ inputs.candidate_sha256 }}
@@ -86,7 +86,7 @@ jobs:
           CANDIDATE_SHA256: ${{ inputs.candidate_sha256 }}
         run: python3 scripts/author-cli-qa/guard.py
       - name: Fetch the same pinned released ELF independently
-        run: sh scripts/fetch-released-cli.sh author-cli-pin.env "$RUNNER_TEMP/author-cli"
+        run: sh scripts/fetch-cli0155.sh author-cli-pin.env "$RUNNER_TEMP/author-cli"
       - name: Publish inert QA content and verify exact retries
         env:
           QA_AUTHOR_GITHUB_TOKEN: ${{ secrets.QA_AUTHOR_GITHUB_TOKEN }}

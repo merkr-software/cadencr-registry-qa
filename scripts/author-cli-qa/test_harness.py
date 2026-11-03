@@ -130,7 +130,7 @@ spec.loader.exec_module(qa)
 assert packages.ROOT == packages.ROOT.resolve()
 assert qa.SCRIPTS_ROOT == qa.SCRIPTS_ROOT.resolve()
 import base64
-for kind, variant in (("provider", "ui-only"), ("theme", "ui-only"),
+for kind, variant in (("provider", "ui-only"), ("theme", "ui-only"), ("lsp", "ui-only"),
                       ("tab", "ui-only"), ("tab", "native-backend")):
     candidate = {"kind": kind, "tag": "qa-author-cli/fixture-001", "source_commit": "a" * 40}
     if kind == "tab":
@@ -612,7 +612,7 @@ for kind, variant in (("provider", "ui-only"), ("theme", "ui-only"),
         import tarfile
         cli = Path(os.environ["CADENCR_DEVELOPMENT_FIXTURE_CLI"]).resolve(strict=True)
         with tempfile.TemporaryDirectory(prefix="author-fixture-development-") as scratch:
-            for kind in ("provider", "theme", "tab"):
+            for kind in ("provider", "theme", "tab", "lsp"):
                 with self.subTest(kind=kind):
                     root = Path(scratch).resolve() / kind
                     root.mkdir()
@@ -720,6 +720,9 @@ for kind, variant in (("provider", "ui-only"), ("theme", "ui-only"),
             "QA_AUTHOR_GITHUB_TOKEN": "same-token", "GITHUB_TOKEN": "same-token"
         }, clear=True), self.assertRaises(qa.Rejected):
             qa.qualify(Path("/cli"), candidate(), True)
+
+
+from lsp_tests import LspTests
 
 
 if __name__ == "__main__":

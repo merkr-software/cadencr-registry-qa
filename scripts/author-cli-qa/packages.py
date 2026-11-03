@@ -1,9 +1,11 @@
 """Inert fixture orchestration; released CLI owns all business validation."""
 from datetime import datetime, timedelta, timezone
+import hashlib
 import json
 from pathlib import Path
 import shutil
 import urllib.parse
+from failure_diagnostics import require
 
 ROOT = Path(__file__).resolve().parent
 TARGETS = ("linux-x86_64", "darwin-aarch64")
@@ -24,17 +26,23 @@ def metadata(kind, repository, tag):
     url = "https://github.com/" + repository
     descriptor = {"id": "qa-author-" + kind, "name": "Author CLI QA " + kind,
                   "description": "Inert original-author qualification; never execute.",
-                  "version": "1.0.8", "repository": url,
+                  "version": "1.0.0" if kind == "lsp" else "1.0.8", "repository": url,
                   "license": "Apache-2.0" if kind == "theme" else "MIT"}
     def distribution(name):
         return {"archive": url + "/releases/download/" + urllib.parse.quote(tag, safe="") +
                 "/" + name, "sha256": "0" * 64}
-    host = {"publisher": "qa-author", "compatibility": {"min_app_version": "999.0.0" if kind == "tab" else "1.0.0"}}
+    host = {"publisher": "qa-author", "compatibility": {"min_app_version": "999.0.0" if kind in ("tab", "lsp") else "1.0.0"}}
     if kind == "provider":
         descriptor["distribution"] = {"binary": {
             target: {**distribution("provider-" + target + ".tar.gz"), "cmd": "bin/provider"}
             for target in TARGETS}}
         host["assets"] = {"icon": "icon.svg", "readme": "README.md", "license": "LICENSE"}
+    elif kind == "lsp":
+        descriptor.update(protocol_version=1, languages=[{
+            "id": "typescript", "extensions": ["ts"], "filenames": []}],
+            root_markers=["package.json"], role="general", args=["--stdio"],
+            initialization_options={}, distribution={"binary": {
+                target: distribution("lsp-" + target + ".tar.gz") for target in TARGETS}})
     else:
         descriptor["api_version" if kind == "tab" else "document_version"] = 1
         descriptor["distribution"] = distribution(kind + ".tar.gz")
@@ -72,8 +80,15 @@ def prepare(cli, c, root, home, invoke, asset):
         backends = native_fixture.pack(cli, source, stage, package["package"]["tab"],
                                       home, invoke, asset)
         write_json(package_path, package)
-    invoke(cli, validation, home)
-    archives = pack(cli, kind, ui if native else source, stage, package, package_path, home, invoke, asset) + backends
+    if kind == "lsp":
+        # Capture prepared bytes first; lsp.json binds their exact Rust receipts.
+        archives = pack_lsp(cli, source, stage, package, home, invoke, asset)
+        write_json(source / "lsp.json", package)
+        write_json(package_path, package)
+        invoke(cli, validation, home)
+    else:
+        invoke(cli, validation, home)
+        archives = pack(cli, kind, ui if native else source, stage, package, package_path, home, invoke, asset) + backends
     packages = root / "packages"
     packages.mkdir()
     write_json(packages / "package.json", package)
@@ -93,6 +108,26 @@ def prepare(cli, c, root, home, invoke, asset):
         "--repository", c["repository"], "--output", str(root / "plan.json")], home)
     write_json(stage / "metadata.json", package)
     return stage, archives
+
+
+def pack_lsp(cli, source, stage, package, home, invoke, asset):
+    archives = []
+    entry = "server.js"
+    entry_bytes = (source / entry).read_bytes()
+    for target in TARGETS:
+        output = stage / ("lsp-" + target + ".tar.gz")
+        receipt = json.loads(invoke(cli, ["registry", "pack-lsp", "--directory", str(source),
+            "--target", target, "--entry", entry, "--runtime", "node", "--output", str(output)], home))
+        archive = asset(output)
+        bound = {"sha256": archive["sha256"], "size": archive["size"], "entry": entry,
+                 "entry_sha256": hashlib.sha256(entry_bytes).hexdigest(),
+                 "entry_size": len(entry_bytes), "runtime": "node"}
+        # Receipt integrity only; all package/archive business validation is Rust-owned.
+        require(receipt == {"kind": "lsp", "target": target,
+                            "archive": str(output.absolute()), **bound})
+        package["package"]["lsp"]["distribution"]["binary"][target].update(bound)
+        archives.append(archive)
+    return archives
 
 
 def pack(cli, kind, source, stage, package, package_path, home, invoke, asset):

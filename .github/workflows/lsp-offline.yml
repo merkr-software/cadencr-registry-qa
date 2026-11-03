@@ -1,0 +1,99 @@
+name: Qualify released CLI LSP offline
+
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_commit:
+        description: Exact reviewed QA workflow, script and pin commit
+        required: true
+        type: string
+      pins_sha256:
+        description: Reviewed lsp-cli-pin.env SHA-256
+        required: true
+        type: string
+      source_commit:
+        description: Exact source commit of public cli/v0.15.5
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    if: >-
+      github.repository == 'merkr-software/cadencr-registry-qa' &&
+      github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Require reviewed QA context and dedicated 0.15.5 pin
+        env:
+          REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+          PINS_SHA256: ${{ inputs.pins_sha256 }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, os, pathlib, re
+          expected = 'merkr-software/cadencr-registry-qa'
+          assert os.environ['GITHUB_REPOSITORY'] == expected
+          assert os.environ['GITHUB_REPOSITORY_ID'] == '1420296872'
+          assert os.environ['GITHUB_REF'] == 'refs/heads/main'
+          assert os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch'
+          assert os.environ['GITHUB_WORKFLOW_REF'] == expected + '/.github/workflows/lsp-offline.yml@refs/heads/main'
+          assert re.fullmatch('[a-f0-9]{40}', os.environ['REVIEWED_COMMIT'])
+          assert os.environ['GITHUB_SHA'] == os.environ['REVIEWED_COMMIT']
+          assert re.fullmatch('[a-f0-9]{40}', os.environ['SOURCE_COMMIT'])
+          assert re.fullmatch('[a-f0-9]{64}', os.environ['PINS_SHA256'])
+          pin = pathlib.Path('lsp-cli-pin.env')
+          assert pin.is_file() and not pin.is_symlink() and pin.stat().st_size <= 1024
+          raw = pin.read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == os.environ['PINS_SHA256']
+          lines = raw.decode().splitlines()
+          assert len(lines) == 3
+          assert lines[0] == 'CADENCR_RELEASE_VERSION=0.15.5'
+          assert lines[1] == 'CADENCR_RELEASE_TAG=cli/v0.15.5'
+          assert re.fullmatch('CADENCR_RELEASE_SHA256=[a-f0-9]{64}', lines[2])
+          script = pathlib.Path('scripts/qualify-lsp-released.py')
+          assert script.is_file() and not script.is_symlink() and script.stat().st_size <= 65536
+          compile(script.read_bytes(), str(script), 'exec')
+          PY
+      - name: Fetch exact public ELF without source fallback
+        run: sh scripts/fetch-cli0155.sh lsp-cli-pin.env "$RUNNER_TEMP/lsp-cli"
+      - name: Exercise general CLI qualification without network or credentials
+        run: |
+          sudo unshare --net -- setpriv \
+            --reuid "$(id -u)" --regid "$(id -g)" --clear-groups \
+            --bounding-set=-all --no-new-privs \
+            env -i PATH=/usr/bin:/bin \
+            CLI="$RUNNER_TEMP/lsp-cli/cadencr" \
+            CLI_WORK_ROOT="$RUNNER_TEMP/general-offline" \
+            CLI_QUALIFICATION_PINS="$GITHUB_WORKSPACE/lsp-cli-pin.env" \
+            sh scripts/qualify-released-cli.sh
+      - name: Exercise LSP authoring and signatures without network or credentials
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          sudo unshare --net -- setpriv \
+            --reuid "$(id -u)" --regid "$(id -g)" --clear-groups \
+            --bounding-set=-all --no-new-privs \
+            env -i PATH=/usr/bin:/bin \
+            CLI="$RUNNER_TEMP/lsp-cli/cadencr" \
+            CLI_WORK_ROOT="$RUNNER_TEMP/lsp-offline" \
+            CLI_QUALIFICATION_PINS="$GITHUB_WORKSPACE/lsp-cli-pin.env" \
+            CLI_RELEASE_PROVENANCE="$RUNNER_TEMP/lsp-cli/provenance.json" \
+            CLI_RELEASE_SOURCE_COMMIT="$SOURCE_COMMIT" \
+            python3 -B scripts/qualify-lsp-released.py
+      - name: Retain only key-free explicit public evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: lsp-offline-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/general-offline/evidence/evidence.json
+            ${{ runner.temp }}/lsp-offline/evidence/evidence.json
+          if-no-files-found: error
+          retention-days: 14

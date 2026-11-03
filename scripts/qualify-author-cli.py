@@ -45,7 +45,7 @@ def load_candidate(data, confirmation):
     require(type(c) is dict and set(c) - {"tab_variant"} == {
         "cli_version", "cli_sha256", "repository", "repository_id",
         "public", "expected_account", "tag", "source_commit", "kind"})
-    require(c["kind"] in ("provider", "theme", "tab"))
+    require(c["kind"] in ("provider", "theme", "tab", "lsp"))
     if "tab_variant" in c:
         require(c["kind"] == "tab" and type(c["tab_variant"]) is str
                 and c["tab_variant"] in ("ui-only", "native-backend"))
