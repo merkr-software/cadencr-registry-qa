@@ -1,0 +1,90 @@
+name: Prepare held real Node LSP seed
+
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_commit:
+        description: Exact reviewed QA commit containing workflow and harness
+        required: true
+        type: string
+      source_lock_sha256:
+        description: Reviewed scripts/lsp-node-seed/source-lock.json SHA-256
+        required: true
+        type: string
+      pins_sha256:
+        description: Reviewed lsp-cli-pin.env SHA-256
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    if: >-
+      github.repository == 'merkr-software/cadencr-registry-qa' &&
+      github.repository_id == '1420296872' &&
+      github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify exact reviewed context, source lock and released CLI pins
+        env:
+          REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+          SOURCE_LOCK_SHA256: ${{ inputs.source_lock_sha256 }}
+          PINS_SHA256: ${{ inputs.pins_sha256 }}
+        run: python3 -B scripts/lsp-node-seed/guard.py
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.19.0'
+          check-latest: false
+      - name: Fetch exact official source bytes and pinned public CLI without execution
+        run: |
+          sh scripts/fetch-cli0155.sh lsp-cli-pin.env "$RUNNER_TEMP/lsp-seed-cli"
+          python3 -B scripts/lsp-node-seed/sources.py \
+            --lock "$GITHUB_WORKSPACE/scripts/lsp-node-seed/source-lock.json" \
+            --output "$RUNNER_TEMP/lsp-seed-sources"
+      - name: Prepare and smoke the real bundle without network, credentials or privileges
+        env:
+          REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+        run: |
+          NODE=$(command -v node)
+          sudo unshare --net -- setpriv \
+            --reuid "$(id -u)" --regid "$(id -g)" --clear-groups \
+            --bounding-set=-all --no-new-privs \
+            env -i PATH=/usr/bin:/bin \
+            python3 -B scripts/lsp-node-seed/prepare.py \
+            --cli "$RUNNER_TEMP/lsp-seed-cli/cadencr" \
+            --provenance "$RUNNER_TEMP/lsp-seed-cli/provenance.json" \
+            --pins "$GITHUB_WORKSPACE/lsp-cli-pin.env" \
+            --node "$NODE" \
+            --sources "$RUNNER_TEMP/lsp-seed-sources" \
+            --lock "$GITHUB_WORKSPACE/scripts/lsp-node-seed/source-lock.json" \
+            --reviewed-commit "$REVIEWED_COMMIT" \
+            --work "$RUNNER_TEMP/lsp-seed-private" \
+            --output "$RUNNER_TEMP/lsp-seed-public"
+      - name: Retain only held candidate archives, metadata and public evidence
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: held-lsp-node-seed-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/lsp-seed-public/lsp-typescript-language-server-0.1.0-darwin-aarch64.tar.gz
+            ${{ runner.temp }}/lsp-seed-public/lsp-typescript-language-server-0.1.0-darwin-x86_64.tar.gz
+            ${{ runner.temp }}/lsp-seed-public/lsp-typescript-language-server-0.1.0-linux-x86_64.tar.gz
+            ${{ runner.temp }}/lsp-seed-public/package.json
+            ${{ runner.temp }}/lsp-seed-public/pack-receipts.json
+            ${{ runner.temp }}/lsp-seed-public/prepared-files.json
+            ${{ runner.temp }}/lsp-seed-public/evidence.json
+            ${{ runner.temp }}/lsp-seed-public/smoke.json
+            ${{ runner.temp }}/lsp-seed-public/source-lock.json
+            ${{ runner.temp }}/lsp-seed-public/lsp-cli-pin.env
+            ${{ runner.temp }}/lsp-seed-public/cli-provenance.json
+            ${{ runner.temp }}/lsp-seed-public/acquisition.json
+            ${{ runner.temp }}/lsp-seed-public/SHA256SUMS
+          include-hidden-files: false
+          if-no-files-found: error
+          retention-days: 14
