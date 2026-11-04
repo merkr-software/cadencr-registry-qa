@@ -307,6 +307,18 @@
       "run": 41727012894,
       "size": 266,
       "sha256": "d7a0a1d37072c348f590c493a2e6fbe498a6b366630df1a8cedad09dd87a0866"
+    },
+    {
+      "file": "typescript-publication/proof.json",
+      "run": 41794301860,
+      "size": 2563,
+      "sha256": "ff1b3f7f39f79c27a0589407046835108d95c25d8829785c4fd94c07e868f853"
+    },
+    {
+      "file": "typescript-publication/request.json",
+      "run": 41794301860,
+      "size": 1793,
+      "sha256": "89b8004e1e7ec9ae695700b883c22739d2bfabe6a1637e6d2a316460ba16bf10"
     }
   ]
 }

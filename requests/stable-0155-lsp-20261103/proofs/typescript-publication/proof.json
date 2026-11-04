@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "status": "published-and-downloaded-verified",
+  "repository": "merkr-software/CadencR",
+  "source_commit": "29c6186180f171f4f373bc4f17e7b0fdd179b76f",
+  "workflow_commit": "f37b91f400676842a65fe3d50de88ecb485c35c2",
+  "tag": "lsp-typescript-language-server-v0.1.0",
+  "release": {
+    "id": 433637319,
+    "url": "https://github.com/merkr-software/CadencR/releases/tag/lsp-typescript-language-server-v0.1.0",
+    "immutable": true,
+    "draft": false,
+    "prerelease": false
+  },
+  "inspection_run": 41794064060,
+  "publication_run": 41794301860,
+  "request_sha256": "89b8004e1e7ec9ae695700b883c22739d2bfabe6a1637e6d2a316460ba16bf10",
+  "assets": [
+    {
+      "id": 708694110,
+      "name": "lsp-typescript-language-server-0.1.0-darwin-aarch64.tar.gz",
+      "size": 5014231,
+      "digest": "sha256:295472a5ede14af100e3a0fb0eb121d71d2818ee05399ffb3dac3290b0ec7286",
+      "browser_download_url": "https://github.com/merkr-software/CadencR/releases/download/lsp-typescript-language-server-v0.1.0/lsp-typescript-language-server-0.1.0-darwin-aarch64.tar.gz"
+    },
+    {
+      "id": 708694299,
+      "name": "lsp-typescript-language-server-0.1.0-darwin-x86_64.tar.gz",
+      "size": 5014231,
+      "digest": "sha256:295472a5ede14af100e3a0fb0eb121d71d2818ee05399ffb3dac3290b0ec7286",
+      "browser_download_url": "https://github.com/merkr-software/CadencR/releases/download/lsp-typescript-language-server-v0.1.0/lsp-typescript-language-server-0.1.0-darwin-x86_64.tar.gz"
+    },
+    {
+      "id": 708694385,
+      "name": "lsp-typescript-language-server-0.1.0-linux-x86_64.tar.gz",
+      "size": 5014231,
+      "digest": "sha256:295472a5ede14af100e3a0fb0eb121d71d2818ee05399ffb3dac3290b0ec7286",
+      "browser_download_url": "https://github.com/merkr-software/CadencR/releases/download/lsp-typescript-language-server-v0.1.0/lsp-typescript-language-server-0.1.0-linux-x86_64.tar.gz"
+    },
+    {
+      "id": 708694203,
+      "name": "package.json",
+      "size": 3149,
+      "digest": "sha256:cea23ecd78255d6afc313b737ec16704f4ccbfc028625147a8582bfaa40b7b26",
+      "browser_download_url": "https://github.com/merkr-software/CadencR/releases/download/lsp-typescript-language-server-v0.1.0/package.json"
+    }
+  ],
+  "qualification_run": 41727012894,
+  "min_app_version": "0.16.1",
+  "app_latest_after_publication": "v0.16.0",
+  "production_catalogue_sha256": "d4e36be3e31581ecd8fe3022606dc23fdae2c23592a3f646e70de3f260e707e2",
+  "production_lsp_entries": 0,
+  "production_lsp_feed_configured": false,
+  "app_release_performed": false
+}
