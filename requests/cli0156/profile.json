@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "status": "AWAITING_PUBLIC_RELEASE",
+  "repository": "merkr-software/CadencR",
+  "version": "0.15.6",
+  "tag": "cli/v0.15.6",
+  "source_commit": "PENDING_PUBLIC_RELEASE_SOURCE_COMMIT",
+  "cli_sha256": "PENDING_PUBLIC_RELEASE_BINARY_SHA256",
+  "run_id": "PENDING_PUBLIC_RELEASE_RUN_ID",
+  "run_attempt": "PENDING_PUBLIC_RELEASE_RUN_ATTEMPT"
+}
