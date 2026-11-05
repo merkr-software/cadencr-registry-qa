@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_QA_TYPESCRIPT_PILOT",
+  "historical_entries": 27,
+  "exact_published_typescript_entries": 1,
+  "total_entries": 28,
+  "baseline_sha256": "b9189c29393c17e3cfc8d2825e50d1a61333e8c46809087b780f21ae1e09b87f",
+  "baseline_metadata_unchanged": true,
+  "typescript_metadata_sha256": "cea23ecd78255d6afc313b737ec16704f4ccbfc028625147a8582bfaa40b7b26",
+  "typescript_metadata_unchanged": true,
+  "catalog_payload_sha256": "d1b58e20c04de3ef6f595f95dd9462248d1bfa653338915a9fda54067b4a0b4a",
+  "catalog_payload_size": 31178,
+  "lsp_policy_payload_sha256": "ca6076ab98564568fc3b51021b497d22358cbd081d39b3b14d6f483f9c8b7568",
+  "lsp_policy_entries": 0,
+  "generated_at": "2026-11-05T11:46:27Z",
+  "expires_at": "2026-11-12T11:46:27Z",
+  "validity_days": 7,
+  "kind_counts": {
+    "lsp": 2,
+    "provider": 8,
+    "tab": 8,
+    "theme": 10
+  },
+  "cli": {
+    "version": "0.15.5",
+    "sha256": "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441",
+    "source_commit": "cfbb3b0d7c94a5d0fe91a3a642c5c1debf917239",
+    "origin": "public cli/v0.15.5 release, four assets matched to GitHub release API digests"
+  },
+  "container": {
+    "image": "ubuntu@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac",
+    "platform": "linux/amd64",
+    "network": "none",
+    "non_root": true,
+    "cap_eff": 0,
+    "cap_bnd": 0,
+    "no_new_privileges": true,
+    "rootfs": "read-only",
+    "mounts": "public inputs read-only, private output only"
+  },
+  "checks": [
+    "GitHub public release and tag identity",
+    "four exact TypeScript assets SHA-256/size",
+    "four exact public CLI0155 assets SHA-256/size",
+    "145 safe regular TypeScript archive entries on each target",
+    "published entry SHA-256/size",
+    "CLI validate-metadata",
+    "CLI plugin validate all three Node targets",
+    "three CLI deterministic repacks byte-equal to public archives",
+    "CLI build-index schema2",
+    "all27 historical metadata objects preserved",
+    "only public TypeScript0.1.0 appended",
+    "empty policy exact schema/domain/window"
+  ],
+  "historical_identities": [
+    [
+      "lsp",
+      "qa-author-lsp",
+      "1.0.0"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.0"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.1"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.2"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.3"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.4"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.5"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.6"
+    ],
+    [
+      "provider",
+      "qa-author-provider",
+      "1.0.7"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.0"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.1"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.2"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.3"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.4"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.5"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.6"
+    ],
+    [
+      "tab",
+      "qa-author-tab",
+      "1.0.7"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.0"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.1"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.2"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.3"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.4"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.5"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.6"
+    ],
+    [
+      "theme",
+      "qa-author-theme",
+      "1.0.7"
+    ],
+    [
+      "theme",
+      "qa-inert-theme",
+      "0.0.1"
+    ],
+    [
+      "theme",
+      "qa-inert-theme",
+      "0.0.2"
+    ]
+  ],
+  "final_feed": {
+    "expected_total_entries": 53,
+    "preserved_pilot_entries": 28,
+    "later_new_official_entries": 24,
+    "later_qa_fixture_entries": 1,
+    "strict_assembler_modified": false,
+    "generated_at_must_be_newer_than_pilot": true
+  },
+  "keys_read": false,
+  "signed": true,
+  "published": false,
+  "service_started": false,
+  "renderer_started": false,
+  "database_opened": false,
+  "keys_uploaded": false,
+  "public_feed_files": {
+    "managed-index.json": "669790136fe7da7323cb3fd35197165cbf59f6edc0b92f3237db45046945c68d",
+    "managed-lsp-blocklist.json": "997626e47801b014768717c9e09effcd31d626228a890f2f1b3310f3277fd1b3"
+  },
+  "feed_branch": "marketplace-lsp-install-74314fcb-20261105",
+  "base_qa_catalog_commit": "b3db06ac53784f217fb87f9e9d7f41d4db9b8fa9",
+  "private_app_source": "13754c3d74bda51026ff7d99d37f67d700b26cc2",
+  "private_app_version": "0.16.1",
+  "trust_generation": 2,
+  "publication_scope": "New QA branch only; no production catalog, app release, or new original-author package publication."
+}
