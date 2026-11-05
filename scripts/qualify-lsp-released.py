@@ -10,6 +10,7 @@ import resource
 import socket
 import struct
 import subprocess
+import sys
 import tempfile
 import tarfile
 from datetime import datetime, timedelta, timezone
@@ -37,7 +38,8 @@ def regular(path, limit):
 
 
 def limits():
-    resource.setrlimit(resource.RLIMIT_FSIZE, (1024 * 1024, 1024 * 1024))
+    bound = 64 * 1024 * 1024 if os.environ.get("QA_CLI_PROFILE") == "cli0156" else 1024 * 1024
+    resource.setrlimit(resource.RLIMIT_FSIZE, (bound, bound))
 
 
 def invoke(label, args, code=None):
@@ -62,7 +64,7 @@ def invoke(label, args, code=None):
     return stdout
 
 
-def check_archive(output, folder, runtime):
+def check_archive(output, folder, runtime, entry):
     expected = {p.relative_to(folder).as_posix(): p.read_bytes()
                 for p in folder.rglob('*') if p.is_file()}
     with tarfile.open(output, 'r:gz') as archive:
@@ -75,7 +77,7 @@ def check_archive(output, folder, runtime):
             require(not path.is_absolute() and '..' not in path.parts and str(path) == member.name
                     and member.isfile() and not member.linkname, 'unsafe archive member')
             require(member.size == len(expected[member.name])
-                    and member.mode == (0o755 if runtime == 'native' else 0o644)
+                    and member.mode == (0o755 if runtime == 'native' and member.name == entry else 0o644)
                     and member.uid == member.gid == member.mtime == 0, 'archive metadata mismatch')
             require(archive.extractfile(member).read() == expected[member.name], 'archive bytes mismatch')
 
@@ -91,7 +93,7 @@ def pack(label, folder, target, entry, runtime):
             and receipt["size"] == output.stat().st_size
             and receipt["entry_sha256"] == digest((folder / entry).read_bytes())
             and receipt["entry_size"] == (folder / entry).stat().st_size, "pack receipt")
-    check_archive(output, folder, runtime)
+    check_archive(output, folder, runtime, entry)
     second = WORK / (label + "-second.tar.gz")
     retry = args[:-1] + [second]
     repeated = json.loads(invoke(label + "-deterministic", retry))
@@ -200,6 +202,11 @@ def signed_checks(packages):
     envelope = json.loads(signed.read_bytes())
     require(envelope["signed"]["schema_version"] == 2 and len(envelope["signed"]["packages"]) == 3
             and {v["kind"] for v in envelope["signed"]["packages"]} == {"lsp", "theme"}, "mixed index contents")
+    if os.environ.get("QA_CLI_PROFILE") == "cli0156":
+        actual = {value["package"]["lsp"]["id"]: value for value in envelope["signed"]["packages"]
+                  if value["kind"] == "lsp"}
+        require(all(actual[value["package"]["lsp"]["id"]] == value for value in packages),
+                "omitted optional minima changed historical signed metadata")
     target = packages[0]["package"]["lsp"]["distribution"]["binary"]["linux-x86_64"]
     policy = {"schema_version": 1, "kind": "lsp-blocklist", "generated_at": GENERATED,
         "expires_at": EXPIRES, "entries": [{"lsp_id": "qa-inert-node-lsp", "version_requirement": "=1.0.0",
@@ -228,6 +235,18 @@ require(os.uname().sysname == "Linux" and os.uname().machine == "x86_64", "Linux
 require({name for _, name in socket.if_nameindex()} <= {"lo"}, "networkless namespace required")
 require(not any(os.environ.get(name) for name in ("GH_TOKEN", "GITHUB_TOKEN", "QA_AUTHOR_GITHUB_TOKEN",
     "CADENCR_AUTHOR_GITHUB_TOKEN", "CADENCR_REGISTRY_GITHUB_TOKEN")), "credentials forbidden")
+modern = os.environ.get("QA_CLI_PROFILE") == "cli0156"
+if modern:
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "cli0156"))
+    from cli_profile import load
+    profile = load()
+    status = dict(line.split(":", 1) for line in Path("/proc/self/status").read_text().splitlines() if ":" in line)
+    require(os.geteuid() != 0 and int(status["CapEff"].strip(), 16) == 0
+        and int(status["CapBnd"].strip(), 16) == 0 and status["NoNewPrivs"].strip() == "1",
+        "dropped privileges are required")
+else:
+    require(os.environ.get("QA_CLI_PROFILE") is None, "unknown CLI profile")
+    profile = {"version": "0.15.5", "tag": "cli/v0.15.5"}
 CLI = Path(os.environ["CLI"])
 binary = regular(CLI, 128 * 1024 * 1024)
 pins_path = Path(os.environ["CLI_QUALIFICATION_PINS"])
@@ -235,7 +254,7 @@ pin_bytes = regular(pins_path, 1024)
 pins = dict(line.split("=", 1) for line in pin_bytes.decode().splitlines())
 require(len(pin_bytes.decode().splitlines()) == len(pins) and set(pins) == {
     "CADENCR_RELEASE_VERSION", "CADENCR_RELEASE_TAG", "CADENCR_RELEASE_SHA256"}, "unexpected pins")
-require(pins["CADENCR_RELEASE_VERSION"] == "0.15.5" and pins["CADENCR_RELEASE_TAG"] == "cli/v0.15.5"
+require(pins["CADENCR_RELEASE_VERSION"] == profile["version"] and pins["CADENCR_RELEASE_TAG"] == profile["tag"]
         and re.fullmatch("[a-f0-9]{64}", pins["CADENCR_RELEASE_SHA256"])
         and digest(binary) == pins["CADENCR_RELEASE_SHA256"]
         and binary[:6] == b"\x7fELF\x02\x01" and binary[18:20] == b"\x3e\x00", "wrong released ELF")
@@ -244,10 +263,14 @@ require(re.fullmatch("[a-f0-9]{40}", source), "invalid source commit")
 provenance_bytes = regular(Path(os.environ["CLI_RELEASE_PROVENANCE"]), 65536)
 provenance = json.loads(provenance_bytes)
 require(provenance["repository"] == "merkr-software/CadencR" and provenance["source_commit"] == source
-    and provenance["version"] == "0.15.5" and provenance["tag"] == "cli/v0.15.5"
-    and provenance["asset"] == "cadencr-v0.15.5-x86_64-unknown-linux-gnu"
+    and provenance["version"] == profile["version"] and provenance["tag"] == profile["tag"]
+    and provenance["asset"] == "cadencr-v" + profile["version"] + "-x86_64-unknown-linux-gnu"
     and provenance["workflow"] == ".github/workflows/cli-release.yml"
     and provenance["sha256"] == digest(binary), "provenance mismatch")
+if modern:
+    require(source == profile["source_commit"] and digest(binary) == profile["cli_sha256"]
+        and provenance["run_id"] == profile["run_id"] and provenance["run_attempt"] == profile["run_attempt"],
+        "finalized public release binding mismatch")
 WORK = Path(os.environ["CLI_WORK_ROOT"])
 require(WORK.is_absolute() and not WORK.exists() and not WORK.is_symlink()
     and WORK.parent.resolve() == WORK.parent and WORK.parent.is_dir(), "new canonical work directory required")
@@ -259,17 +282,20 @@ HOST = {"publisher": "qa-author", "compatibility": {"min_app_version": "999.0.0"
 now = datetime.now(timezone.utc).replace(microsecond=0)
 GENERATED = (now - timedelta(minutes=1)).isoformat().replace("+00:00", "Z")
 EXPIRES = (now + timedelta(days=1)).isoformat().replace("+00:00", "Z")
-require(invoke("version", ["--version"]).decode().strip() == "cadencr 0.15.5", "wrong version")
+require(invoke("version", ["--version"]).decode().strip() == "cadencr " + profile["version"], "wrong version")
 fixture_packages = fixture_checks()
 try:
     signed_checks(fixture_packages)
+    if modern:
+        from lsp_contracts import run
+        run(globals())
 finally:
     # Remove only known generated disposable keys; retain scratch, never recurse.
     for key in ("private.pem", "public.pem"):
         (WORK / key).unlink(missing_ok=True)
 (WORK / "evidence").mkdir()
 write(WORK / "evidence/evidence.json", {"schema_version": 1, "qualification": "lsp-offline-only",
-    "status": "passed", "version": "0.15.5", "cli_sha256": digest(binary), "source_commit": source,
+    "status": "passed", "version": profile["version"], "cli_sha256": digest(binary), "source_commit": source,
     "provenance_sha256": digest(provenance_bytes), "pins_sha256": digest(pin_bytes),
     "harness_sha256": digest(Path(__file__).read_bytes()), "checks": CHECKS, "artifact_sha256": ARCHIVES,
     "network": "isolated-loopback-only", "credentials": "none", "fixtures_executed": False,

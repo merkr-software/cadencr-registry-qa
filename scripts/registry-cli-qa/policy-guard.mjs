@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { file, local, sha, REPOSITORY } from "./guard.mjs";
+import { file, local, sha, REPOSITORY, VERSION } from "./guard.mjs";
 export const REQUEST = "requests/stable-0152-20261025/policy.json";
-export const LSP_REQUEST = "requests/stable-0155-lsp-20261103/policy.json";
+export const LSP_REQUEST = VERSION === "0.15.6" ? "requests/cli0156/policy.json" : "requests/stable-0155-lsp-20261103/policy.json";
 export const KINDS = ["provider", "theme", "tab"];
 const FILES = {
   provider: "managed-blocklist.json",
@@ -21,13 +21,17 @@ export function policyGuard(env = process.env) {
   assert.equal(env.GITHUB_REF, "refs/heads/main");
   assert.equal(
     env.GITHUB_WORKFLOW_REF,
-    `${REPOSITORY}/.github/workflows/policy.yml@refs/heads/main`,
+    `${REPOSITORY}/.github/workflows/${VERSION === "0.15.6" ? "cli0156-policy.yml" : "policy.yml"}@refs/heads/main`,
   );
   assert.match(env.REVIEWED_COMMIT ?? "", /^[a-f0-9]{40}$/);
   assert.equal(env.GITHUB_SHA, env.REVIEWED_COMMIT);
   assert.match(env.REQUEST_SHA256 ?? "", /^[a-f0-9]{64}$/);
   const profile = env.QA_POLICY_PROFILE ?? "legacy";
   assert.ok(["legacy", "lsp"].includes(profile), "unknown QA policy profile");
+  if (VERSION === "0.15.6") {
+    assert.equal(profile, "lsp");
+    assert.equal(sha(file("requests/cli0156/profile.json", 4096)), env.CLI0156_PROFILE_SHA256);
+  }
   const requestPath = profile === "lsp" ? LSP_REQUEST : REQUEST;
   const kinds = profile === "lsp" ? ["lsp"] : KINDS;
   const requestBytes = file(local(requestPath));
@@ -38,7 +42,7 @@ export function policyGuard(env = process.env) {
   // Policy files live on a QA-only branch; never the production registry or an unreviewed branch.
   const branches =
     profile === "lsp"
-      ? ["qa-policy-0155-lsp"]
+      ? [VERSION === "0.15.6" ? "qa-policy-0156-lsp" : "qa-policy-0155-lsp"]
       : ["marketplace-v2", "qa-policy-0152", "qa-policy-0152-r2"];
   assert.ok(branches.includes(request.discovery_branch));
   assert.match(request.key_id, /^[a-z0-9][a-z0-9-]{0,63}$/);

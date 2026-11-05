@@ -43,13 +43,16 @@ export function validateProfile(plan, request, submissions, selected, previous) 
   }
   if (plan.phase === "renewal") {
     const existing = previous.signed.packages.filter((entry) => entry.kind === "lsp");
-    assert.equal(existing.length, 1, "LSP renewal must retain its actual LSP baseline");
-    assert.equal(existing[0].package.lsp.id, "qa-author-lsp");
-    assert.equal(existing[0].package.lsp.repository, `https://github.com/${REPOSITORY}`);
-    assert.equal(existing[0].package.host.compatibility.min_app_version, "999.0.0");
-    assert.deepEqual(Object.keys(existing[0].package.lsp.distribution.binary).sort(), LSP_TARGETS);
-    for (const target of Object.values(existing[0].package.lsp.distribution.binary))
-      lspBinding(target);
+    const versions = process.env.QA_CLI_PROFILE === "cli0156" ? ["1.0.0", "1.0.1"] : ["1.0.0"];
+    assert.deepEqual(existing.map((entry) => entry.package.lsp.version).sort(), versions,
+      "LSP renewal must preserve every reviewed historical fixture version");
+    for (const entry of existing) {
+      assert.equal(entry.package.lsp.id, "qa-author-lsp");
+      assert.equal(entry.package.lsp.repository, `https://github.com/${REPOSITORY}`);
+      assert.equal(entry.package.host.compatibility.min_app_version, "999.0.0");
+      assert.deepEqual(Object.keys(entry.package.lsp.distribution.binary).sort(), LSP_TARGETS);
+      for (const target of Object.values(entry.package.lsp.distribution.binary)) lspBinding(target);
+    }
     return;
   }
   const submission = submissions[0];
@@ -60,6 +63,7 @@ export function validateProfile(plan, request, submissions, selected, previous) 
   assert.match(submission.source.tag, /^qa-author-cli\/[a-z0-9][a-z0-9-]{5,79}$/);
   const descriptor = submission.package.package.lsp;
   assert.equal(descriptor.id, "qa-author-lsp");
+  if (process.env.QA_CLI_PROFILE === "cli0156") assert.equal(descriptor.version, "1.0.1");
   assert.equal(descriptor.repository, `https://github.com/${REPOSITORY}`);
   assert.equal(submission.package.package.host.compatibility.min_app_version, "999.0.0");
   assert.deepEqual(Object.keys(descriptor.distribution.binary).sort(), LSP_TARGETS);

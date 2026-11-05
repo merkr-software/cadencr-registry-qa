@@ -22,11 +22,11 @@ def write_json(path, value):
     path.write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
 
 
-def metadata(kind, repository, tag):
+def metadata(kind, repository, tag, lsp_version="1.0.0"):
     url = "https://github.com/" + repository
     descriptor = {"id": "qa-author-" + kind, "name": "Author CLI QA " + kind,
                   "description": "Inert original-author qualification; never execute.",
-                  "version": "1.0.0" if kind == "lsp" else "1.0.8", "repository": url,
+                  "version": lsp_version if kind == "lsp" else "1.0.8", "repository": url,
                   "license": "Apache-2.0" if kind == "theme" else "MIT"}
     def distribution(name):
         return {"archive": url + "/releases/download/" + urllib.parse.quote(tag, safe="") +
@@ -59,7 +59,8 @@ def prepare(cli, c, root, home, invoke, asset):
         shutil.copyfile(ROOT / "theme.json", source / "theme.json")
     else:
         shutil.copytree(ROOT / "fixtures" / kind, source)
-    package = metadata(kind, c["repository"], c["tag"])
+    package = metadata(kind, c["repository"], c["tag"],
+                       lsp_version="1.0.1" if c["cli_version"] == "0.15.6" else "1.0.0")
     package_path = root / "package.json"
     write_json(package_path, package)
     validation = ["--json", "plugin", "validate", str(source), "--kind", kind]

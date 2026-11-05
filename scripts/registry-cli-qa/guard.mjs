@@ -2,10 +2,13 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { lstatSync, readFileSync } from "node:fs";
 import { resolve, sep, dirname, join } from "node:path";
+import { profile0156 } from "../cli0156/profile.mjs";
 import { validateProfile } from "./profiles.mjs";
 export const REPOSITORY = "merkr-software/cadencr-registry-qa";
-export const VERSION = "0.15.5";
-export const BINARY_SHA = "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441";
+assert.ok(process.env.QA_CLI_PROFILE === undefined || process.env.QA_CLI_PROFILE === "cli0156", "unknown CLI profile");
+const active = process.env.QA_CLI_PROFILE === "cli0156" ? profile0156() : null;
+export const VERSION = active?.version ?? "0.15.5";
+export const BINARY_SHA = active?.cli_sha256 ?? "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441";
 export const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export function file(path, max = 4194304) {
   const stat = lstatSync(path);
@@ -29,6 +32,11 @@ export function guard(env = process.env) {
   assert.ok(["first", "fresh"].includes(env.QA_RUNNER));
   for (const key of ["REQUEST_SHA256", "PLAN_SHA256"])
     assert.match(env[key] ?? "", /^[a-f0-9]{64}$/);
+  if (active) {
+    assert.equal(env.GITHUB_WORKFLOW_REF, `${REPOSITORY}/.github/workflows/cli0156-registry.yml@refs/heads/main`);
+    assert.equal(sha(file("requests/cli0156/profile.json", 4096)), env.CLI0156_PROFILE_SHA256);
+    assert.ok(env.QA_PLAN.startsWith("requests/cli0156/"), "0.15.6 must not reuse sealed 0.15.5 requests");
+  }
   const planBytes = file(local(env.QA_PLAN));
   assert.equal(sha(planBytes), env.PLAN_SHA256);
   const plan = JSON.parse(planBytes);

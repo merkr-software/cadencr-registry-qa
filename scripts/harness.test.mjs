@@ -5,7 +5,7 @@ const read = path => readFileSync(new URL(path, root), 'utf8');
 const workflow = read('.github/workflows/qa.yml');
 const runtime = read('scripts/registry-cli-qa/run.mjs');
 const pin = read('cli-pin.env');
-assert.equal(pin, 'CADENCR_RELEASE_VERSION=0.13.1-dev.39108033875.1\nCADENCR_RELEASE_SHA256=d11bfade6297fa30e1e10e82605f5a221da8e07edeeee372e2c2f6185c6ff725\nCADENCR_RELEASE_TAG=cli/v0.13.1-dev.39108033875.1\n');
+assert.equal(pin, 'CADENCR_RELEASE_VERSION=0.15.5\nCADENCR_RELEASE_TAG=cli/v0.15.5\nCADENCR_RELEASE_SHA256=b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441\n');
 assert.equal((workflow.match(/runs-on: ubuntu-24.04/g) ?? []).length, 2);
 assert.match(workflow, /fresh:\n    needs: first/);
 assert.doesNotMatch(workflow, /actions\/(?:download-artifact|cache)@/);
