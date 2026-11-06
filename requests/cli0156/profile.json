@@ -1,11 +1,11 @@
 {
-  "schema_version": 1,
-  "status": "AWAITING_PUBLIC_RELEASE",
+  "cli_sha256": "0d95aec0e56f1957d7e928226208fb2d987666b0713678e66ef5798a5ec16623",
   "repository": "merkr-software/CadencR",
-  "version": "0.15.6",
+  "run_attempt": "1",
+  "run_id": "42207612393",
+  "schema_version": 1,
+  "source_commit": "33abe673179a889c7ec362da2e9845166de1ac34",
+  "status": "FINALIZED_PUBLIC_RELEASE",
   "tag": "cli/v0.15.6",
-  "source_commit": "PENDING_PUBLIC_RELEASE_SOURCE_COMMIT",
-  "cli_sha256": "PENDING_PUBLIC_RELEASE_BINARY_SHA256",
-  "run_id": "PENDING_PUBLIC_RELEASE_RUN_ID",
-  "run_attempt": "PENDING_PUBLIC_RELEASE_RUN_ATTEMPT"
+  "version": "0.15.6"
 }

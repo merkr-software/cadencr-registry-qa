@@ -28,7 +28,14 @@ class Profile(unittest.TestCase):
         self.assets.mkdir()
         self.folder = self.root / 'requests/cli0156'
         self.folder.mkdir(parents=True)
-        self.pending = (ROOT / profile.PROFILE).read_bytes()
+        self.pending = json.dumps(dict(schema_version=1, status='AWAITING_PUBLIC_RELEASE',
+            repository='merkr-software/CadencR', version='0.15.6', tag='cli/v0.15.6',
+            source_commit='PENDING_PUBLIC_RELEASE_SOURCE_COMMIT',
+            cli_sha256='PENDING_PUBLIC_RELEASE_BINARY_SHA256', run_id='PENDING_PUBLIC_RELEASE_RUN_ID',
+            run_attempt='PENDING_PUBLIC_RELEASE_RUN_ATTEMPT')).encode()
+        (self.root / 'scripts/cli0156').mkdir(parents=True)
+        shutil.copyfile(ROOT / 'scripts/fetch-cli0156.sh', self.root / 'scripts/fetch-cli0156.sh')
+        shutil.copyfile(ROOT / 'scripts/cli0156/cli_profile.py', self.root / 'scripts/cli0156/cli_profile.py')
         (self.root / profile.PROFILE).write_bytes(self.pending)
         binary = bytearray(64)
         binary[:6] = b'\x7fELF\x02\x01'
@@ -50,7 +57,7 @@ class Profile(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'CLI0156_PROFILE_PENDING'):
             profile.load(self.root)
         output = self.root / 'output'
-        result = subprocess.run(['sh', str(ROOT / 'scripts/fetch-cli0156.sh'),
+        result = subprocess.run(['sh', str(self.root / 'scripts/fetch-cli0156.sh'),
                                  str(self.assets / 'released-cli.env'), str(output)], capture_output=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(b'CLI0156_PROFILE_PENDING', result.stderr)
