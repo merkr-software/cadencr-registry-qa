@@ -1,0 +1,8 @@
+{
+  "index_sha256": "160d7ea20d78fd10ea5fd8b78bf0b3633cfeacbd0f49f20289ba66fd0a318e45",
+  "cli_sha256": "0d95aec0e56f1957d7e928226208fb2d987666b0713678e66ef5798a5ec16623",
+  "exit_status": 0,
+  "stdout": "{\"code\":\"OK\",\"message\":\"verified signed index: /in/index.json\",\"ok\":true}\n",
+  "stderr": "",
+  "network": "none"
+}

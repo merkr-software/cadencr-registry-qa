@@ -1,0 +1,11 @@
+{
+  "repository": "merkr-software/CadencR",
+  "source_commit": "33abe673179a889c7ec362da2e9845166de1ac34",
+  "version": "0.15.6",
+  "tag": "cli/v0.15.6",
+  "run_id": "42207612393",
+  "run_attempt": "1",
+  "workflow": ".github/workflows/cli-release.yml",
+  "asset": "cadencr-v0.15.6-x86_64-unknown-linux-gnu",
+  "sha256": "0d95aec0e56f1957d7e928226208fb2d987666b0713678e66ef5798a5ec16623"
+}
