@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "repository": "merkr-software/cadencr-registry-qa",
+  "discovery_branch": "qa-policy-0156-lsp",
+  "key_id": "qa-2026",
+  "public_key": "public.pem",
+  "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
+  "renewal_expires_at": "2026-11-08T11:18:54Z",
+  "policies": [
+    {
+      "kind": "lsp",
+      "file": "managed-lsp-blocklist.json",
+      "payload": "lsp-policy.json",
+      "payload_sha256": "75c18261a8801e7b64e85a52d8eedf18c610269aed9d87ec0587e1a3d57707b1"
+    }
+  ],
+  "cdn_settle_seconds": 0
+}

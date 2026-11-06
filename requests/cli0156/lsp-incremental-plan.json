@@ -1,0 +1,306 @@
+{
+  "profile": "lsp-incremental",
+  "phase": "incremental",
+  "request": "requests/cli0156/incremental.json",
+  "previous": "requests/cli0156/previous.json",
+  "previous_sha256": "b9189c29393c17e3cfc8d2825e50d1a61333e8c46809087b780f21ae1e09b87f",
+  "public_key": "requests/cli0156/public.pem",
+  "public_key_sha256": "e7f23eb02c1de202a3566c77dbb3b72fe65ae843a4dfe9dd5c49f6fb269780c4",
+  "key_id": "qa-2026",
+  "inputs": {
+    "requests/cli0156/lsp-submission.json": "3cfb52adfa24eeadc0051948fd00a23775e18dd0d531cc21f97a5e4750aef074",
+    "requests/cli0156/author-metadata.json": "c7e58ae73d417a768d2973c13edf0c160f4e29f1703c83b3d2a9a4c5db8d4b11",
+    "requests/cli0156/elf-author-offline-proof.json": "98949c72b2df6f3fa132e4882507b6a34e5d02aef98811f868ccb8e10e14a154",
+    "requests/cli0156/author-publication-proof.json": "f2a35dc81667950ea8188d23ab87dca7c639b262a27a3673d6876436cee4b28d",
+    "requests/cli0156/author-fresh-proof.json": "9d35397e219b217726c2eb9b5dc2372380fe5a1ee5bff2d82421f3570a581863"
+  },
+  "mirror_tags": [
+    "lsp-qa-author-lsp-v1.0.1"
+  ],
+  "added_entry_sha256": [
+    "4e2e951ec593d5ef2b8ecc86ea1a27007519e0bd842932a72fed40e763999075"
+  ],
+  "archives": [
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/lsp-qa-author-lsp-v1.0.0/darwin-aarch64-e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c.tar.gz",
+      "sha256": "e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c",
+      "size": 207,
+      "entry": "server.js",
+      "entry_sha256": "49c3b5352eeee07e26aa780d319b3f22f0ab808856b58d82a0e5e0190aaf036b",
+      "entry_size": 158,
+      "runtime": "node"
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/lsp-qa-author-lsp-v1.0.0/linux-x86_64-e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c.tar.gz",
+      "sha256": "e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c",
+      "size": 207,
+      "entry": "server.js",
+      "entry_sha256": "49c3b5352eeee07e26aa780d319b3f22f0ab808856b58d82a0e5e0190aaf036b",
+      "entry_size": 158,
+      "runtime": "node"
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.0/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.0/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.1/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.1/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.2/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.2/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.3/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.3/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.4/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.4/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.5/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.5/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.6/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.6/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.7/darwin-aarch64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/provider-qa-author-provider-v1.0.7/linux-x86_64-52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed.tar.gz",
+      "sha256": "52960216e0a5d72484ea49cd5dfd05efbc05b4d5b24715ed02178395bae1dbed",
+      "size": 1064
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.0/tab.tar.gz",
+      "sha256": "e6823d9743c61bb7c54fa372f3c8095ece6f8d25dac1aa1d1aca09d54180df56",
+      "size": 297
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.1/tab.tar.gz",
+      "sha256": "4547bd6151b3e668dd16a3151451bbc83875fb313be7aa3b23d5a76a6f74a25a",
+      "size": 297
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.2/tab.tar.gz",
+      "sha256": "736ed7b11e46462a43c032c9bf9f869192687ddf76b70db2949feac9e8689313",
+      "size": 298
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.3/tab.tar.gz",
+      "sha256": "520bbad7833ac7e7657babeafa5a6af2c88a752b0f9b31d99983e93c29335d82",
+      "size": 385
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.3/backend-darwin-aarch64-93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5.tar.gz",
+      "sha256": "93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5",
+      "size": 140
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.3/backend-darwin-x86_64-da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df.tar.gz",
+      "sha256": "da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df",
+      "size": 128
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.3/backend-linux-x86_64-19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8.tar.gz",
+      "sha256": "19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8",
+      "size": 120
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.4/tab.tar.gz",
+      "sha256": "ffa3f973e82bb55c0cb5419e55e821e6ba450e95973d3ddadf743d5a06ac81fa",
+      "size": 384
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.4/backend-darwin-aarch64-93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5.tar.gz",
+      "sha256": "93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5",
+      "size": 140
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.4/backend-darwin-x86_64-da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df.tar.gz",
+      "sha256": "da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df",
+      "size": 128
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.4/backend-linux-x86_64-19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8.tar.gz",
+      "sha256": "19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8",
+      "size": 120
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.5/tab.tar.gz",
+      "sha256": "26dd3daf68728c8d5bfdc12383476bfb143f9d56a8e1bd9acf981b40285b571d",
+      "size": 385
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.5/backend-darwin-aarch64-93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5.tar.gz",
+      "sha256": "93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5",
+      "size": 140
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.5/backend-darwin-x86_64-da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df.tar.gz",
+      "sha256": "da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df",
+      "size": 128
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.5/backend-linux-x86_64-19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8.tar.gz",
+      "sha256": "19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8",
+      "size": 120
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.6/tab.tar.gz",
+      "sha256": "6e6043c1554c1adeb61adcedd2bb27492adf6074690c74266e0ba465dd412b8e",
+      "size": 384
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.6/backend-darwin-aarch64-93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5.tar.gz",
+      "sha256": "93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5",
+      "size": 140
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.6/backend-darwin-x86_64-da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df.tar.gz",
+      "sha256": "da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df",
+      "size": 128
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.6/backend-linux-x86_64-19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8.tar.gz",
+      "sha256": "19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8",
+      "size": 120
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.7/tab.tar.gz",
+      "sha256": "579c1fa3016d0014274e232ae0f549b0db487138bc932b94bfc7130cac608749",
+      "size": 385
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.7/backend-darwin-aarch64-93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5.tar.gz",
+      "sha256": "93ec92e27a7497adf32d911346c33593651db5dd2f01e93994dfad30246698b5",
+      "size": 140
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.7/backend-darwin-x86_64-da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df.tar.gz",
+      "sha256": "da119d2c01047c04f89afcf53cb1d73161490d7c384248ece025b3277309d1df",
+      "size": 128
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/tab-qa-author-tab-v1.0.7/backend-linux-x86_64-19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8.tar.gz",
+      "sha256": "19636acda3547aed9b9bd29eed0ced9fd035fe95bc25796acc19df331bb97ad8",
+      "size": 120
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.0/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.1/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.2/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.3/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.4/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.5/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.6/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-author-theme-v1.0.7/theme.tar.gz",
+      "sha256": "a7ba859dfa2579d17a168c4cdfc016189750f58a5ee142f4c0fd622ffcabe500",
+      "size": 1115
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-inert-theme-v0.0.1/theme.tar.gz",
+      "sha256": "feb4ba028cbb4abf9014284322d7920ad647e7c26318db586c8a50d9326ceb17",
+      "size": 1100
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/theme-qa-inert-theme-v0.0.2/theme.tar.gz",
+      "sha256": "feb4ba028cbb4abf9014284322d7920ad647e7c26318db586c8a50d9326ceb17",
+      "size": 1100
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/lsp-qa-author-lsp-v1.0.1/darwin-aarch64-e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c.tar.gz",
+      "sha256": "e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c",
+      "size": 207,
+      "entry": "server.js",
+      "entry_sha256": "49c3b5352eeee07e26aa780d319b3f22f0ab808856b58d82a0e5e0190aaf036b",
+      "entry_size": 158,
+      "runtime": "node"
+    },
+    {
+      "url": "https://github.com/merkr-software/cadencr-registry-qa/releases/download/lsp-qa-author-lsp-v1.0.1/linux-x86_64-e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c.tar.gz",
+      "sha256": "e41f20fdc4bca39cc29c759df9a64217e3fbd70f4d34028f6e6b590c9043440c",
+      "size": 207,
+      "entry": "server.js",
+      "entry_sha256": "49c3b5352eeee07e26aa780d319b3f22f0ab808856b58d82a0e5e0190aaf036b",
+      "entry_size": 158,
+      "runtime": "node"
+    }
+  ]
+}
