@@ -11,7 +11,8 @@
     "requests/cli0156/lsp-submission.json": "3cfb52adfa24eeadc0051948fd00a23775e18dd0d531cc21f97a5e4750aef074",
     "requests/cli0156/author-metadata.json": "c7e58ae73d417a768d2973c13edf0c160f4e29f1703c83b3d2a9a4c5db8d4b11",
     "requests/cli0156/elf-author-offline-proof.json": "98949c72b2df6f3fa132e4882507b6a34e5d02aef98811f868ccb8e10e14a154",
-    "requests/cli0156/author-publication-proof.json": "f2a35dc81667950ea8188d23ab87dca7c639b262a27a3673d6876436cee4b28d"
+    "requests/cli0156/author-publication-proof.json": "f2a35dc81667950ea8188d23ab87dca7c639b262a27a3673d6876436cee4b28d",
+    "requests/cli0156/author-fresh-proof.json": "9d35397e219b217726c2eb9b5dc2372380fe5a1ee5bff2d82421f3570a581863"
   },
   "mirror_tags": [
     "lsp-qa-author-lsp-v1.0.1"
