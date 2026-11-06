@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "scope": "Retained key-free public CLI QA evidence; no app release or production activation authority",
+  "qualification": "PUBLIC_CLI_LIFECYCLES_QUALIFIED",
+  "cli_version": "0.15.6",
+  "cli_sha256": "0d95aec0e56f1957d7e928226208fb2d987666b0713678e66ef5798a5ec16623",
+  "cli_source_commit": "33abe673179a889c7ec362da2e9845166de1ac34",
+  "cli_release_id": 436405263,
+  "cli_publish_run": 42207612393,
+  "cli_publish_attempt": 1,
+  "inert_author_source_commit": "3ad1af383861c4d4a97222847c65a947d625b5ae",
+  "inert_author_tag": "qa-author-cli/stable-0156-lsp-42207612393-1",
+  "inert_author_release_id": 436410179,
+  "general_offline_checks": 91,
+  "lsp_offline_checks": 129,
+  "fixtures_executed": false,
+  "native_runtime_qualified": false,
+  "installation_enforcement_tested": false,
+  "app_release_performed": false,
+  "production_activation_performed": false,
+  "historical_files_preserved": 187,
+  "final_catalog_sha256": "0e01e107db2827313de4b7b720ae80fe25e7c7038cf2bf585d7f5d65da3776d5",
+  "final_catalog_head": "54d4ee28aea259fc483f6dc3bbcb4fe2a1c02400",
+  "final_catalog_entries": 28,
+  "archive_urls": 53,
+  "final_policy_sha256": "945c6ccedc7a7c982ca5e281510e38c9f984080d1520d8e7b5be1070afd7fb95",
+  "final_policy_head": "2ffb18028170752155ff8199ab8cea9b5f087bda",
+  "files": [
+    {
+      "file": "README.md",
+      "size": 2019,
+      "sha256": "ec30277badb404ba0a38a1eeba72282e9f7883ef58a2d176e48fb26861edc622",
+      "origin": "coordinator-explanation",
+      "associated_run": 42211832866,
+      "associated_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2"
+    },
+    {
+      "file": "author-fresh.json",
+      "run": 42209433459,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "size": 5259,
+      "sha256": "9d35397e219b217726c2eb9b5dc2372380fe5a1ee5bff2d82421f3570a581863",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "author-offline.json",
+      "run": 42208675951,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "size": 4205,
+      "sha256": "98949c72b2df6f3fa132e4882507b6a34e5d02aef98811f868ccb8e10e14a154",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "author-publication.json",
+      "run": 42208862735,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "size": 5303,
+      "sha256": "f2a35dc81667950ea8188d23ab87dca7c639b262a27a3673d6876436cee4b28d",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "incremental-public-cli-verification.json",
+      "size": 331,
+      "sha256": "51e337b866d47e59d2e4d392e657dcdb31ae8cd4827efa6ebdd5662e3489a23b",
+      "origin": "isolated-released-cli-verification",
+      "associated_run": 42209917316,
+      "associated_commit": "b28554c40676efb5f8bd750273ca6950cf70b559"
+    },
+    {
+      "file": "offline-general.json",
+      "run": 42208668469,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "size": 4543,
+      "sha256": "b14cd2f52516f768fa158b79cadf79865b98cdca74a04d51923689e85bf1d358",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "offline-lsp.json",
+      "run": 42208668469,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "size": 8203,
+      "sha256": "38ff4f935e1abd39345c087382673e5a95ac088ccda90907ea82a8f43091308b",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "policy/branch-created.json",
+      "size": 413,
+      "sha256": "ae7299381b576ebb854a23675d8812f39e447da09e45196cb90f1fdf6a8c81e2",
+      "origin": "github-api-ref-creation",
+      "associated_run": 42210995535,
+      "associated_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2"
+    },
+    {
+      "file": "policy/initial-failure.json",
+      "run": 42210723838,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 104,
+      "sha256": "361a33a667d8e25c0f0d34810d87fda7a26a0ae31088fe7f61328c099f0f3d60",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "policy/lsp-bootstrap.json",
+      "run": 42210995535,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 296,
+      "sha256": "73617770deeb417a4244c69a1488706a758ae23844dcfa8e4fce484686374d26",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "policy/lsp-renewed.json",
+      "run": 42210995535,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 296,
+      "sha256": "945c6ccedc7a7c982ca5e281510e38c9f984080d1520d8e7b5be1070afd7fb95",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "policy/policy-proof.json",
+      "run": 42210995535,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 4108,
+      "sha256": "ebfe2a0c222c71f83bac2feaaf421d0ab5a94db11007314fe54cf3abb785bf53",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "public-cli-provenance.json",
+      "size": 390,
+      "sha256": "d3075d8ac81b878250f54317dc3c1b3465219de733a75a8d60dcf5cf53fe97fc",
+      "origin": "github-release-asset",
+      "associated_run": 42207612393,
+      "associated_commit": "33abe673179a889c7ec362da2e9845166de1ac34"
+    },
+    {
+      "file": "public-cli-release-api.json",
+      "size": 10421,
+      "sha256": "6b80c9820a0bb6705a2d86197dcf2856b0aaea970f1d933e5fcdab0991b133b0",
+      "origin": "github-release-api",
+      "associated_run": 42207612393,
+      "associated_commit": "33abe673179a889c7ec362da2e9845166de1ac34"
+    },
+    {
+      "file": "public-cli-release.json",
+      "size": 967,
+      "sha256": "a5d6efb458d29446b0bbde5818741901feba7b791880bc7c3d1fd962e395add2",
+      "origin": "coordinator-release-verification",
+      "associated_run": 42207612393,
+      "associated_commit": "33abe673179a889c7ec362da2e9845166de1ac34"
+    },
+    {
+      "file": "registry-first/publish-index.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 30690,
+      "sha256": "160d7ea20d78fd10ea5fd8b78bf0b3633cfeacbd0f49f20289ba66fd0a318e45",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "registry-first/publish.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 48283,
+      "sha256": "3a9821fc4074f7c85d0a1232903e5c90f347e31ec188038d33ff1197e26989fb",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "registry-first/same-state-replay-index.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 30690,
+      "sha256": "160d7ea20d78fd10ea5fd8b78bf0b3633cfeacbd0f49f20289ba66fd0a318e45",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "registry-first/same-state-replay.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 48293,
+      "sha256": "b70443ede220c77ecbacdcf75ef52de437e54fa2e2a31af369bc2ee313ece0b7",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "registry-fresh/publish-index.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 30690,
+      "sha256": "160d7ea20d78fd10ea5fd8b78bf0b3633cfeacbd0f49f20289ba66fd0a318e45",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "registry-fresh/publish.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 48283,
+      "sha256": "d041e2de64fdfc87a126af87a031d86de6d7afbaceef8a64f2b629d630027436",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "registry-fresh/same-state-replay-index.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 30690,
+      "sha256": "160d7ea20d78fd10ea5fd8b78bf0b3633cfeacbd0f49f20289ba66fd0a318e45",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "registry-fresh/same-state-replay.json",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "size": 48293,
+      "sha256": "055a60823141c3055e372f209527e3037baf28a97bcaf58d1fdd36b6469af0dd",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-first/publish-index.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 30690,
+      "sha256": "0e01e107db2827313de4b7b720ae80fe25e7c7038cf2bf585d7f5d65da3776d5",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-first/publish.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 48596,
+      "sha256": "3f0043e513f8791cad55aadf5cd210df7bbbb5f23a75c98821284790e2a5fc99",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-first/same-state-replay-index.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 30690,
+      "sha256": "0e01e107db2827313de4b7b720ae80fe25e7c7038cf2bf585d7f5d65da3776d5",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-first/same-state-replay.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 48606,
+      "sha256": "3f74a0cb718b8bdf970c56e0eacf41897dfc77b81717b2b1ab9cb1ad32e7cae1",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-fresh/publish-index.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 30690,
+      "sha256": "0e01e107db2827313de4b7b720ae80fe25e7c7038cf2bf585d7f5d65da3776d5",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-fresh/publish.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 48596,
+      "sha256": "b894a34d3913d0c8e1adbe2ba94d73eb5cd6be442a211a05f5c5b0534588db6b",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-fresh/same-state-replay-index.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 30690,
+      "sha256": "0e01e107db2827313de4b7b720ae80fe25e7c7038cf2bf585d7f5d65da3776d5",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-fresh/same-state-replay.json",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "size": 48606,
+      "sha256": "645c081da97dafab2515760dfb4b4eddee66cac3d303632b97d87eda00c6b903",
+      "origin": "github-workflow-artifact"
+    },
+    {
+      "file": "renewal-public-cli-verification.json",
+      "size": 331,
+      "sha256": "a27672ac0a5b0bf2486df4b183fb3b564521e448babe2d8ec6166f3d83acec36",
+      "origin": "isolated-released-cli-verification",
+      "associated_run": 42211832866,
+      "associated_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2"
+    },
+    {
+      "file": "workflow-artifacts.json",
+      "size": 4819,
+      "sha256": "d6770b8cda223f92a19adbc93256bb9bc57c4f1d167cda468c8cd190ebaf47b6",
+      "origin": "coordinator-verified-github-artifact-ledger",
+      "associated_run": 42211832866,
+      "associated_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2"
+    }
+  ]
+}

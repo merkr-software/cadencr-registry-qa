@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "phase": "offline",
+      "run": 42208668469,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "conclusion": "success",
+      "artifact_id": 13497997132,
+      "artifact_name": "cli0156-offline-42208668469-1",
+      "zip_size": 3957,
+      "zip_sha256": "a7d192838405baed5a46957c180db90e25a0f0b38b59b00c6a73e734b6292748"
+    },
+    {
+      "phase": "author-readonly",
+      "run": 42208675951,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "conclusion": "success",
+      "artifact_id": 13498381094,
+      "artifact_name": "author-offline-42208675951-1",
+      "zip_size": 1190,
+      "zip_sha256": "e5822ffca5ac29202266b9839fd4dd63d6ef6b3f51f1348b1e11211251a0a86b"
+    },
+    {
+      "phase": "author-publication",
+      "run": 42208862735,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "conclusion": "success",
+      "artifact_id": 13497587672,
+      "artifact_name": "author-offline-42208862735-1",
+      "zip_size": 1190,
+      "zip_sha256": "37f83093cc5ad62499a15022018dd51501457b415b6dd5c8b481376f19e664db"
+    },
+    {
+      "phase": "author-publication",
+      "run": 42208862735,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "conclusion": "success",
+      "artifact_id": 13497044406,
+      "artifact_name": "author-publication-42208862735-1",
+      "zip_size": 1515,
+      "zip_sha256": "a2478d5c9d65fc9b8519dcc88330a29116564ca492d64144377f303740ebf584"
+    },
+    {
+      "phase": "author-fresh",
+      "run": 42209433459,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "conclusion": "success",
+      "artifact_id": 13498780908,
+      "artifact_name": "author-publication-42209433459-1",
+      "zip_size": 1483,
+      "zip_sha256": "af7457d8e9024dcf0e4f44511733c74c09f319844fe3f50b9e3a2338e1568dff"
+    },
+    {
+      "phase": "author-fresh",
+      "run": 42209433459,
+      "attempt": 1,
+      "workflow_commit": "e30e43388c5a9ee1b9b4ffe3ff3c04018b5ede96",
+      "conclusion": "success",
+      "artifact_id": 13497258672,
+      "artifact_name": "author-offline-42209433459-1",
+      "zip_size": 1190,
+      "zip_sha256": "03bfc20e0fd84243bea1cc73968c25b24847a68ed20b4c3e55f6d32ed7ef6911"
+    },
+    {
+      "phase": "registry-incremental",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "conclusion": "success",
+      "artifact_id": 13498955100,
+      "artifact_name": "qa-lsp-incremental-first-42209917316-1",
+      "zip_size": 21776,
+      "zip_sha256": "17f216b0a9d773c7fb2ab192b1c15e2ab00cbaab14dbd78dd3163303104ef8af"
+    },
+    {
+      "phase": "registry-incremental",
+      "run": 42209917316,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "conclusion": "success",
+      "artifact_id": 13498612549,
+      "artifact_name": "qa-lsp-incremental-fresh-42209917316-1",
+      "zip_size": 21774,
+      "zip_sha256": "3cab1e8d1c77e382557f83f6f8b99c2fae55093031fc458b93202dd4a3ece0f4"
+    },
+    {
+      "phase": "policy-initial-failure",
+      "run": 42210723838,
+      "attempt": 1,
+      "workflow_commit": "b28554c40676efb5f8bd750273ca6950cf70b559",
+      "conclusion": "failure",
+      "artifact_id": 13497979338,
+      "artifact_name": "qa-policy-lifecycle-42210723838-1",
+      "zip_size": 243,
+      "zip_sha256": "b892dc0dde78de59a30f49b879f8311df2202ee04276741557df40aac9c5b6c8"
+    },
+    {
+      "phase": "policy",
+      "run": 42210995535,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "conclusion": "success",
+      "artifact_id": 13498424857,
+      "artifact_name": "qa-policy-lifecycle-42210995535-1",
+      "zip_size": 2040,
+      "zip_sha256": "504bb05a8079e92249539122139b3b928348eb544adcce74cb800ff92d3893db"
+    },
+    {
+      "phase": "registry-renewal",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "conclusion": "success",
+      "artifact_id": 13499536121,
+      "artifact_name": "qa-lsp-renewal-fresh-42211832866-1",
+      "zip_size": 21852,
+      "zip_sha256": "9afb0cf7850df24ca6627202bf0fa7e1fc15676b2b8932dd9d2fa1e8dfada0cc"
+    },
+    {
+      "phase": "registry-renewal",
+      "run": 42211832866,
+      "attempt": 1,
+      "workflow_commit": "d19cbf58949ecef6b5578518d4dc2fed58f929a2",
+      "conclusion": "success",
+      "artifact_id": 13498509147,
+      "artifact_name": "qa-lsp-renewal-first-42211832866-1",
+      "zip_size": 21854,
+      "zip_sha256": "36bebbbc4d16364138a540b447fc22f44cc4e27e47ad9a03044ce73a26a32e62"
+    }
+  ]
+}

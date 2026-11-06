@@ -1,0 +1,29 @@
+{
+  "status": "VERIFIED_CLI_RELEASE_ASSET_BYTES",
+  "version": "0.15.6",
+  "source_commit": "33abe673179a889c7ec362da2e9845166de1ac34",
+  "run_id": "42207612393",
+  "run_attempt": "1",
+  "binary_executed": false,
+  "assets": {
+    "cadencr-v0.15.6-SHA256SUMS": {
+      "sha256": "63523f5737fec8a8ed4fe5b122d0d598b31dbbf2efd3b04ce542a02ef4e3398d",
+      "size": 107
+    },
+    "cadencr-v0.15.6-x86_64-unknown-linux-gnu": {
+      "sha256": "0d95aec0e56f1957d7e928226208fb2d987666b0713678e66ef5798a5ec16623",
+      "size": 6531352
+    },
+    "provenance.json": {
+      "sha256": "d3075d8ac81b878250f54317dc3c1b3465219de733a75a8d60dcf5cf53fe97fc",
+      "size": 390
+    },
+    "released-cli.env": {
+      "sha256": "a7b955fb6967921f07da0ff25f4236dc13208e7cb7580f917c5787d119c9cae4",
+      "size": 151
+    }
+  },
+  "comparison_directory": "/private/tmp/cadencr-cli0156-release.kjRIiD/publish-candidate",
+  "public_release_id": 436405263,
+  "github_immutable_flag": true
+}
