@@ -1,0 +1,11 @@
+{
+  "cli_sha256": "4bd0a2d6bb0067f976ee27a0636006a495b0ce5c9f4aed52324e7aa0a17108d7",
+  "repository": "merkr-software/CadencR",
+  "run_attempt": "1",
+  "run_id": "42496585214",
+  "schema_version": 1,
+  "source_commit": "6135f96168c7b77ee676f01bbfb878b84226ad50",
+  "status": "FINALIZED_PUBLIC_RELEASE",
+  "tag": "cli/v0.15.7",
+  "version": "0.15.7"
+}
