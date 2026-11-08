@@ -30,7 +30,7 @@ def registry_plan(root, candidate):
     source = document(root / "stage/metadata.json")
     require(plan["schema_version"] == 2 and plan["repository"] == candidate["repository"])
     expected = metadata("lsp", candidate["repository"], candidate["tag"],
-                        lsp_version="1.0.1" if candidate["cli_version"] == "0.15.6" else "1.0.0")
+                        lsp_version={"0.15.6": "1.0.1", "0.15.7": "1.0.2"}.get(candidate["cli_version"], "1.0.0"))
     descriptor = source["package"]["lsp"]
     require(set(source) == {"kind", "package"} and source["kind"] == "lsp"
             and set(source["package"]) == {"lsp", "host"}

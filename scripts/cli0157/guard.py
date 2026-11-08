@@ -16,7 +16,7 @@ def guard(env=os.environ):
     reviewed = env.get('REVIEWED_COMMIT', '')
     require(re.fullmatch('[a-f0-9]{40}', reviewed) and env.get('GITHUB_SHA') == reviewed,
             'reviewed QA source mismatch')
-    workflows = ['cli0157-offline.yml']
+    workflows = ['cli0157-offline.yml', 'cli0157-author.yml']
     require(env.get('GITHUB_WORKFLOW_REF') in [repo + '/.github/workflows/' + name + '@refs/heads/main'
                                             for name in workflows], 'wrong CLI0157 workflow')
     raw = regular(ROOT / PROFILE, 4096)
