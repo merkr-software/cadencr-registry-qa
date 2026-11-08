@@ -38,7 +38,7 @@ def regular(path, limit):
 
 
 def limits():
-    bound = 64 * 1024 * 1024 if os.environ.get("QA_CLI_PROFILE") == "cli0156" else 1024 * 1024
+    bound = 64 * 1024 * 1024 if os.environ.get("QA_CLI_PROFILE") in ("cli0156", "cli0157") else 1024 * 1024
     resource.setrlimit(resource.RLIMIT_FSIZE, (bound, bound))
 
 
@@ -202,7 +202,7 @@ def signed_checks(packages):
     envelope = json.loads(signed.read_bytes())
     require(envelope["signed"]["schema_version"] == 2 and len(envelope["signed"]["packages"]) == 3
             and {v["kind"] for v in envelope["signed"]["packages"]} == {"lsp", "theme"}, "mixed index contents")
-    if os.environ.get("QA_CLI_PROFILE") == "cli0156":
+    if os.environ.get("QA_CLI_PROFILE") in ("cli0156", "cli0157"):
         actual = {value["package"]["lsp"]["id"]: value for value in envelope["signed"]["packages"]
                   if value["kind"] == "lsp"}
         require(all(actual[value["package"]["lsp"]["id"]] == value for value in packages),
@@ -235,9 +235,9 @@ require(os.uname().sysname == "Linux" and os.uname().machine == "x86_64", "Linux
 require({name for _, name in socket.if_nameindex()} <= {"lo"}, "networkless namespace required")
 require(not any(os.environ.get(name) for name in ("GH_TOKEN", "GITHUB_TOKEN", "QA_AUTHOR_GITHUB_TOKEN",
     "CADENCR_AUTHOR_GITHUB_TOKEN", "CADENCR_REGISTRY_GITHUB_TOKEN")), "credentials forbidden")
-modern = os.environ.get("QA_CLI_PROFILE") == "cli0156"
+modern = os.environ.get("QA_CLI_PROFILE") in ("cli0156", "cli0157")
 if modern:
-    sys.path.insert(0, str(Path(__file__).resolve().parent / "cli0156"))
+    sys.path.insert(0, str(Path(__file__).resolve().parent / os.environ["QA_CLI_PROFILE"]))
     from cli_profile import load
     profile = load()
     status = dict(line.split(":", 1) for line in Path("/proc/self/status").read_text().splitlines() if ":" in line)

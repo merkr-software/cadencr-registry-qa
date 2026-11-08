@@ -1,0 +1,72 @@
+name: Qualify distributed CLI 0.15.7 offline
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_commit:
+        description: Exact reviewed QA workflow and finalized profile commit on main
+        required: true
+        type: string
+      profile_sha256:
+        description: Exact reviewed finalized requests/cli0157/profile.json SHA-256
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  offline:
+    if: github.repository == 'merkr-software/cadencr-registry-qa' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Require finalized exact public release before any execution
+        id: profile
+        env:
+          REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+          CLI0157_PROFILE_SHA256: ${{ inputs.profile_sha256 }}
+        run: python3 scripts/cli0157/guard.py
+      - name: Fetch authenticated public assets without executing the ELF
+        run: sh scripts/fetch-cli0157.sh requests/cli0157/released-cli.env "$RUNNER_TEMP/cli0157"
+      - name: Preacquire the immutable published TypeScript baseline as inert data
+        run: |
+          curl --disable --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+            --max-redirs 3 --connect-timeout 15 --max-time 120 --max-filesize 33554432 \
+            'https://github.com/merkr-software/CadencR/releases/download/lsp-typescript-language-server-v0.1.0/lsp-typescript-language-server-0.1.0-linux-x86_64.tar.gz' \
+            --output "$RUNNER_TEMP/typescript-baseline.tar.gz"
+          printf '%s  %s\n' 295472a5ede14af100e3a0fb0eb121d71d2818ee05399ffb3dac3290b0ec7286 "$RUNNER_TEMP/typescript-baseline.tar.gz" | sha256sum --check
+      - name: Exercise general contracts without network, credentials or privileges
+        run: |
+          sudo unshare --net -- setpriv \
+            --reuid "$(id -u)" --regid "$(id -g)" --clear-groups \
+            --bounding-set=-all --no-new-privs \
+            env -i PATH=/usr/bin:/bin CLI="$RUNNER_TEMP/cli0157/cadencr" \
+            CLI_WORK_ROOT="$RUNNER_TEMP/cli0157-general" \
+            CLI_QUALIFICATION_PINS="$GITHUB_WORKSPACE/requests/cli0157/released-cli.env" \
+            sh scripts/qualify-released-cli.sh
+      - name: Exercise original and new 0.15.7 LSP contracts in the same isolation
+        env:
+          SOURCE_COMMIT: ${{ steps.profile.outputs.source_commit }}
+        run: |
+          sudo unshare --net -- setpriv \
+            --reuid "$(id -u)" --regid "$(id -g)" --clear-groups \
+            --bounding-set=-all --no-new-privs \
+            env -i PATH=/usr/bin:/bin QA_CLI_PROFILE=cli0157 \
+            CLI="$RUNNER_TEMP/cli0157/cadencr" CLI_WORK_ROOT="$RUNNER_TEMP/cli0157-lsp" \
+            CLI_QUALIFICATION_PINS="$GITHUB_WORKSPACE/requests/cli0157/released-cli.env" \
+            CLI_RELEASE_PROVENANCE="$RUNNER_TEMP/cli0157/provenance.json" \
+            CLI_RELEASE_SOURCE_COMMIT="$SOURCE_COMMIT" \
+            CLI_TYPESCRIPT_BASELINE_ARCHIVE="$RUNNER_TEMP/typescript-baseline.tar.gz" \
+            python3 -B scripts/qualify-lsp-released.py
+      - name: Retain only explicit key-free evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cli0157-offline-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/cli0157-general/evidence/evidence.json
+            ${{ runner.temp }}/cli0157-lsp/evidence/evidence.json
+          if-no-files-found: warn
+          retention-days: 14
