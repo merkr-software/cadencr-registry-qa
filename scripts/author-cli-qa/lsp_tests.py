@@ -197,6 +197,25 @@ class LspTests(unittest.TestCase):
             self.assertEqual(len(archives), 2)
             self.assertEqual(packages.metadata("lsp", qa.REPOSITORY, candidate()["tag"])["package"]["lsp"]["version"], "1.0.0")
 
+    def test_cli0157_uses_a_distinct_inert_version(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch).resolve()
+            home = root / "home"
+            home.mkdir()
+            c = {**candidate(), "cli_version": "0.15.7", "tag": "qa-author-cli/stable-0157-lsp-test"}
+            def invoke(cli, args, home):
+                if args[:2] == ["registry", "pack-lsp"]:
+                    return json.dumps(receipt(args)).encode()
+                if "--output" in args:
+                    Path(args[args.index("--output") + 1]).write_bytes(b"inert plan")
+                return b"{}"
+            stage, archives = packages.prepare(Path("/released/cli"), c, root, home, invoke, qa.asset)
+            metadata = json.loads((stage / "metadata.json").read_bytes())
+            self.assertEqual(metadata["package"]["lsp"]["version"], "1.0.2")
+            self.assertEqual(len(archives), 2)
+            for target in metadata["package"]["lsp"]["distribution"]["binary"].values():
+                self.assertIn("qa-author-cli%2Fstable-0157-lsp-test/", target["archive"])
+
     def test_every_lsp_receipt_binding_is_required(self):
         for field in ("kind", "target", "archive", "sha256", "size", "entry", "entry_sha256",
                       "entry_size", "runtime", "unexpected", "missing"):

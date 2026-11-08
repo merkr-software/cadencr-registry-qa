@@ -60,7 +60,7 @@ def prepare(cli, c, root, home, invoke, asset):
     else:
         shutil.copytree(ROOT / "fixtures" / kind, source)
     package = metadata(kind, c["repository"], c["tag"],
-                       lsp_version="1.0.1" if c["cli_version"] == "0.15.6" else "1.0.0")
+                       lsp_version={"0.15.6": "1.0.1", "0.15.7": "1.0.2"}.get(c["cli_version"], "1.0.0"))
     package_path = root / "package.json"
     write_json(package_path, package)
     validation = ["--json", "plugin", "validate", str(source), "--kind", kind]

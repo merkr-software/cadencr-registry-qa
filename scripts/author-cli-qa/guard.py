@@ -21,21 +21,22 @@ def main():
         require(re.fullmatch("[0-9a-f]{40}", sha))
         require(os.environ.get("REVIEWED_COMMIT") == sha)
         workflow = os.environ.get("GITHUB_WORKFLOW_REF")
-        modern = workflow == expected + "/.github/workflows/cli0156-author.yml@refs/heads/main"
+        profile_id = next((name for name in ("cli0156", "cli0157") if workflow == expected + "/.github/workflows/" + name + "-author.yml@refs/heads/main"), None)
+        modern = profile_id is not None
         require(modern or workflow == expected + "/.github/workflows/author.yml@refs/heads/main")
         root = Path(__file__).resolve().parents[2]
         if modern:
-            sys.path.insert(0, str(root / "scripts/cli0156"))
-            profile_guard = runpy.run_path(str(root / "scripts/cli0156/guard.py"))
+            sys.path.insert(0, str(root / "scripts" / profile_id))
+            profile_guard = runpy.run_path(str(root / "scripts" / profile_id / "guard.py"))
             profile = profile_guard["guard"]()
-        candidate = root / ("requests/cli0156/author-candidate.json" if modern else "author-cli-candidate.json")
+        candidate = root / ("requests/" + profile_id + "/author-candidate.json" if modern else "author-cli-candidate.json")
         require(candidate.is_file() and not candidate.is_symlink())
         require(candidate.stat().st_size <= 65536)
         harness = runpy.run_path(str(root / "scripts/qualify-author-cli.py"))
         c = harness["load_candidate"](candidate.read_bytes(), os.environ["CANDIDATE_SHA256"])
         if modern:
             require(c["cli_version"] == profile["version"] and c["cli_sha256"] == profile["cli_sha256"])
-        pin = root / ("requests/cli0156/released-cli.env" if modern else "author-cli-pin.env")
+        pin = root / ("requests/" + profile_id + "/released-cli.env" if modern else "author-cli-pin.env")
         require(pin.is_file() and not pin.is_symlink() and pin.stat().st_size <= 4096)
         values = {}
         for line in pin.read_text().splitlines():
