@@ -43,7 +43,7 @@ export function validateProfile(plan, request, submissions, selected, previous) 
   }
   if (plan.phase === "renewal") {
     const existing = previous.signed.packages.filter((entry) => entry.kind === "lsp");
-    const versions = process.env.QA_CLI_PROFILE === "cli0156" ? ["1.0.0", "1.0.1"] : ["1.0.0"];
+    const versions = process.env.QA_CLI_PROFILE === "cli0157" ? ["1.0.0", "1.0.1", "1.0.2"] : process.env.QA_CLI_PROFILE === "cli0156" ? ["1.0.0", "1.0.1"] : ["1.0.0"];
     assert.deepEqual(existing.map((entry) => entry.package.lsp.version).sort(), versions,
       "LSP renewal must preserve every reviewed historical fixture version");
     for (const entry of existing) {
@@ -64,6 +64,7 @@ export function validateProfile(plan, request, submissions, selected, previous) 
   const descriptor = submission.package.package.lsp;
   assert.equal(descriptor.id, "qa-author-lsp");
   if (process.env.QA_CLI_PROFILE === "cli0156") assert.equal(descriptor.version, "1.0.1");
+  if (process.env.QA_CLI_PROFILE === "cli0157") assert.equal(descriptor.version, "1.0.2");
   assert.equal(descriptor.repository, `https://github.com/${REPOSITORY}`);
   assert.equal(submission.package.package.host.compatibility.min_app_version, "999.0.0");
   assert.deepEqual(Object.keys(descriptor.distribution.binary).sort(), LSP_TARGETS);
