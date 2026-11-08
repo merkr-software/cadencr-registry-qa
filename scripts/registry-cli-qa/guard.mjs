@@ -3,10 +3,12 @@ import { createHash } from "node:crypto";
 import { lstatSync, readFileSync } from "node:fs";
 import { resolve, sep, dirname, join } from "node:path";
 import { profile0156 } from "../cli0156/profile.mjs";
+import { profile0157 } from "../cli0157/profile.mjs";
 import { validateProfile } from "./profiles.mjs";
 export const REPOSITORY = "merkr-software/cadencr-registry-qa";
-assert.ok(process.env.QA_CLI_PROFILE === undefined || process.env.QA_CLI_PROFILE === "cli0156", "unknown CLI profile");
-const active = process.env.QA_CLI_PROFILE === "cli0156" ? profile0156() : null;
+assert.ok(process.env.QA_CLI_PROFILE === undefined || ["cli0156", "cli0157"].includes(process.env.QA_CLI_PROFILE), "unknown CLI profile");
+const profileId = process.env.QA_CLI_PROFILE;
+const active = profileId === "cli0157" ? profile0157() : profileId === "cli0156" ? profile0156() : null;
 export const VERSION = active?.version ?? "0.15.5";
 export const BINARY_SHA = active?.cli_sha256 ?? "b74ff1a682866902422cedfe5be0ae754a12402c4aee85fa3539ef0d30348441";
 export const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -33,9 +35,9 @@ export function guard(env = process.env) {
   for (const key of ["REQUEST_SHA256", "PLAN_SHA256"])
     assert.match(env[key] ?? "", /^[a-f0-9]{64}$/);
   if (active) {
-    assert.equal(env.GITHUB_WORKFLOW_REF, `${REPOSITORY}/.github/workflows/cli0156-registry.yml@refs/heads/main`);
-    assert.equal(sha(file("requests/cli0156/profile.json", 4096)), env.CLI0156_PROFILE_SHA256);
-    assert.ok(env.QA_PLAN.startsWith("requests/cli0156/"), "0.15.6 must not reuse sealed 0.15.5 requests");
+    assert.equal(env.GITHUB_WORKFLOW_REF, `${REPOSITORY}/.github/workflows/${profileId}-registry.yml@refs/heads/main`);
+    assert.equal(sha(file(`requests/${profileId}/profile.json`, 4096)), env[profileId.toUpperCase() + "_PROFILE_SHA256"]);
+    assert.ok(env.QA_PLAN.startsWith(`requests/${profileId}/`), "profile must not reuse sealed requests");
   }
   const planBytes = file(local(env.QA_PLAN));
   assert.equal(sha(planBytes), env.PLAN_SHA256);
